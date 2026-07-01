@@ -1,0 +1,16 @@
+# auto text
+* text=auto
+
+# Scripts
+*.sh text eol=lf
+/mvnw text eol=lf
+*.bat text eol=crlf
+*.cmd text eol=crlf
+
+# Binary files
+*.png binary
+*.jpg binary
+*.gif binary
+*.ico binary
+*.pdf binary
+*.jar binary
