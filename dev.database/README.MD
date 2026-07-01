@@ -60,8 +60,8 @@ The application expects the following configuration:
 ```yaml
 spring:
   datasource:
-    url: ${ANIMALDB_URL:jdbc:postgresql://localhost:5432/animaldb}
-    username: ${ANIMALDB_USER:animal_app}
+    url: jdbc:postgresql://localhost:5432/animaldb
+    username: animal_app
     password: ${ANIMALDB_PASSWORD}
 ```
 

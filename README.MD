@@ -1,1 +1,2 @@
-# AnimalDB is a laboratory animal management system for tracking mice, breeding, genealogy and experimental data.
+# AnimalDB 
+### is a laboratory animal management system for tracking mice, breeding, genealogy and experimental data.

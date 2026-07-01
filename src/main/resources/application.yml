@@ -1,0 +1,15 @@
+spring:
+  application:
+    name: animaldb
+
+  datasource:
+    url: jdbc:postgresql://localhost:5432/animaldb
+    username: animal_app
+    password: ${ANIMALDB_PASSWORD}
+
+  flyway:
+    enabled: true
+
+  jpa:
+    hibernate:
+      ddl-auto: validate
