@@ -43,3 +43,5 @@ build/
 #################
 .secret
 .local/
+### temporary sql files ####
+*.sql_*
