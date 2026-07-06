@@ -47,6 +47,9 @@ CREATE TABLE lab_procedure_technician (
     person_id BIGINT NOT NULL
         REFERENCES person(id),
 
+    assigned_date DATE NOT NULL,
+    note TEXT,
+
     PRIMARY KEY (lab_procedure_id, person_id)
 );
 
