@@ -16,3 +16,7 @@ Then start the application:
 ```bash
 ./mvnw spring-boot:run
 ```
+
+## TESTS
+### JPA entities 
+It uses testcontainers-junit-jupiter, so needs a local **Docker Destop** to be installed.
