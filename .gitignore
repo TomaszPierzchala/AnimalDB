@@ -43,5 +43,6 @@ build/
 #################
 .secret
 .local/
+*Test_Local.java
 ### temporary sql files ####
 *.sql_*
