@@ -9,7 +9,7 @@ Tech stack: Java 21, Spring Boot, PostgreSQL, Flyway, React.
 
 ## Getting Started
 
-Before running the application for the first time, create the PostgreSQL database and application user as described in the **Local Database Setup** please follow the [README](dev.database/README.md) [](section below - comments).
+Before running the application for the first time, create the PostgreSQL database and application user as described in the **Local Database Setup** please follow the [README](dev.database/README.md) .
 
 Then start the application:
 
