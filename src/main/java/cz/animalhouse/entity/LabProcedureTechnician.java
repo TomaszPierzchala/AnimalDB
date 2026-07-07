@@ -62,7 +62,6 @@ public class LabProcedureTechnician {
 	public String getNote() {
 		return note;
 	}
-
 	
 	public void setLabProcedure(LabProcedure labProcedure) {
 		this.labProcedure = labProcedure;
