@@ -45,6 +45,7 @@ class PersonTest {
         assertThat(saved.hashCode()).isEqualTo(person.hashCode());
 
         assertThat(saved.toString())
+                .contains("Person [")
                 .contains("John Smith")
                 .contains("Laboratory technician");
     }

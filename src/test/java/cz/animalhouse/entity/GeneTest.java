@@ -45,6 +45,7 @@ class GeneTest {
         assertThat(saved.hashCode()).isEqualTo(gene.hashCode());
 
         assertThat(saved.toString())
+                .contains("Gene [id=")
                 .contains("OT1")
                 .contains("Ovalbumin-specific T-cell receptor");
     }

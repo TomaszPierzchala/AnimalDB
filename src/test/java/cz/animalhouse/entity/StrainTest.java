@@ -40,7 +40,7 @@ class StrainTest {
 		assertThat(saved).isEqualTo(strain);
 		assertThat(saved.hashCode()).isEqualTo(strain.hashCode());
 
-		assertThat(saved.toString()).contains("C57BL/6J").contains("Black 6");
+		assertThat(saved.toString()).contains("Strain [id=").contains("C57BL/6J").contains("Black 6");
 
 	}
 

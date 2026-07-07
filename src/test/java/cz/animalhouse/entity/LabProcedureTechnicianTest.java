@@ -47,6 +47,9 @@ class LabProcedureTechnicianTest {
 		assertThat(saved.getId()).isEqualTo(id);
 		assertThat(saved.getAssignedDate()).isEqualTo(LocalDate.of(2026, 1, 2));
 		assertThat(saved.getNote()).isEqualTo("Initial assignment");
+		assertThat(saved.toString())
+		        .contains("LabProcedureTechnician [EmbeddedId=").contains("(labProcedureId=")
+		        .contains(", personId=").contains(", assignedDate=2026-01-02");
 	}
 
 	@Test
@@ -73,7 +76,7 @@ class LabProcedureTechnicianTest {
 				"Test description", director, LocalDate.of(2026, 1, 1), null));
 
 		final Person NULL_TECHNICIAN = null;
-		
+
 		LabProcedureTechnician assignment = new LabProcedureTechnician(procedure, NULL_TECHNICIAN,
 				LocalDate.of(2026, 1, 2), "Initial assignment");
 
@@ -127,13 +130,13 @@ class LabProcedureTechnicianTest {
 
 		procedure = entityManager.find(LabProcedure.class, procedure.getId());
 		technician = entityManager.find(Person.class, technician.getId());
-		
+
 		LabProcedureTechnician duplicate =
 		        new LabProcedureTechnician(procedure, technician, LocalDate.of(2026, 7, 6), null);
 
 		assertThatThrownBy(() -> entityManager.persistAndFlush(duplicate))
 		        .hasRootCauseInstanceOf(org.postgresql.util.PSQLException.class)
 		        .hasMessageContaining("duplicate key value violates unique constraint");
-	
+
 	}
 }

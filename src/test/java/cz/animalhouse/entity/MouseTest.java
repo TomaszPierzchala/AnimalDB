@@ -88,6 +88,7 @@ class MouseTest {
         assertThat(saved.hashCode()).isEqualTo(mouse.hashCode());
 
         assertThat(saved.toString())
+                .contains("Mouse [(id=")
                 .contains("animalNumber=1001")
                 .contains("sex=M");
     }

@@ -52,6 +52,7 @@ class TransgenicLineTest {
                 .isEqualTo(line.hashCode());
 
         assertThat(saved.toString())
+                .contains("TransgenicLine [id=")
                 .contains("OT-I");
     }
 
