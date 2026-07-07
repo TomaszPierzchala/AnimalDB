@@ -1,0 +1,3 @@
+ALTER TABLE mouse
+    ALTER COLUMN sex TYPE CHAR(1)
+    USING sex::CHAR(1);
