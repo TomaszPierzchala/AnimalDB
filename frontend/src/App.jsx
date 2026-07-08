@@ -147,8 +147,8 @@ function App() {
             <thead>
               <tr>
 				  <th className="id-column">ID</th>
-				  <th>Symbol</th>
-				  <th>Description</th>
+				  <th className="symbol-column">Symbol</th>
+				  <th className="description-column">Description</th>
               </tr>
             </thead>
 
@@ -169,10 +169,11 @@ function App() {
 			    className="empty-row"
 			    onClick={openCreatePopup}
 			  >
-			    <td className="id-column add-icon-cell">
-			      <span className="add-icon">+</span>
+			    <td className="id-column"/>
+			    <td className="add-icon-cell">
+			       <span className="add-icon">+</span>
 			    </td>
-			    <td colSpan="2" className="add-text-cell">
+			    <td className="add-text-cell">
 			      Click here to add a new gene...
 			    </td>
 			  </tr>

@@ -65,6 +65,14 @@ tbody tr:nth-child(even) {
 .id-column {
   text-align: center;
   width: 48px;
+  opacity: 0.25;
+}
+.symbol-column {
+  min-width: 100px;
+}
+
+.description-column {
+  min-width: 200px;
 }
 
 .add-icon-cell {
@@ -95,6 +103,15 @@ tbody tr:nth-child(even) {
   color: #666666;
   font-style: italic;
 }
+
+.empty-row .add-icon-cell {
+  border-right: none;
+}
+
+.empty-row .add-text-cell {
+  border-left: none;
+}
+
 .empty-row:hover .add-text-cell {
   color: #e00;
 }
