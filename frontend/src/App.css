@@ -129,10 +129,6 @@ tbody tr:nth-child(even) {
   color: #870000;
 }
 
-button[type="submit"] {
-  color: #870000;
-}
-
 form div {
   margin-bottom: 12px;
 }
@@ -151,11 +147,48 @@ input {
 
 .popup-buttons {
   display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.popup-main-buttons {
+  display: flex;
   gap: 12px;
-  justify-content: flex-end;
+}
+
+.delete-button {
+  color: #870000;
+  border-color: #aa9999;
+  font-size: 12px;
+  padding: 4px 18px;
+  border-radius: 6px;
+}
+
+.delete-button:hover {
+  background-color: #f8eeee;
+}
+
+.delete-armed {
+  color: #ffffff;
+  background-color: #870000;
+  border-color: #870000;
+}
+
+.delete-armed:hover {
+  background-color: #aa0000;
 }
 
 button {
   padding: 8px 16px;
   cursor: pointer;
+
+  border: 1px solid #999999;
+  border-radius: 6px;
+  background-color: #f4f4f8;
+  font-size: 16px;
 }
+
+button[type="submit"] {
+  color: #870000;
+}
+

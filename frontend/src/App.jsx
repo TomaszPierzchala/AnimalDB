@@ -9,6 +9,7 @@ function App() {
 
   const [popupOpen, setPopupOpen] = useState(false);
   const [editingGene, setEditingGene] = useState(null);
+  const [deleteArmed, setDeleteArmed] = useState(false);
 
   const [symbol, setSymbol] = useState('');
   const [description, setDescription] = useState('');
@@ -38,6 +39,7 @@ function App() {
     setSymbol('');
     setDescription('');
     setPopupOpen(true);
+	setDeleteArmed(false);
   }
 
   function openEditPopup(gene) {
@@ -45,6 +47,7 @@ function App() {
     setSymbol(gene.symbol);
     setDescription(gene.description ?? '');
     setPopupOpen(true);
+	setDeleteArmed(false);
   }
 
   function closePopup() {
@@ -52,6 +55,7 @@ function App() {
     setEditingGene(null);
     setSymbol('');
     setDescription('');
+	setDeleteArmed(false);
   }
 
   async function handleSubmit(event) {
@@ -89,6 +93,31 @@ function App() {
             ? 'Could not create gene'
             : 'Could not update gene'
         );
+      }
+
+      closePopup();
+      await loadGenes();
+    } catch (err) {
+      setError(err.message);
+    }
+  }
+  async function handleDelete() {
+    if (editingGene === null) {
+      return;
+    }
+
+	if (!deleteArmed) {
+	    setDeleteArmed(true);
+	    return;
+	}
+
+    try {
+      const response = await fetch(`${API_URL}/${editingGene.id}`, {
+        method: 'DELETE'
+      });
+
+      if (!response.ok) {
+        throw new Error('Could not delete gene');
       }
 
       closePopup();
@@ -184,13 +213,27 @@ function App() {
                 </div>
 
                 <div className="popup-buttons">
-                  <button type="submit">
-                    {editingGene === null ? 'Add' : 'Save'}
-                  </button>
+                  <div>
+                    {editingGene !== null && (
+                      <button
+                        type="button"
+                        className={deleteArmed ? 'delete-button delete-armed' : 'delete-button'}
+                        onClick={handleDelete}
+                      >
+                        {deleteArmed ? 'Confirm delete' : 'Delete'}
+                      </button>
+                    )}
+                  </div>
 
-                  <button type="button" onClick={closePopup}>
-                    Cancel
-                  </button>
+                  <div className="popup-main-buttons">
+                    <button type="submit">
+                      {editingGene === null ? 'Add' : 'Save'}
+                    </button>
+
+				    <button type="button" onClick={closePopup}>
+                      Cancel
+                    </button>
+                  </div>
                 </div>
               </form>
             </div>

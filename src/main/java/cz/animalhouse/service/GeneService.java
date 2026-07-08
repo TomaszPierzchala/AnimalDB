@@ -37,4 +37,9 @@ public class GeneService {
 
         return GeneResponse.fromEntity(saved);
     }
+
+    @Transactional
+    public void delete(Long id) {
+        geneRepository.deleteById(id);
+    }
 }
