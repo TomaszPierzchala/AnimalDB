@@ -66,6 +66,10 @@ function App() {
       description: description
     };
 
+    if (editingGene !== null && !hasChanges) {
+      return;
+    }
+
     try {
       let response;
 
@@ -126,6 +130,11 @@ function App() {
       setError(err.message);
     }
   }
+
+  const hasChanges =
+    editingGene === null ||
+    symbol !== editingGene.symbol ||
+    description !== (editingGene.description ?? '');
 
   return (
     <>
@@ -196,6 +205,20 @@ function App() {
                       type="text"
                       value={symbol}
                       onChange={(event) => setSymbol(event.target.value)}
+                      onInvalid={(event) =>
+                        event.target.setCustomValidity('Gene symbol is required')
+                      }
+                      onInput={(event) =>
+                        event.target.setCustomValidity('')
+                      }
+                      onMouseEnter={(event) => {
+                          if (event.target.value.trim() === '') {
+                            event.target.setCustomValidity('Gene symbol is required');
+                          }
+                      }}
+                      onMouseLeave={(event) =>
+                          event.target.setCustomValidity('')
+                      }
                       required
                       maxLength={50}
                     />
@@ -227,7 +250,9 @@ function App() {
                   </div>
 
                   <div className="popup-main-buttons">
-                    <button type="submit">
+                    <button type="submit"
+                            disabled={editingGene !== null && !hasChanges}
+                    >
                       {editingGene === null ? 'Add' : 'Save'}
                     </button>
 
