@@ -44,5 +44,6 @@ build/
 .secret
 .local/
 *Test_Local.java
+OPIS.md
 ### temporary sql files ####
 *.sql_*
