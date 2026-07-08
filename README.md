@@ -22,6 +22,39 @@ The goal of AnimalDB is to support the daily work of a laboratory animal facilit
 - PostgreSQL schema versioning with Flyway
 - REST API backend for future React frontend integration
 
+## Current frontend prototype
+
+AnimalDB includes an initial React frontend prototype for managing gene records.
+
+The current Gene view provides a simple table-based interface for displaying, adding, <!--   editing, --> and deleting gene definitions stored in the backend PostgreSQL database through the REST API.
+
+<img src="docs/animaldb-gene-view.png" alt="AnimalDB Gene view" width="900">
+
+### Gene view functionality
+
+The Gene view currently supports:
+
+- displaying all gene records from the backend,
+- adding a new gene through a popup form,
+- editing an existing gene by clicking a table row,
+<!-- - deleting an existing gene from the edit popup, -->
+- refreshing the list after create, update, or delete operations.
+
+The frontend communicates with the backend using the following REST endpoints:
+
+```text
+GET    /api/genes       List all genes
+POST   /api/genes       Create a new gene
+<!-- PUT    /api/genes/{id}  Update an existing gene -->
+DELETE /api/genes/{id}  Delete an existing gene
+```
+
+The interface is intentionally simple at this stage. It is used as the first working frontend slice for validating the full application flow:
+
+React UI -> REST Controller -> Service -> Repository -> PostgreSQL
+
+This first frontend screen will be used as a pattern for implementing additional AnimalDB views, such as mice, strains, transgenic lines, mating records, and laboratory procedures.
+
 ## Technology stack
 
 - Java 21
@@ -128,7 +161,7 @@ These tests start a PostgreSQL container and verify persistence mappings against
 
 ## Project status
 
-This project is currently under active development. The backend data model and database schema are being designed and implemented first. A React frontend will be added as the next major part of the system.
+This project is currently under active development. The backend data model and database schema are being designed and implemented first. An initial React frontend prototype has been added for the Gene entity and will be extended to other parts of the domain model.
 
 ## Repository structure
 
