@@ -118,6 +118,8 @@ tbody tr:nth-child(even) {
 
 .error {
   color: darkred;
+  background-color: yellow;
+  border-radius: 6px;
   font-weight: bold;
   opacity: 1;
   transition: opacity 7s ease;
@@ -126,6 +128,8 @@ tbody tr:nth-child(even) {
 
 .error-fading {
   opacity: 0;
+  background-color: yellow;
+  border-radius: 6px;
 }
 
 .popup-backdrop {
