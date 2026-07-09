@@ -6,6 +6,7 @@ const API_URL = 'http://localhost:8080/api/genes';
 function App() {
   const [genes, setGenes] = useState([]);
   const [error, setError] = useState('');
+  const [errorFading, setErrorFading] = useState(false);
 
   const [popupOpen, setPopupOpen] = useState(false);
   const [editingGene, setEditingGene] = useState(null);
@@ -17,6 +18,25 @@ function App() {
   useEffect(() => {
     loadGenes();
   }, []);
+  useEffect(() => {
+    if (!error) {
+      return;
+    }
+
+    const fadeTimer = setTimeout(() => {
+      setErrorFading(true);
+    }, 10000);
+
+    const clearTimer = setTimeout(() => {
+      setError('');
+      setErrorFading(false);
+    }, 17500);
+
+    return () => {
+      clearTimeout(fadeTimer);
+      clearTimeout(clearTimer);
+    };
+  }, [error]);
 
   async function loadGenes() {
     try {
@@ -30,8 +50,13 @@ function App() {
       setGenes(data);
       setError('');
     } catch (err) {
-      setError(err.message);
+      showError(err.message);
     }
+  }
+  
+  function showError(message) {
+    setErrorFading(false);
+    setError(message);
   }
 
   function openCreatePopup() {
@@ -106,7 +131,7 @@ function App() {
 
       await refreshAfterPopup();
     } catch (err) {
-      setError(err.message);
+      showError(err.message);
     }
   }
   async function handleDelete() {
@@ -131,7 +156,7 @@ function App() {
 
       await refreshAfterPopup();
     } catch (err) {
-      setError(err.message);
+      showError(err.message);
     }
   }
 
@@ -148,7 +173,7 @@ function App() {
 
       <main>
         {error && (
-          <p className="error">
+          <p className={errorFading ? 'error error-fading' : 'error'}>
             {error}
           </p>
         )}
