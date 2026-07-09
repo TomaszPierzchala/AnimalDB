@@ -39,7 +39,12 @@ public class GeneService {
     }
 
     @Transactional
-    public void delete(Long id) {
+    public boolean delete(Long id) {
+        if (!geneRepository.existsById(id)) {
+            return false;
+        }
+
         geneRepository.deleteById(id);
+        return true;
     }
 }

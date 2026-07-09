@@ -57,6 +57,11 @@ function App() {
     setDescription('');
 	setDeleteArmed(false);
   }
+  
+  async function refreshAfterPopup() {
+    closePopup();
+    await loadGenes();
+  }
 
   async function handleSubmit(event) {
     event.preventDefault();
@@ -99,8 +104,7 @@ function App() {
         );
       }
 
-      closePopup();
-      await loadGenes();
+      await refreshAfterPopup();
     } catch (err) {
       setError(err.message);
     }
@@ -121,11 +125,11 @@ function App() {
       });
 
       if (!response.ok) {
+        await refreshAfterPopup();
         throw new Error('Could not delete gene');
       }
 
-      closePopup();
-      await loadGenes();
+      await refreshAfterPopup();
     } catch (err) {
       setError(err.message);
     }
