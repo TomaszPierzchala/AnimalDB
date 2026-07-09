@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { apiJson } from './api/apiClient';
 import './App.css';
 
 const API_URL = 'http://localhost:8080/api/genes';
@@ -40,17 +41,12 @@ function App() {
 
   async function loadGenes() {
     try {
-      const response = await fetch(API_URL);
+      const data = await apiJson(API_URL);
 
-      if (!response.ok) {
-        throw new Error('Could not load genes');
-      }
-
-      const data = await response.json();
       setGenes(data);
       setError('');
     } catch (err) {
-      showError(err.message);
+      showError('Could not load genes\n' + err.message);
     }
   }
   
@@ -101,10 +97,8 @@ function App() {
     }
 
     try {
-      let response;
-
       if (editingGene === null) {
-        response = await fetch(API_URL, {
+        await apiJson(API_URL, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json'
@@ -112,7 +106,7 @@ function App() {
           body: JSON.stringify(requestBody)
         });
       } else {
-        response = await fetch(`${API_URL}/${editingGene.id}`, {
+        await apiJson(`${API_URL}/${editingGene.id}`, {
           method: 'PUT',
           headers: {
             'Content-Type': 'application/json'
@@ -121,17 +115,12 @@ function App() {
         });
       }
 
-      if (!response.ok) {
-        throw new Error(
-          editingGene === null
-            ? 'Could not create gene'
-            : 'Could not update gene'
-        );
-      }
-
       await refreshAfterPopup();
     } catch (err) {
-      showError(err.message);
+      showError((editingGene === null
+                                ? 'Could not create gene: '
+                                : 'Could not update gene: ')
+                                   + '\n' + err.message);
     }
   }
   async function handleDelete() {
@@ -145,18 +134,13 @@ function App() {
 	}
 
     try {
-      const response = await fetch(`${API_URL}/${editingGene.id}`, {
+      await apiJson(`${API_URL}/${editingGene.id}`, {
         method: 'DELETE'
       });
 
-      if (!response.ok) {
-        await refreshAfterPopup();
-        throw new Error('Could not delete gene');
-      }
-
       await refreshAfterPopup();
     } catch (err) {
-      showError(err.message);
+      showError('Could not delete gene:\n' + err.message);
       closePopup();
     }
   }
