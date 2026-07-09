@@ -8,6 +8,7 @@ import org.springframework.transaction.annotation.Transactional;
 import cz.animalhouse.dto.GeneCreateRequest;
 import cz.animalhouse.dto.GeneResponse;
 import cz.animalhouse.entity.Gene;
+import cz.animalhouse.exception.DuplicateGeneSymbolException;
 import cz.animalhouse.repository.GeneRepository;
 
 @Service
@@ -29,6 +30,10 @@ public class GeneService {
 
     @Transactional
     public GeneResponse create(GeneCreateRequest request) {
+        if (geneRepository.existsBySymbol(request.getSymbol())) {
+            throw new DuplicateGeneSymbolException(request.getSymbol());
+        }
+
         Gene gene = new Gene(
                 request.getSymbol(),
                 request.getDescription());

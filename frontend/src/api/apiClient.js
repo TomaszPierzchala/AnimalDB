@@ -4,7 +4,22 @@ export async function apiJson(url, options = {}) {
     const response = await fetch(url, options);
 
     if (!response.ok) {
-      throw new Error(`Server returned the error ${response.status}`);
+      let errorMessage = `Server returned the error ${response.status}`;
+
+      try {
+        const errorBody = await response.json();
+
+        if (
+          errorBody.message &&
+          errorBody.message.trim() !== ''
+        ) {
+          errorMessage = errorBody.message;
+        }
+      } catch {
+        // Response body was empty or was not valid JSON.
+      }
+
+      throw new Error(errorMessage);
     }
 
     if (response.status === 204) {
