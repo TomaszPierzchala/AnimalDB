@@ -157,6 +157,7 @@ function App() {
       await refreshAfterPopup();
     } catch (err) {
       showError(err.message);
+      closePopup();
     }
   }
 
