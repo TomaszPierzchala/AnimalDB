@@ -3,9 +3,11 @@ import { apiJson } from './api/apiClient';
 import './App.css';
 
 const API_URL = 'http://localhost:8080/api/genes';
+const SYMBOL_MAX_LENGTH = 50;
 
 function App() {
   const [genes, setGenes] = useState([]);
+  const [symbolWarning, setSymbolWarning] = useState('');
   const [error, setError] = useState('');
   const [errorFading, setErrorFading] = useState(false);
 
@@ -46,7 +48,7 @@ function App() {
       setGenes(data);
       setError('');
     } catch (err) {
-      showError('Could not load genes\n' + err.message);
+      showError('Could not load genes.\n' + err.message);
     }
   }
   
@@ -55,12 +57,25 @@ function App() {
     setError(message);
   }
 
+  function validateSymbol(value) {
+    if (value.trim() === '') {
+      return 'Gene symbol is required.';
+    }
+
+    if (value.length === SYMBOL_MAX_LENGTH) {
+      return `Maximum length (${SYMBOL_MAX_LENGTH}) reached.`;
+    }
+
+    return '';
+  }
+
   function openCreatePopup() {
     setEditingGene(null);
     setSymbol('');
     setDescription('');
     setPopupOpen(true);
 	setDeleteArmed(false);
+	setSymbolWarning(validateSymbol(''));
   }
 
   function openEditPopup(gene) {
@@ -69,6 +84,7 @@ function App() {
     setDescription(gene.description ?? '');
     setPopupOpen(true);
 	setDeleteArmed(false);
+	setSymbolWarning(validateSymbol(gene.symbol));
   }
 
   function closePopup() {
@@ -77,6 +93,7 @@ function App() {
     setSymbol('');
     setDescription('');
 	setDeleteArmed(false);
+	setSymbolWarning('');
   }
   
   async function refreshAfterPopup() {
@@ -87,6 +104,10 @@ function App() {
   async function handleSubmit(event) {
     event.preventDefault();
 
+    if (symbol.trim() === '') {
+      setSymbolWarning('Gene symbol is required.');
+      return;
+    }
     const requestBody = {
       symbol: symbol,
       description: description
@@ -118,8 +139,8 @@ function App() {
       await refreshAfterPopup();
     } catch (err) {
       showError((editingGene === null
-                                ? 'Could not create gene: '
-                                : 'Could not update gene: ')
+                                ? 'Could not create a new gene. '
+                                : 'Could not update the gene. ')
                                    + '\n' + err.message);
     }
   }
@@ -140,7 +161,7 @@ function App() {
 
       await refreshAfterPopup();
     } catch (err) {
-      showError('Could not delete gene:\n' + err.message);
+      showError('Could not delete the gene.\n' + err.message);
       closePopup();
     }
   }
@@ -167,11 +188,16 @@ function App() {
           <h1>Genes</h1>
 
           <table>
+            <colgroup>
+              <col className="id-table-column" />
+              <col className="symbol-table-column" />
+              <col className="description-table-column" />
+            </colgroup>
             <thead>
               <tr>
-				  <th className="id-column">ID</th>
-				  <th className="symbol-column">Symbol</th>
-				  <th className="description-column">Description</th>
+                  <th className="id-column">ID</th>
+                  <th className="symbol-column">Symbol</th>
+                  <th className="description-column">Description</th>
               </tr>
             </thead>
 
@@ -192,11 +218,11 @@ function App() {
 			    className="empty-row"
 			    onClick={openCreatePopup}
 			  >
-			    <td className="id-column"/>
-			    <td className="add-icon-cell">
-			       <span className="add-icon">+</span>
+			    <td className="id-column add-icon-cell">
+			      <span className="add-icon">+</span>
 			    </td>
-			    <td className="add-text-cell">
+
+			    <td colSpan="2" className="add-text-cell">
 			      Click here to add a new gene...
 			    </td>
 			  </tr>
@@ -218,24 +244,17 @@ function App() {
                     <input
                       type="text"
                       value={symbol}
-                      onChange={(event) => setSymbol(event.target.value)}
-                      onInvalid={(event) =>
-                        event.target.setCustomValidity('Gene symbol is required')
-                      }
-                      onInput={(event) =>
-                        event.target.setCustomValidity('')
-                      }
-                      onMouseEnter={(event) => {
-                          if (event.target.value.trim() === '') {
-                            event.target.setCustomValidity('Gene symbol is required');
-                          }
+                      onChange={(event) => {
+                        const value = event.target.value;
+                        setSymbol(value);
+
+                        setSymbolWarning(validateSymbol(value));
                       }}
-                      onMouseLeave={(event) =>
-                          event.target.setCustomValidity('')
-                      }
-                      required
-                      maxLength={50}
+                      maxLength={SYMBOL_MAX_LENGTH}
                     />
+                    <small className="field-warning">
+                      {symbolWarning}
+                    </small>
                   </label>
                 </div>
 

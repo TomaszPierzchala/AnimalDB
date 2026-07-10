@@ -11,7 +11,7 @@
 }
 
 main {
-  width: 900px;
+  width: 1000px;
   margin: 40px auto 40px auto;
   font-family: Arial, sans-serif;
 }
@@ -26,8 +26,14 @@ section {
 
 table {
   width: 100%;
+  table-layout: fixed;
   border-collapse: collapse;
 }
+
+tbody td:nth-child(2),
+tbody td:nth-child(3) {
+  overflow-wrap: anywhere;
+}	
 
 th,
 td {
@@ -62,17 +68,26 @@ tbody tr:nth-child(even) {
   background-color: #cec4c8;
 }
 
+.id-table-column {
+  width: 60px;
+}
+
+.symbol-table-column {
+  width: 40%;
+}
+
+.description-table-column {
+  width: auto;
+}
+
 .id-column {
   text-align: center;
-  width: 48px;
   opacity: 0.25;
 }
 .symbol-column {
-  min-width: 100px;
 }
 
 .description-column {
-  min-width: 200px;
 }
 
 .add-icon-cell {
@@ -114,6 +129,17 @@ tbody tr:nth-child(even) {
 
 .empty-row:hover .add-text-cell {
   color: #e00;
+}
+
+.field-warning {
+  display: block;
+  min-height: 16px;
+  margin-top: 4px;
+
+  color: darkred;
+  font-size: 14px;
+  font-weight: normal;
+  line-height: 16px;
 }
 
 .error {
@@ -217,7 +243,7 @@ button {
 }
 
 button:disabled {
-  background-color: #eee
+  background-color: #eee;
   cursor: not-allowed;
   opacity: 0.3;
 }
