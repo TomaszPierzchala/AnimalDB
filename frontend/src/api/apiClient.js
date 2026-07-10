@@ -4,7 +4,7 @@ export async function apiJson(url, options = {}) {
     const response = await fetch(url, options);
 
     if (!response.ok) {
-      let errorMessage = `Server returned the error ${response.status}`;
+      let errorMessage = `Server returned the error ${response.status}.`;
 
       try {
         const errorBody = await response.json();
