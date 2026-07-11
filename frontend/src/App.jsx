@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { apiJson } from './api/apiClient';
 import './App.css';
 
-const API_URL = 'http://localhost:8080/api/genes';
+const API_URL = `${import.meta.env.VITE_API_URL}/api/genes`;
 const SYMBOL_MAX_LENGTH = 50;
 
 function App() {
