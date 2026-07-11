@@ -1,11 +1,11 @@
 spring:
   application:
-    name: animaldb
+    name: animal-house
 
   datasource:
-    url: jdbc:postgresql://localhost:5432/animaldb
-    username: animal_app
-    password: ${ANIMALDB_PASSWORD}
+    url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/${DB_NAME:animaldb}
+    username: ${DB_USERNAME:animal_app}
+    password: ${DB_PASSWORD:ANIMALDB_PASSWORD}
 
   flyway:
     enabled: true
@@ -13,3 +13,10 @@ spring:
   jpa:
     hibernate:
       ddl-auto: validate
+
+app:
+  cors:
+    allowed-origin: ${FRONTEND_URL:http://localhost:5173}
+
+server:
+  port: ${PORT:8080}

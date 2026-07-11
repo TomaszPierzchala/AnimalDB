@@ -19,7 +19,7 @@ import cz.animalhouse.dto.GeneResponse;
 import cz.animalhouse.service.GeneService;
 import jakarta.validation.Valid;
 
-@CrossOrigin(origins = "http://localhost:5173")
+@CrossOrigin(origins = "${app.cors.allowed-origin}")
 @RestController
 @RequestMapping("/api/genes")
 public class GeneController {
