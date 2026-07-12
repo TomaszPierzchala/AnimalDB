@@ -42,6 +42,7 @@ build/
 
 #################
 .secret
+.env.docker
 .local/
 *Test_Local.java
 OPIS.md
