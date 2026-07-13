@@ -1,13 +1,48 @@
 .app-logo {
   position: fixed;
   top: 16px;
-  left: 24px;
+  left: 23px;
 
   font-size: 24px;
   font-weight: bold;
   letter-spacing: 0.5px;
 
   z-index: 1000;
+}
+
+.github-project-link {
+  position: fixed;
+  left: 47px;
+  bottom: 24px;
+
+  width: 60px;
+  height: 60px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 12px;
+  background-color: white;
+
+  z-index: 1000;
+
+  transition: transform 0.2s ease;
+}
+
+.github-project-link img {
+  width: 80%;
+  height: 80%;
+  object-fit: contain;
+}
+
+.github-project-link:hover {
+  transform: scale(1.1);
+}
+
+.github-project-link:focus-visible {
+  outline: 3px solid #4f91a6;
+  outline-offset: 3px;
 }
 
 main {
@@ -33,7 +68,7 @@ table {
 tbody td:nth-child(2),
 tbody td:nth-child(3) {
   overflow-wrap: anywhere;
-}	
+}
 
 th,
 td {
