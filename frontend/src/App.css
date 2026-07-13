@@ -22,9 +22,6 @@
   align-items: center;
   justify-content: center;
 
-  border-radius: 12px;
-  background-color: white;
-
   z-index: 1000;
 
   transition: transform 0.2s ease;
