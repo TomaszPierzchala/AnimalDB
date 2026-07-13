@@ -31,7 +31,7 @@ $ psql -h localhost -U tomek -d postgres -v password="$ANIMALDB_PASSWORD" -f cre
 
 ### test connection to newly created DB
 ```bash
-$ psql -h localhost -U animal_app -d animaldb
+$ psql -h localhost -U dbadmin -d animaldb
 ```
 ### then run SQL
 ```SQL
@@ -41,7 +41,7 @@ SELECT current_database(), current_user;
 ```
 current_database | current_user
 ------------------+--------------
- animaldb         | animal_app
+ animaldb         | dbadmin
 ```
 
 ## 2B. Eventually drop animaldb
@@ -61,7 +61,7 @@ The application expects the following configuration:
 spring:
   datasource:
     url: jdbc:postgresql://localhost:5432/animaldb
-    username: animal_app
+    username: dbadmin
     password: ${ANIMALDB_PASSWORD}
 ```
 

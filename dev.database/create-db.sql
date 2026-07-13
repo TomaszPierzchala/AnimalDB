@@ -1,2 +1,2 @@
-CREATE USER animal_app WITH PASSWORD :'password';
-CREATE DATABASE animaldb OWNER animal_app;
+CREATE USER dbadmin WITH PASSWORD :'password';
+CREATE DATABASE animaldb OWNER dbadmin;

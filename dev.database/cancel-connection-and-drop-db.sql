@@ -5,4 +5,4 @@ WHERE datname = 'animaldb'
 
 DROP DATABASE IF EXISTS animaldb;
 
-DROP ROLE IF EXISTS animal_app;
+DROP ROLE IF EXISTS dbadmin;
