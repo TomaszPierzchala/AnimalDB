@@ -179,3 +179,5 @@ docs/                          Project documentation and database diagrams
 Tomasz Pierzchała
 
 GitHub: [TomaszPierzchala](https://github.com/TomaszPierzchala)
+
+Project repository: [AnimalDB](https://github.com/TomaszPierzchala/AnimalDB)
