@@ -1,6 +1,7 @@
 package cz.animalhouse.service;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -51,5 +52,28 @@ public class GeneService {
 
         geneRepository.deleteById(id);
         return true;
+    }
+    
+    @Transactional
+    public Optional<GeneResponse> update(
+            Long id,
+            GeneCreateRequest request) {
+
+        Optional<Gene> optionalGene = geneRepository.findById(id);
+
+        if (optionalGene.isEmpty()) {
+            return Optional.empty();
+        }
+
+        if (geneRepository.existsBySymbolAndIdNot(request.getSymbol(), id)) {
+            throw new DuplicateGeneSymbolException(request.getSymbol());
+        }
+
+        Gene gene = optionalGene.get();
+
+        gene.setSymbol(request.getSymbol());
+        gene.setDescription(request.getDescription());
+
+        return Optional.of(GeneResponse.fromEntity(gene));
     }
 }

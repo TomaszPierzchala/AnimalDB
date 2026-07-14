@@ -7,4 +7,6 @@ import cz.animalhouse.entity.Gene;
 public interface GeneRepository extends JpaRepository<Gene, Long> {
 
 	boolean existsBySymbol(String symbol);
+
+	boolean existsBySymbolAndIdNot(String symbol, Long id);
 }

@@ -10,6 +10,7 @@ function App() {
   const [symbolWarning, setSymbolWarning] = useState('');
   const [error, setError] = useState('');
   const [errorFading, setErrorFading] = useState(false);
+  const [refreshAfterError, setRefreshAfterError] = useState(false);
 
   const [popupOpen, setPopupOpen] = useState(false);
   const [editingGene, setEditingGene] = useState(null);
@@ -21,6 +22,20 @@ function App() {
   useEffect(() => {
     loadGenes();
   }, []);
+
+  useEffect(() => {
+    if (!refreshAfterError || error !== '') {
+      return;
+    }
+
+    async function refresh() {
+      setRefreshAfterError(false);
+      await loadGenes();
+    }
+
+    refresh();
+  }, [error, refreshAfterError]);
+
   useEffect(() => {
     if (!error) {
       return;
@@ -28,12 +43,12 @@ function App() {
 
     const fadeTimer = setTimeout(() => {
       setErrorFading(true);
-    }, 10000);
+    }, 3000);
 
     const clearTimer = setTimeout(() => {
       setError('');
       setErrorFading(false);
-    }, 17500);
+    }, 6500);
 
     return () => {
       clearTimeout(fadeTimer);
@@ -142,6 +157,10 @@ function App() {
                                 ? 'Could not create a new gene. '
                                 : 'Could not update the gene. ')
                                    + '\n' + err.message);
+	 if(editingGene !== null) {
+		closePopup();
+		setRefreshAfterError(true);
+	 }
     }
   }
   async function handleDelete() {

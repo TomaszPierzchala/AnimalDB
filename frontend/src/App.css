@@ -180,7 +180,7 @@ tbody tr:nth-child(even) {
   border-radius: 6px;
   font-weight: bold;
   opacity: 1;
-  transition: opacity 7s ease;
+  transition: opacity 3s ease;
   white-space: pre-line;
 }
 
