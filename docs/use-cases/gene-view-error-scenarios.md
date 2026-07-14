@@ -13,7 +13,6 @@ Partially implemented.
 User opens the Gene view or performs one of the following operations:
 
 - list genes,
-- refresh gene list,
 - create gene,
 - update gene,
 - delete gene.
@@ -88,7 +87,7 @@ The first line is a generic frontend error context. The second line comes from t
 ## ERR-GENE-003: Gene selected for editing no longer exists
 
 **Status**  
-This scenario is **not implemented** yet. The current frontend opens the edit popup based on the data already loaded in the table.
+The current frontend opens the edit popup based on the data already loaded in the table.
 
 **When**  
 User clicks a gene row in the table, but the selected gene was already deleted from the database.
@@ -106,14 +105,14 @@ The table still displays gene `GFP`, but another user or external tool deleted t
 Application shows:
 
 <div style="text-align: center; padding: 12px 2px; color: darkred; background-color: yellow; border-radius: 6px; font-weight: bold;">
-Could not save edited gene.</br>
+Could not update the gene.</br>
 Server returned the error 404.
 </div>
 
 **UI behavior**
 
 - The opened edit popup is closed.
-- The gene list is refreshed.
+- The gene list is refreshed, after an error message disappear.
 - The deleted record disappears from the table.
 
 ---
@@ -121,7 +120,7 @@ Server returned the error 404.
 ## ERR-GENE-004: Gene selected for deletion no longer exists
 
 **Status**
-Partially implemented.
+Implemented.
 
 **When**  
 User tries to delete a gene, but the record was already deleted from the database.
@@ -151,43 +150,7 @@ Server returned the error 404.
 
 ---
 
-## ERR-GENE-005: Gene selected for update no longer exists
-
-**Status**  
-This scenario is **not implemented** yet.
-
-**When**  
-User opens the Edit gene popup, but before saving changes, the gene is deleted from the database.
-
-**Example**  
-User edits gene `GFP`, but another user or external tool deletes that record before Save is clicked.
-
-**Backend response**
-
-```http
-404 Not Found
-```
-
-**Expected result**  
-Application shows:
-
-```text
-Could not update gene. 
-Server returned the error 404.
-```
-
-**UI behavior**
-
-- The update is not saved.
-- The gene list is refreshed.
-- The popup may be closed because the edited record no longer exists.
-
----
-
-## ERR-GENE-006: Gene update creates duplicate symbol
-
-**Status**  
-This scenario is **not implemented** yet.
+## ERR-GENE-005: Gene update creates duplicate symbol
 
 **When**  
 User edits an existing gene and changes its symbol to a symbol already used by another gene.
@@ -210,19 +173,20 @@ Genes `GFP` and `OT1` already exist. User edits `OT1` and changes its symbol to 
 **Expected result**  
 Application shows:
 
-```text
-Gene with symbol "GFP" already exists.
-```
+
+<div style="text-align: center; padding: 12px 2px; color: darkred; background-color: yellow; border-radius: 6px; font-weight: bold;">
+Could not update the gene.</br>
+Gene with symbol "GFP" already exists
+</div>
 
 **UI behavior**
 
 - The gene is not updated.
-- The Edit gene popup remains open.
-- User can correct the symbol and try again.
+- The Edit gene popup is closed.
 
 ---
 
-## ERR-GENE-007: Gene symbol is empty
+## ERR-GENE-006: Gene symbol is empty
 
 **When**  
 User tries to create or update a gene without providing a symbol.
