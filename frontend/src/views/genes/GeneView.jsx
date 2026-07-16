@@ -12,7 +12,7 @@ import GeneForm from './GeneForm';
 import { validateSymbol } from './geneValidation';
 import GeneTable from './GeneTable';
 
-import './GeneView.css';
+import '../View.css';
 
 function GeneView() {
   const [genes, setGenes] = useState([]);
