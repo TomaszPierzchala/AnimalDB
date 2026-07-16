@@ -1,15 +1,46 @@
-h1 {
-  margin-bottom: 28px;
-}
-
 section {
+  display: flow-root;
   margin-bottom: 32px;
 }
 
+h1,
+h2 {
+  color: #08060d;
+  font-weight: 500;
+  font-family: var(--heading);
+}
+
+h1 {
+  margin: 32px 0 28px;
+
+  font-size: 56px;
+  letter-spacing: -1.68px;
+}
+
+h2 {
+  margin: 0 0 8px;
+
+  font-size: 24px;
+  line-height: 1.18;
+}
+
+/* =========================
+   TABLE
+   ========================= */
+
 table {
   width: 100%;
+
   table-layout: fixed;
   border-collapse: collapse;
+}
+
+th,
+td {
+  padding: 8px;
+
+  border: 1px solid #cccccc;
+  text-align: left;
 }
 
 tbody td:nth-child(2),
@@ -17,37 +48,18 @@ tbody td:nth-child(3) {
   overflow-wrap: anywhere;
 }
 
-th,
-td {
-  border: 1px solid #cccccc;
-  padding: 8px;
-  text-align: left;
-}
-
 tbody tr:nth-child(even) {
   background-color: #eef4f8;
 }
 
-.clickable-row {
-  cursor: pointer;
-}
-
-.clickable-row:hover {
-  background-color: #dde8ef;
-}
-
+.clickable-row,
 .empty-row {
   cursor: pointer;
 }
 
+.clickable-row:hover,
 .empty-row:hover {
   background-color: #dde8ef;
-}
-
-.empty-row:hover .add-icon {
-  border-color: #4f91a6;
-  color: #ee0000;
-  background-color: #cec4c8;
 }
 
 .id-table-column {
@@ -66,11 +78,10 @@ tbody tr:nth-child(even) {
   text-align: center;
   opacity: 0.25;
 }
-.symbol-column {
-}
 
-.description-column {
-}
+/* =========================
+   ADDING ROW
+   ========================= */
 
 .add-icon-cell {
   width: 48px;
@@ -84,8 +95,8 @@ tbody tr:nth-child(even) {
   width: 24px;
   height: 24px;
 
-  border-radius: 50%;
   border: 1px solid #8fa8b8;
+  border-radius: 50%;
 
   color: #5f7f92;
   background-color: #eef4f8;
@@ -96,8 +107,9 @@ tbody tr:nth-child(even) {
 }
 
 .add-text-cell {
-  text-align: center;
   color: #666666;
+
+  text-align: center;
   font-style: italic;
 }
 
@@ -109,26 +121,28 @@ tbody tr:nth-child(even) {
   border-left: none;
 }
 
+.empty-row:hover .add-icon {
+  border-color: #4f91a6;
+
+  color: #ee0000;
+  background-color: #cec4c8;
+}
+
 .empty-row:hover .add-text-cell {
-  color: #e00;
+  color: #ee0000;
 }
 
-.field-warning {
-  display: block;
-  min-height: 16px;
-  margin-top: 4px;
-
-  color: darkred;
-  font-size: 14px;
-  font-weight: normal;
-  line-height: 16px;
-}
+/* =========================
+   ERROS
+   ========================= */
 
 .error {
   color: darkred;
   background-color: yellow;
+
   border-radius: 6px;
   font-weight: bold;
+
   opacity: 1;
   transition: opacity 3s ease;
   white-space: pre-line;
@@ -136,28 +150,43 @@ tbody tr:nth-child(even) {
 
 .error-fading {
   opacity: 0;
-  background-color: yellow;
-  border-radius: 6px;
 }
+
+.field-warning {
+  display: block;
+
+  min-height: 16px;
+  margin-top: 4px;
+
+  color: darkred;
+
+  font-size: 14px;
+  font-weight: normal;
+  line-height: 16px;
+}
+
+/* =========================
+   POPUP
+   ========================= */
 
 .popup-backdrop {
   position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0, 0, 0, 0.35);
+  inset: 0;
 
   display: flex;
   align-items: center;
   justify-content: center;
+
+  background-color: rgba(0, 0, 0, 0.35);
 }
 
 .popup {
-  background-color: #eef1f3;
-  padding: 24px;
   width: 420px;
+  padding: 24px;
+
   border: 1px solid #cccccc;
+  background-color: #eef1f3;
+
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25);
 }
 
@@ -172,19 +201,48 @@ form div {
 label {
   display: flex;
   flex-direction: column;
+
   font-weight: bold;
 }
 
 input {
   margin-top: 4px;
   padding: 8px;
+
   font-size: 14px;
+}
+
+/* =========================
+   BUTTONS
+   ========================= */
+
+button {
+  padding: 8px 16px;
+
+  border: 1px solid #999999;
+  border-radius: 6px;
+
+  background-color: #f4f4f8;
+
+  font-size: 16px;
+  cursor: pointer;
+}
+
+button:disabled {
+  background-color: #eeeeee;
+
+  cursor: not-allowed;
+  opacity: 0.3;
+}
+
+button[type="submit"] {
+  color: #870000;
 }
 
 .popup-buttons {
   display: flex;
-  justify-content: space-between;
   align-items: center;
+  justify-content: space-between;
 }
 
 .popup-main-buttons {
@@ -193,11 +251,13 @@ input {
 }
 
 .delete-button {
-  color: #870000;
-  border-color: #aa9999;
-  font-size: 12px;
   padding: 4px 18px;
-  border-radius: 6px;
+
+  border-color: #aa9999;
+
+  color: #870000;
+
+  font-size: 12px;
 }
 
 .delete-button:hover {
@@ -212,24 +272,4 @@ input {
 
 .delete-armed:hover {
   background-color: #aa0000;
-}
-
-button {
-  padding: 8px 16px;
-  cursor: pointer;
-
-  border: 1px solid #999999;
-  border-radius: 6px;
-  background-color: #f4f4f8;
-  font-size: 16px;
-}
-
-button:disabled {
-  background-color: #eee;
-  cursor: not-allowed;
-  opacity: 0.3;
-}
-
-button[type="submit"] {
-  color: #870000;
 }
