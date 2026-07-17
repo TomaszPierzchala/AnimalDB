@@ -1,7 +1,10 @@
-function GeneTable({
-  genes,
+import { firstCapital } from '../utils/textUtils';
+
+function TwoColumnTable({
+  records,
   onEdit,
-  onCreate
+  onCreate,
+  firstField, secondField, entityName
 }) {
   return (
     <table>
@@ -14,21 +17,21 @@ function GeneTable({
       <thead>
         <tr>
           <th className="id-column">ID</th>
-          <th>Symbol</th>
-          <th>Description</th>
+          <th>{firstCapital(firstField)}</th>
+          <th>{firstCapital(secondField)}</th>
         </tr>
       </thead>
 
       <tbody>
-        {genes.map((gene) => (
+        {records.map((record) => (
           <tr
-            key={gene.id}
+            key={record.id}
             className="clickable-row"
-            onClick={() => onEdit(gene)}
+            onClick={() => onEdit(record)}
           >
-            <td className="id-column">{gene.id}</td>
-            <td>{gene.symbol}</td>
-            <td>{gene.description}</td>
+            <td className="id-column">{record.id}</td>
+            <td>{record[firstField]}</td>
+            <td>{record[secondField]}</td>
           </tr>
         ))}
 
@@ -44,7 +47,7 @@ function GeneTable({
             colSpan={2}
             className="add-text-cell"
           >
-            Click here to add a new gene...
+            Click here to add a new {entityName}...
           </td>
         </tr>
       </tbody>
@@ -52,4 +55,4 @@ function GeneTable({
   );
 }
 
-export default GeneTable;
+export default TwoColumnTable;

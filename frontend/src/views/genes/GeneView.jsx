@@ -10,7 +10,7 @@ import {
 import ErrorBanner from '../../components/ErrorBanner';
 import GeneForm from './GeneForm';
 import { validateSymbol } from './geneValidation';
-import GeneTable from './GeneTable';
+import TwoColumnTable from '../TwoColumnTable';
 
 import '../View.css';
 
@@ -193,10 +193,13 @@ function GeneView() {
 
       <h1>Genes</h1>
 
-      <GeneTable
-        genes={genes}
+      <TwoColumnTable
+        records={genes}
         onEdit={openEditPopup}
         onCreate={openCreatePopup}
+		firstField="symbol"
+		secondField="description"
+		entityName="Gene"
       />
 
       {popupOpen && (
