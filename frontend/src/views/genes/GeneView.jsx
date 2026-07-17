@@ -9,7 +9,7 @@ import {
 
 import ErrorBanner from '../../components/ErrorBanner';
 import GeneForm from './GeneForm';
-import { validateSymbol } from './geneValidation';
+import { validateEmptyAndMax } from '../textValidation';
 import TwoColumnTable from '../TwoColumnTable';
 
 import '../View.css';
@@ -82,7 +82,7 @@ function GeneView() {
     setSymbol('');
     setDescription('');
     setDeleteArmed(false);
-    setSymbolWarning(validateSymbol(''));
+    setSymbolWarning(validateEmptyAndMax(''));
     setPopupOpen(true);
   }
 
@@ -91,7 +91,7 @@ function GeneView() {
     setSymbol(gene.symbol);
     setDescription(gene.description ?? '');
     setDeleteArmed(false);
-    setSymbolWarning(validateSymbol(gene.symbol));
+    setSymbolWarning(validateEmptyAndMax(gene.symbol));
     setPopupOpen(true);
   }
 
@@ -112,7 +112,7 @@ function GeneView() {
   async function handleSubmit(event) {
     event.preventDefault();
 
-    const validationMessage = validateSymbol(symbol);
+    const validationMessage = validateEmptyAndMax(symbol);
 
     if (symbol.trim() === '') {
       setSymbolWarning(validationMessage);

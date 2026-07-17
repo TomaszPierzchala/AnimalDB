@@ -1,7 +1,7 @@
 import {
   SYMBOL_MAX_LENGTH,
-  validateSymbol
-} from './geneValidation';
+  validateEmptyAndMax
+} from '../textValidation';
 
 function GeneForm({
   editingGene,
@@ -36,7 +36,7 @@ function GeneForm({
 
                   onSymbolChange(
                     value,
-                    validateSymbol(value)
+                    validateEmptyAndMax(value)
                   );
                 }}
                 maxLength={SYMBOL_MAX_LENGTH}

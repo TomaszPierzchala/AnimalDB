@@ -1,6 +1,6 @@
 export const SYMBOL_MAX_LENGTH = 50;
 
-export function validateSymbol(value) {
+export function validateEmptyAndMax(value) {
   if (value.trim() === '') {
     return 'Gene symbol is required.';
   }
