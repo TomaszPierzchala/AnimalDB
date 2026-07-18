@@ -8,7 +8,7 @@ import {
 } from '../../api/geneApi';
 
 import ErrorBanner from '../../components/ErrorBanner';
-import GeneForm from './GeneForm';
+import DoubleParamForm from './DoubleParamForm';
 import { validateEmptyAndMax } from '../textValidation';
 import TwoColumnTable from '../TwoColumnTable';
 
@@ -203,18 +203,21 @@ function GeneView() {
       />
 
       {popupOpen && (
-        <GeneForm
-          editingGene={editingGene}
-          symbol={symbol}
-          description={description}
-          symbolWarning={symbolWarning}
+        <DoubleParamForm
+          editing={editingGene}
+          entityName='Gene'
+          firstName='Symbol'
+          firstValue={symbol}
+          secondName='Description'
+          secondValue={description}
+          warning={symbolWarning}
           deleteArmed={deleteArmed}
           hasChanges={hasChanges}
-          onSymbolChange={(value, warning) => {
+          onChangeWithValidation={(value, warning) => {
             setSymbol(value);
             setSymbolWarning(warning);
           }}
-          onDescriptionChange={setDescription}
+          onChange={setDescription}
           onSubmit={handleSubmit}
           onDelete={handleDelete}
           onCancel={closePopup}

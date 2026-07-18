@@ -1,17 +1,20 @@
 import {
-  SYMBOL_MAX_LENGTH,
+  VAR_MAX_LENGTH,
   validateEmptyAndMax
 } from '../textValidation';
 
-function GeneForm({
-  editingGene,
-  symbol,
-  description,
-  symbolWarning,
+function DoubleParamForm({
+  editing,
+  entityName,
+  firstName,
+  firstValue,
+  secondName,
+  secondValue,
+  warning,
   deleteArmed,
   hasChanges,
-  onSymbolChange,
-  onDescriptionChange,
+  onChangeWithValidation,
+  onChange,
   onSubmit,
   onDelete,
   onCancel
@@ -20,43 +23,45 @@ function GeneForm({
     <div className="popup-backdrop">
       <div className="popup">
         <h2>
-          {editingGene === null ? 'Add gene' : 'Edit gene'}
+          {editing === null
+            ? `Add ${entityName}`
+            : `Edit ${entityName}`}
         </h2>
 
         <form onSubmit={onSubmit}>
           <div>
             <label>
-              Symbol:
+              {firstName}:
 
               <input
                 type="text"
-                value={symbol}
+                value={firstValue}
                 onChange={(event) => {
                   const value = event.target.value;
 
-                  onSymbolChange(
+                  onChangeWithValidation(
                     value,
                     validateEmptyAndMax(value)
                   );
                 }}
-                maxLength={SYMBOL_MAX_LENGTH}
+                maxLength={VAR_MAX_LENGTH}
               />
 
               <small className="field-warning">
-                {symbolWarning}
+                {warning}
               </small>
             </label>
           </div>
 
           <div>
             <label>
-              Description:
+              {secondName}:
 
               <input
                 type="text"
-                value={description}
+                value={secondValue}
                 onChange={(event) =>
-                  onDescriptionChange(event.target.value)
+                  onChange(event.target.value)
                 }
               />
             </label>
@@ -64,7 +69,7 @@ function GeneForm({
 
           <div className="popup-buttons">
             <div>
-              {editingGene !== null && (
+              {editing !== null && (
                 <button
                   type="button"
                   className={
@@ -85,11 +90,11 @@ function GeneForm({
               <button
                 type="submit"
                 disabled={
-                  editingGene !== null &&
+                  editing !== null &&
                   !hasChanges
                 }
               >
-                {editingGene === null
+                {editing === null
                   ? 'Add'
                   : 'Save'}
               </button>
@@ -108,4 +113,4 @@ function GeneForm({
   );
 }
 
-export default GeneForm;
+export default DoubleParamForm;
