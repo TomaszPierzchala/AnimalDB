@@ -6,6 +6,10 @@ This project is a Spring Boot backend application that uses PostgreSQL for data 
 
 The application is designed for a real animal facility use case and focuses on clean relational data modelling, traceability, and future extensibility.
 
+Live demo: [AnimalDB on Render](https://animaldb-frontend.onrender.com/)
+
+> The application uses Render's free service tier. The first load may take approximately two minutes because inactive services are put to sleep.
+
 ## Project purpose
 
 The goal of AnimalDB is to support the daily work of a laboratory animal facility by providing a structured system for managing information about laboratory mice, their genetic background, breeding history, genealogy, and procedures performed by laboratory staff.
@@ -26,26 +30,26 @@ The goal of AnimalDB is to support the daily work of a laboratory animal facilit
 
 AnimalDB includes an initial React frontend prototype for managing gene records.
 
-The current Gene view provides a simple table-based interface for displaying, adding, <!--   editing, --> and deleting gene definitions stored in the backend PostgreSQL database through the REST API.
+The current Gene & Strain views provide a simple table-based interface for displaying, adding, editing, and deleting gene definitions stored in the backend PostgreSQL database through the REST API.
 
 <img src="docs/animaldb-gene-view.png" alt="AnimalDB Gene view" width="900">
 
 ### Gene view functionality
 
-The Gene view currently supports:
+The Gene & Strain views currently support:
 
 - displaying all gene records from the backend,
 - adding a new gene through a popup form,
 - editing an existing gene by clicking a table row,
-<!-- - deleting an existing gene from the edit popup, -->
+- deleting an existing gene from the edit popup,
 - refreshing the list after create, update, or delete operations.
 
-The frontend communicates with the backend using the following REST endpoints:
+For example the Gene View frontend communicates with the backend using the following REST endpoints:
 
 ```text
 GET    /api/genes       List all genes
 POST   /api/genes       Create a new gene
-<!-- PUT    /api/genes/{id}  Update an existing gene -->
+PUT    /api/genes/{id}  Update an existing gene
 DELETE /api/genes/{id}  Delete an existing gene
 ```
 
@@ -54,6 +58,14 @@ The interface is intentionally simple at this stage. It is used as the first wor
 React UI -> REST Controller -> Service -> Repository -> PostgreSQL
 
 This first frontend screen will be used as a pattern for implementing additional AnimalDB views, such as mice, strains, transgenic lines, mating records, and laboratory procedures.
+
+## Live demo
+
+A deployed version of the application is available at:
+
+[https://animaldb-frontend.onrender.com/](https://animaldb-frontend.onrender.com/)
+
+The application is hosted on Render using the free service tier. After a period of inactivity, the service may be put to sleep, so the first load can take approximately two minutes while the backend service starts.
 
 ## Technology stack
 
@@ -180,4 +192,4 @@ Tomasz Pierzchała
 
 GitHub: [TomaszPierzchala](https://github.com/TomaszPierzchala)
 
-Project repository: [AnimalDB](https://github.com/TomaszPierzchala/AnimalDB)
+Live demo: [AnimalDB on Render](https://animaldb-frontend.onrender.com/)
