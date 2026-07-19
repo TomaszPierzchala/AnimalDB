@@ -1,7 +1,6 @@
 import { useState } from 'react';
 
 import TwoColumnView from './views/TwoColumnView';
-import StrainView from './views/strains/StrainView';
 
 import GitHubLink from './components/GitHubLink';
 import Sidebar from './components/Sidebar';
@@ -17,11 +16,33 @@ import {
   getGenes,
   updateGene
 } from './api/geneApi';
+import {
+  createStrain,
+  deleteStrain,
+  getStrains,
+  updateStrain
+} from './api/strainApi';
 
 import './App.css';
 
 function App() {
-  const [activeView, setActiveView] = useState(VIEW_GENE);
+  const [activeView, setActiveView] = useState(() => {
+    const savedView = localStorage.getItem('activeView');
+
+    if (
+      savedView === VIEW_GENE ||
+      savedView === VIEW_STRAIN
+    ) {
+      return savedView;
+    }
+
+    return VIEW_GENE;
+  });
+
+  function changeView(view) {
+    setActiveView(view);
+    localStorage.setItem('activeView', view);
+  }
 
   function renderActiveView() {
     switch (activeView) {
@@ -29,7 +50,7 @@ function App() {
         return renderGeneView();
 
       case VIEW_STRAIN:
-        return <StrainView />;
+        return renderStrainView();
 
       default:
         return renderGeneView();
@@ -50,6 +71,20 @@ function App() {
     );
   }
 
+  function renderStrainView() {
+    return (
+      <TwoColumnView
+        entityName='Strain'
+        firstName='code'
+        secondName='name'
+        createApi={createStrain}
+        getApi={getStrains}
+        updateApi={updateStrain}
+        deleteApi={deleteStrain}
+      />
+    );
+  }
+ 
   return (
     <div className="app-layout">
       <aside className="app-sidebar">
@@ -59,7 +94,7 @@ function App() {
 
         <Sidebar
           activeView={activeView}
-          onViewChange={setActiveView}
+          onViewChange={changeView}
         />
 		
 		<GitHubLink />
