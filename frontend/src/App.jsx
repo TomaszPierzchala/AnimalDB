@@ -1,6 +1,6 @@
 import { useState } from 'react';
 
-import GeneView from './views/genes/GeneView';
+import TwoColumnView from './views/TwoColumnView';
 import StrainView from './views/strains/StrainView';
 
 import GitHubLink from './components/GitHubLink';
@@ -11,6 +11,13 @@ import {
   VIEW_STRAIN
 } from './viewNames';
 
+import {
+  createGene,
+  deleteGene,
+  getGenes,
+  updateGene
+} from './api/geneApi';
+
 import './App.css';
 
 function App() {
@@ -19,14 +26,28 @@ function App() {
   function renderActiveView() {
     switch (activeView) {
       case VIEW_GENE:
-        return <GeneView />;
+        return renderGeneView();
 
       case VIEW_STRAIN:
         return <StrainView />;
 
       default:
-        return <GeneView />;
+        return renderGeneView();
     }
+  }
+
+  function renderGeneView() {
+    return (
+      <TwoColumnView
+        entityName='Gene'
+        firstName='symbol'
+        secondName='description'
+        createApi={createGene}
+        getApi={getGenes}
+        updateApi={updateGene}
+        deleteApi={deleteGene}
+      />
+    );
   }
 
   return (

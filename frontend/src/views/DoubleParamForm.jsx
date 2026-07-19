@@ -1,7 +1,7 @@
 import {
   VAR_MAX_LENGTH,
   validateEmptyAndMax
-} from '../textValidation';
+} from './textValidation';
 
 function DoubleParamForm({
   editing,

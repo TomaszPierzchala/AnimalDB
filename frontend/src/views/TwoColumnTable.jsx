@@ -4,7 +4,7 @@ function TwoColumnTable({
   records,
   onEdit,
   onCreate,
-  firstField, secondField, entityName
+  entityName, firstName, secondName
 }) {
   return (
     <table>
@@ -17,8 +17,8 @@ function TwoColumnTable({
       <thead>
         <tr>
           <th className="id-column">ID</th>
-          <th>{firstCapital(firstField)}</th>
-          <th>{firstCapital(secondField)}</th>
+          <th>{firstCapital(firstName)}</th>
+          <th>{firstCapital(secondName)}</th>
         </tr>
       </thead>
 
@@ -30,8 +30,8 @@ function TwoColumnTable({
             onClick={() => onEdit(record)}
           >
             <td className="id-column">{record.id}</td>
-            <td>{record[firstField]}</td>
-            <td>{record[secondField]}</td>
+            <td>{record[firstName]}</td>
+            <td>{record[secondName]}</td>
           </tr>
         ))}
 
