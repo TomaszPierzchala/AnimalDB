@@ -33,7 +33,7 @@ function TwoColumnView({
 
   useEffect(() => {
     loadRecords();
-  }, []);
+  }, [getApi]);
 
   useEffect(() => {
     if (!error) {
@@ -125,8 +125,8 @@ function TwoColumnView({
     }
 
     const requestBody = {
-      symbol: firstValue,
-      description: secondValue
+      [firstName]: firstValue,
+      [secondName]: secondValue
     };
 
     try {
