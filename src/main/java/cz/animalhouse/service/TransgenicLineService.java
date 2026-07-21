@@ -10,6 +10,8 @@ import cz.animalhouse.dto.TransgenicLineRequest;
 import cz.animalhouse.dto.TransgenicLineResponse;
 import cz.animalhouse.entity.Strain;
 import cz.animalhouse.entity.TransgenicLine;
+import cz.animalhouse.exception.DuplicateTransgenicLineNameException;
+import cz.animalhouse.exception.StrainNotFoundException;
 import cz.animalhouse.repository.StrainRepository;
 import cz.animalhouse.repository.TransgenicLineRepository;
 
@@ -46,20 +48,17 @@ public class TransgenicLineService {
             TransgenicLineRequest request) {
 
         if (transgenicLineRepository.existsByName(request.name())) {
-            throw new IllegalArgumentException(
-                    "Transgenic line with name '%s' already exists"
-                            .formatted(request.name())
+            throw new DuplicateTransgenicLineNameException(
+                    request.name()
             );
         }
 
-        Strain strain = strainRepository.findById(request.strainId())
-                .orElseThrow(() -> new IllegalArgumentException(
-                        "Strain with ID %d does not exist"
-                                .formatted(request.strainId())
-                ));
+        Strain strain = findStrain(request.strainId());
 
-        TransgenicLine transgenicLine =
-                new TransgenicLine(strain, request.name());
+        TransgenicLine transgenicLine = new TransgenicLine(
+                strain,
+                request.name()
+        );
 
         TransgenicLine saved =
                 transgenicLineRepository.save(transgenicLine);
@@ -79,20 +78,16 @@ public class TransgenicLineService {
             return Optional.empty();
         }
 
-        if (transgenicLineRepository
-                .existsByNameAndIdNot(request.name(), id)) {
+        if (transgenicLineRepository.existsByNameAndIdNot(
+                request.name(),
+                id)) {
 
-            throw new IllegalArgumentException(
-                    "Transgenic line with name '%s' already exists"
-                            .formatted(request.name())
+            throw new DuplicateTransgenicLineNameException(
+                    request.name()
             );
         }
 
-        Strain strain = strainRepository.findById(request.strainId())
-                .orElseThrow(() -> new IllegalArgumentException(
-                        "Strain with ID %d does not exist"
-                                .formatted(request.strainId())
-                ));
+        Strain strain = findStrain(request.strainId());
 
         TransgenicLine transgenicLine =
                 optionalTransgenicLine.get();
@@ -112,6 +107,14 @@ public class TransgenicLineService {
         }
 
         transgenicLineRepository.deleteById(id);
+
         return true;
+    }
+
+    private Strain findStrain(Long strainId) {
+        return strainRepository.findById(strainId)
+                .orElseThrow(() ->
+                        new StrainNotFoundException(strainId)
+                );
     }
 }

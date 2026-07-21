@@ -2,6 +2,7 @@ package cz.animalhouse.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -19,6 +20,8 @@ import cz.animalhouse.dto.TransgenicLineRequest;
 import cz.animalhouse.dto.TransgenicLineResponse;
 import cz.animalhouse.entity.Strain;
 import cz.animalhouse.entity.TransgenicLine;
+import cz.animalhouse.exception.DuplicateTransgenicLineNameException;
+import cz.animalhouse.exception.StrainNotFoundException;
 import cz.animalhouse.repository.StrainRepository;
 import cz.animalhouse.repository.TransgenicLineRepository;
 
@@ -69,7 +72,7 @@ class TransgenicLineServiceTest {
     @Test
     void shouldCreateTransgenicLine() {
 
-        Long strainId = 1L;
+        final Long strainId = 1L;
 
         Strain strain = new Strain(
                 "C57BL6",
@@ -116,8 +119,8 @@ class TransgenicLineServiceTest {
 
         assertThatThrownBy(() ->
                 transgenicLineService.create(request))
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessageContaining("OT-I");
+                .isInstanceOf(DuplicateTransgenicLineNameException.class)
+                .hasMessageContaining("Transgenic line with name 'OT-I' already exists");
 
         verify(strainRepository, never())
                 .findById(1L);
@@ -127,13 +130,105 @@ class TransgenicLineServiceTest {
     }
 
     @Test
-    void shouldReturnEmptyWhenUpdatedRecordDoesNotExist() {
-
-        Long id = 10L;
+    void shouldThrowExceptionWhenCreatingTransgenicLineForMissingStrain() {
+        final Long strainId = 999L;
 
         TransgenicLineRequest request =
                 new TransgenicLineRequest(
-                        1L,
+                        strainId,
+                        "OT-I"
+                );
+
+        when(transgenicLineRepository.existsByName("OT-I"))
+                .thenReturn(false);
+
+        when(strainRepository.findById(strainId))
+                .thenReturn(Optional.empty());
+
+        assertThatThrownBy(() ->
+                transgenicLineService.create(request))
+                .isInstanceOf(StrainNotFoundException.class)
+                .hasMessageContaining("Strain with ID 999 does not exist");
+
+        verify(transgenicLineRepository)
+                .existsByName("OT-I");
+
+        verify(strainRepository)
+                .findById(strainId);
+
+        verify(transgenicLineRepository, never())
+                .save(any(TransgenicLine.class));
+    }
+
+    @Test
+    void shouldUpdateExistingTransgenicLine() {
+        final Long id = 1L;
+        final Long newStrainId = 20L;
+
+        Strain oldStrain = new Strain(
+                "C57BL6",
+                "C57BL/6"
+        );
+
+        Strain newStrain = new Strain(
+                "BALBC",
+                "BALB/c"
+        );
+
+        TransgenicLine transgenicLine = new TransgenicLine(
+                oldStrain,
+                "OT-I"
+        );
+
+        TransgenicLineRequest request =
+                new TransgenicLineRequest(
+                        newStrainId,
+                        "OT-II"
+                );
+
+        when(transgenicLineRepository.findById(id))
+                .thenReturn(Optional.of(transgenicLine));
+
+        when(transgenicLineRepository
+                .existsByNameAndIdNot("OT-II", id))
+                .thenReturn(false);
+
+        when(strainRepository.findById(newStrainId))
+                .thenReturn(Optional.of(newStrain));
+
+
+        Optional<TransgenicLineResponse> result =
+                transgenicLineService.update(id, request);
+
+
+        assertThat(result).isPresent();
+
+        TransgenicLineResponse response = result.orElseThrow();
+
+        assertThat(response.name()).isEqualTo("OT-II");
+        assertThat(response.strainCode()).isEqualTo("BALBC");
+        assertThat(response.strainName()).isEqualTo("BALB/c");
+
+        assertThat(transgenicLine.getName()).isEqualTo("OT-II");
+        assertThat(transgenicLine.getStrain()).isSameAs(newStrain);
+
+        verify(transgenicLineRepository).findById(id);
+
+        verify(transgenicLineRepository)
+                .existsByNameAndIdNot("OT-II", id);
+
+        verify(strainRepository).findById(newStrainId);
+    }
+
+    @Test
+    void shouldReturnEmptyWhenUpdatedRecordDoesNotExist() {
+
+        final Long id = 10L;
+        final Long strainId = 1L;
+
+        TransgenicLineRequest request =
+                new TransgenicLineRequest(
+                        strainId,
                         "OT-I");
 
         when(transgenicLineRepository.findById(id))
@@ -145,13 +240,58 @@ class TransgenicLineServiceTest {
         assertThat(result).isEmpty();
 
         verify(strainRepository, never())
-                .findById(1L);
+                .findById(strainId);
+    }
+
+    @Test
+    void shouldThrowExceptionWhenUpdatingTransgenicLineWithDuplicateName() {
+        final Long id = 1L;
+        final Long newStrainId = 20L;
+
+        Strain oldStrain = new Strain(
+                "C57BL6",
+                "C57BL/6"
+        );
+
+        TransgenicLine transgenicLine = new TransgenicLine(
+                oldStrain,
+                "OT-I"
+        );
+
+        TransgenicLineRequest request =
+                new TransgenicLineRequest(
+                        newStrainId,
+                        "OT-II"
+                );
+
+        when(transgenicLineRepository.findById(id))
+                .thenReturn(Optional.of(transgenicLine));
+
+        when(transgenicLineRepository
+                .existsByNameAndIdNot("OT-II", id))
+                .thenReturn(true);
+
+        assertThatThrownBy(() ->
+                transgenicLineService.update(id, request))
+                .isInstanceOf(
+                        DuplicateTransgenicLineNameException.class)
+                .hasMessageContaining("OT-II");
+
+        assertThat(transgenicLine.getName()).isEqualTo("OT-I");
+        assertThat(transgenicLine.getStrain()).isSameAs(oldStrain);
+
+        verify(transgenicLineRepository).findById(id);
+
+        verify(transgenicLineRepository)
+                .existsByNameAndIdNot("OT-II", id);
+
+        verify(strainRepository, never()).findById(newStrainId);
     }
 
     @Test
     void shouldDeleteExistingTransgenicLine() {
 
-        Long id = 10L;
+        final Long id = 10L;
 
         when(transgenicLineRepository.existsById(id))
                 .thenReturn(true);
@@ -168,7 +308,7 @@ class TransgenicLineServiceTest {
     @Test
     void shouldNotDeleteMissingTransgenicLine() {
 
-        Long id = 10L;
+        final Long id = 10L;
 
         when(transgenicLineRepository.existsById(id))
                 .thenReturn(false);
