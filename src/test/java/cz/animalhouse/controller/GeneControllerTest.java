@@ -86,15 +86,29 @@ class GeneControllerTest {
                                 """))
                 .andExpect(status().isBadRequest());
     }
+    
+    @Test
+    void shouldReturnNotFoundWhenDeletingMissingGene()
+            throws Exception {
+
+        when(geneService.delete(999L))
+                .thenReturn(false);
+
+        mockMvc.perform(
+                        delete("/api/transgenic-lines/999"))
+                .andExpect(status().isNotFound());
+    }
 
     @Test
-    void shouldDeleteGene() throws Exception {
+    void shouldDeleteExistingGene() throws Exception {
+    	when(geneService.delete(7L))
+        .thenReturn(true);
 
-        mockMvc.perform(delete("/api/genes/{id}", 1L))
+        mockMvc.perform(delete("/api/genes/{id}", 7L))
                 .andExpect(status().isNoContent())
                 .andExpect(content().string(""));
 
-        verify(geneService).delete(1L);
+        verify(geneService).delete(7L);
         verifyNoMoreInteractions(geneService);
     }
 }
