@@ -1,20 +1,6 @@
-import {
-  VIEW_GENE,
-  VIEW_STRAIN
-} from '../viewNames';
-
 import './Sidebar.css';
+import { navigationItems } from '../viewNames';
 
-const navigationItems = [
-  {
-    id: VIEW_GENE,
-    label: 'Genes'
-  },
-  {
-    id: VIEW_STRAIN,
-    label: 'Strains'
-  }
-];
 
 function Sidebar({
   activeView,

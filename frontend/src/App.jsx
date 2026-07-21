@@ -7,7 +7,8 @@ import Sidebar from './components/Sidebar';
 
 import {
   VIEW_GENE,
-  VIEW_STRAIN
+  VIEW_STRAIN,
+  VIEW_TRANSLINE
 } from './viewNames';
 
 import {
@@ -23,6 +24,13 @@ import {
   updateStrain
 } from './api/strainApi';
 
+import {
+  createTransLine,
+  deleteTransLine,
+  getTransLines,
+  updateTransLine
+} from './api/transgenicLineApi';
+
 import './App.css';
 
 function App() {
@@ -31,7 +39,8 @@ function App() {
 
     if (
       savedView === VIEW_GENE ||
-      savedView === VIEW_STRAIN
+      savedView === VIEW_STRAIN ||
+      savedView === VIEW_TRANSLINE
     ) {
       return savedView;
     }
@@ -51,6 +60,9 @@ function App() {
 
       case VIEW_STRAIN:
         return renderStrainView();
+
+      case VIEW_TRANSLINE:
+        return renderTransgenicLineView();
 
       default:
         return renderGeneView();
@@ -85,6 +97,20 @@ function App() {
     );
   }
  
+  function renderTransgenicLineView() {
+    return (
+      <TwoColumnView
+        entityName='TransgenicLine'
+        firstName='strainCode'
+        secondName='name'
+        createApi={createTransLine}
+        getApi={getTransLines}
+        updateApi={updateTransLine}
+        deleteApi={deleteTransLine}
+      />
+    );
+  }
+
   return (
     <div className="app-layout">
       <aside className="app-sidebar">
