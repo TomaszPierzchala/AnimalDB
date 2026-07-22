@@ -1,6 +1,11 @@
 package cz.animalhouse.controller;
 
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -24,5 +29,22 @@ public class RestExceptionHandler {
     }
 
     public record ErrorResponse(String message) {
+    }
+
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<Map<String, Object>> handleValidationException(
+            MethodArgumentNotValidException exception) {
+
+        var fieldError = exception.getBindingResult()
+                .getFieldErrors()
+                .getFirst();
+
+        Map<String, Object> response = new LinkedHashMap<>();
+        response.put("message", fieldError.getField() + ": " + fieldError.getDefaultMessage());
+        response.put("rejectedValue", fieldError.getRejectedValue());
+
+        return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
+                .body(response);
     }
 }
