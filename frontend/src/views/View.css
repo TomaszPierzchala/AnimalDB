@@ -273,3 +273,10 @@ button[type="submit"] {
 .delete-armed:hover {
   background-color: #aa0000;
 }
+
+.strain-select {
+  margin-top: 4px;
+  padding: 8px;
+  font-size: 14px;
+  background-color: white;
+}

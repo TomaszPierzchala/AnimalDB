@@ -1,5 +1,6 @@
 import {
   VAR_MAX_LENGTH,
+  MAX_TARANSLINE_NAME,
   validateEmptyAndMax
 } from './textValidation';
 
@@ -10,11 +11,15 @@ function DoubleParamForm({
   firstValue,
   secondName,
   secondValue,
+
+  firstInputType,
+  firstOptions,
+
   warning,
   deleteArmed,
   hasChanges,
-  onChangeWithValidation,
-  onChange,
+  onChangeFirstField,
+  onChangeSecondField,
   onSubmit,
   onDelete,
   onCancel
@@ -33,23 +38,49 @@ function DoubleParamForm({
             <label>
               {firstName}:
 
-              <input
-                type="text"
-                value={firstValue}
-                onChange={(event) => {
-                  const value = event.target.value;
+              {firstInputType === 'select' ? (
+                <select className='strain-select'
+                  value={firstValue}
+                  onChange={event =>
+                    onChangeFirstField(event.target.value)
+                  }
+                  required
+                >
+                  <option value="">
+                    Select {firstName}
+                  </option>
 
-                  onChangeWithValidation(
-                    value,
-                    validateEmptyAndMax(value)
-                  );
-                }}
-                maxLength={VAR_MAX_LENGTH}
-              />
+                  {firstOptions.map(option => (
+                    <option
+                      key={option.value}
+                      value={option.value}
+                    >
+                      {option.label}
+                    </option>
+                  ))}
+                </select>
+              ) : (
+                <input
+                  type="text"
+                  value={firstValue}
+                  onChange={event => {
+                    const value = event.target.value;
 
-              <small className="field-warning">
-                {warning}
-              </small>
+                    onChangeFirstField(
+                      value,
+                      validateEmptyAndMax(value)
+                    );
+                  }}
+                  required
+                  maxLength={VAR_MAX_LENGTH}
+                />
+              )}
+              {firstInputType !== 'select' && (
+                <small className="field-warning">
+                  {warning}
+                </small>
+              )}
+
             </label>
           </div>
 
@@ -60,10 +91,26 @@ function DoubleParamForm({
               <input
                 type="text"
                 value={secondValue}
-                onChange={(event) =>
-                  onChange(event.target.value)
+                onChange={firstInputType !== 'select' ? (
+                  event => onChangeSecondField(event.target.value)
+                  ) : (
+                  event => {
+                            const value = event.target.value;
+
+                            onChangeSecondField(
+                              value,
+                              validateEmptyAndMax(value, MAX_TARANSLINE_NAME)
+                            );
+                           }
+                  )
                 }
+                maxLength={firstInputType === 'select' ? MAX_TARANSLINE_NAME : undefined}
               />
+              {firstInputType === 'select' && (
+                <small className="field-warning">
+                  {warning}
+                </small>
+              )}
             </label>
           </div>
 

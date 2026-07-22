@@ -9,15 +9,22 @@ import { validateEmptyAndMax } from './textValidation';
 import './View.css';
 
 function TwoColumnView({
-	entityName,
-	firstName,
-	secondName,
-	createApi,
-	getApi,
-	updateApi,
-	deleteApi
+  entityName,
+  firstName,
+  secondName,
+
+  firstRequestName = firstName,
+  firstEditName = firstName,
+  firstInputType = 'text',
+  getFirstOptionsApi,
+
+  createApi,
+  getApi,
+  updateApi,
+  deleteApi
 }) {
   const [records, setRecords] = useState([]);
+  const [firstOptions, setFirstOptions] = useState([]);
 
   const [error, setError] = useState('');
   const [errorFading, setErrorFading] = useState(false);
@@ -28,12 +35,40 @@ function TwoColumnView({
   const [deleteArmed, setDeleteArmed] = useState(false);
 
   const [firstValue, setFirstValue] = useState('');
-  const [secondValue, setSecondField] = useState('');
-  const [firstFieldWarning, setFirstFieldWarning] = useState('');
+  const [secondValue, setSecondValue] = useState('');
+  const [fieldWarning, setFieldWarning] = useState('');
 
   useEffect(() => {
     loadRecords();
   }, [getApi]);
+
+  useEffect(() => {
+    if (!getFirstOptionsApi) {
+      return;
+    }
+
+    async function loadFirstOptions() {
+      try {
+        const data = await getFirstOptionsApi();
+
+        const options = Array.isArray(data)
+          ? data.map(item => ({
+              value: item.id,
+              label: item.code
+            }))
+          : [];
+
+        setFirstOptions(options);
+      } catch (err) {
+        showError(
+          'Could not load available options.\n' +
+          err.message
+        );
+      }
+    }
+
+    loadFirstOptions();
+  }, [getFirstOptionsApi]);
 
   useEffect(() => {
     if (!error) {
@@ -81,18 +116,25 @@ function TwoColumnView({
   function openCreatePopup() {
     setEntity(null);
     setFirstValue('');
-    setSecondField('');
+    setSecondValue('');
     setDeleteArmed(false);
-    setFirstFieldWarning(validateEmptyAndMax(''));
+    setFieldWarning('');
     setPopupOpen(true);
   }
 
-  function openEditPopup(entity) {
-    setEntity(entity);
-    setFirstValue(entity[firstName]);
-    setSecondField(entity[secondName] ?? '');
+  function openEditPopup(selectedEntity) {
+    setEntity(selectedEntity);
+
+    const editValue =
+      selectedEntity[firstEditName] ?? '';
+
+    setFirstValue(String(editValue));
+    setSecondValue(
+      selectedEntity[secondName] ?? ''
+    );
+
     setDeleteArmed(false);
-    setFirstFieldWarning(validateEmptyAndMax(entity[firstName]));
+    setFieldWarning('');
     setPopupOpen(true);
   }
 
@@ -100,9 +142,9 @@ function TwoColumnView({
     setPopupOpen(false);
     setEntity(null);
     setFirstValue('');
-    setSecondField('');
+    setSecondValue('');
     setDeleteArmed(false);
-    setFirstFieldWarning('');
+    setFieldWarning('');
   }
 
   async function refreshAfterPopup() {
@@ -113,10 +155,11 @@ function TwoColumnView({
   async function handleSubmit(event) {
     event.preventDefault();
 
-    const validationMessage = validateEmptyAndMax(firstValue);
+    const validateValue = firstInputType === 'select' ? secondValue : firstValue;
+    const validationMessage = validateEmptyAndMax(validateValue);
 
-    if (firstValue.trim() === '') {
-      setFirstFieldWarning(validationMessage);
+    if (String(validateValue).trim() === '') {
+      setFieldWarning(validationMessage);
       return;
     }
 
@@ -124,8 +167,13 @@ function TwoColumnView({
       return;
     }
 
+    const requestFirstValue =
+      firstInputType === 'select'
+        ? Number(firstValue)
+        : firstValue;
+
     const requestBody = {
-      [firstName]: firstValue,
+      [firstRequestName]: requestFirstValue,
       [secondName]: secondValue
     };
 
@@ -179,11 +227,20 @@ function TwoColumnView({
     }
   }
 
+  const originalFirstValue =
+    entity === null
+      ? ''
+      : String(entity[firstEditName] ?? '');
+
+  const originalSecondValue =
+    entity === null
+      ? ''
+      : entity[secondName] ?? '';
+
   const hasChanges =
     entity === null ||
-    firstValue !== entity[firstName] ||
-    secondValue !==
-      (entity[secondName] ?? '');
+    firstValue !== originalFirstValue ||
+    secondValue !== originalSecondValue;
 
   return (
     <section>
@@ -198,7 +255,7 @@ function TwoColumnView({
         records={records}
         onEdit={openEditPopup}
         onCreate={openCreatePopup}
-		entityName={entityName}
+        entityName={entityName}
         firstName={firstName}
         secondName={secondName}
       />
@@ -207,18 +264,37 @@ function TwoColumnView({
         <DoubleParamForm
           entity={entity}
           entityName={entityName}
+
           firstName={firstCapital(firstName)}
           firstValue={firstValue}
+          firstInputType={firstInputType}
+          firstOptions={firstOptions}
+
           secondName={firstCapital(secondName)}
           secondValue={secondValue}
-          warning={firstFieldWarning}
+
+          warning={fieldWarning}
           deleteArmed={deleteArmed}
           hasChanges={hasChanges}
-          onChangeWithValidation={(value, warning) => {
-            setFirstValue(value);
-            setFirstFieldWarning(warning);
-          }}
-          onChange={setSecondField}
+
+          onChangeFirstField={
+            firstInputType === 'select'
+              ? setFirstValue
+              : (value, warning) => {
+                  setFirstValue(value);
+                  setFieldWarning(warning);
+                }
+          }
+
+          onChangeSecondField={
+            firstInputType === 'select'
+              ? (value, warning) => {
+                  setSecondValue(value);
+                  setFieldWarning(warning);
+                }
+              : setSecondValue
+          }
+
           onSubmit={handleSubmit}
           onDelete={handleDelete}
           onCancel={closePopup}

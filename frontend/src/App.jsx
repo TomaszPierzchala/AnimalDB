@@ -4,6 +4,7 @@ import TwoColumnView from './views/TwoColumnView';
 
 import GitHubLink from './components/GitHubLink';
 import Sidebar from './components/Sidebar';
+import TransgenicLineView from './views/TransgenicLineView';
 
 import {
   VIEW_GENE,
@@ -23,13 +24,6 @@ import {
   getStrains,
   updateStrain
 } from './api/strainApi';
-
-import {
-  createTransLine,
-  deleteTransLine,
-  getTransLines,
-  updateTransLine
-} from './api/transgenicLineApi';
 
 import './App.css';
 
@@ -98,17 +92,7 @@ function App() {
   }
  
   function renderTransgenicLineView() {
-    return (
-      <TwoColumnView
-        entityName='TransgenicLine'
-        firstName='strainCode'
-        secondName='name'
-        createApi={createTransLine}
-        getApi={getTransLines}
-        updateApi={updateTransLine}
-        deleteApi={deleteTransLine}
-      />
-    );
+    return <TransgenicLineView />;
   }
 
   return (

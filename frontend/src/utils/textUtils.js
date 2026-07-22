@@ -4,7 +4,6 @@ export function firstCapital(text) {
   }
 
   return (
-    text.charAt(0).toUpperCase() +
-    text.slice(1).toLowerCase()
+    text.charAt(0).toUpperCase() + text.slice(1)
   );
 }
