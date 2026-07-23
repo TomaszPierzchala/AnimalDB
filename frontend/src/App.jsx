@@ -5,7 +5,7 @@ import TwoColumnView from './views/TwoColumnView';
 import GitHubLink from './components/GitHubLink';
 import Sidebar from './components/Sidebar';
 import TransgenicLineView from './views/TransgenicLineView';
-import { FIRST, SECOND } from '../utils/const';
+import { FIRST, SECOND } from './utils/const';
 
 import {
   VIEW_GENE,

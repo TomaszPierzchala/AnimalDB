@@ -1,8 +1,6 @@
 import {
   VAR_MAX_LENGTH,
-  MAX_TARANSLINE_NAME,
-  validateRequiredAndMaxLength,
-  validateNonLessThenZeroAndRequiredAndMaxLength
+  MAX_TARANSLINE_NAME
 } from './textValidation';
 
 function DoubleParamForm({
@@ -102,7 +100,7 @@ function DoubleParamForm({
                     createFieldWarning(firstValue, value)
                   );
                 }}
-                maxLength={firstInputType === 'select' ? MAX_TARANSLINE_NAME : undefined}
+                maxLength={firstInputType === 'select' ? MAX_TARANSLINE_NAME : VAR_MAX_LENGTH}
               />
             </label>
           </div>

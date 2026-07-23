@@ -217,13 +217,13 @@ function TwoColumnView({
 	const firstWarning =
 	  (warningKey & FIRST) !== 0
 	    ? firstInputType === 'select'
-	      ? validateNonLessThenZeroAndRequiredAndMaxLength(first, maxLength)
-	      : validateRequiredAndMaxLength(first, maxLength)
+	      ? validateNonLessThenZeroAndRequiredAndMaxLength({name: firstName, value: first}, maxLength)
+	      : validateRequiredAndMaxLength({name: firstName, value: first}, maxLength)
 	    : '';
 
 	const secondWarning =
 	  (warningKey & SECOND) !== 0
-	    ? validateRequiredAndMaxLength(second, maxLength)
+	    ? validateRequiredAndMaxLength({name: secondName, value: second}, maxLength)
 	    : '';
 
 	const validationMessage =
