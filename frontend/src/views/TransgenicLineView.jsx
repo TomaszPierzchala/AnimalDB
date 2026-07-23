@@ -1,4 +1,5 @@
 import TwoColumnView from './TwoColumnView';
+import { FIRST, SECOND } from '../utils/const';
 
 import {
   createTransLine,
@@ -18,7 +19,7 @@ function TransgenicLineView() {
       firstEditName="strainId"
 
       secondName="name"
-      warningKey = {3}
+      warningKey = {FIRST | SECOND}
 
       firstInputType="select"
       getFirstOptionsApi={getStrains}

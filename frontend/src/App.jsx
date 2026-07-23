@@ -5,6 +5,7 @@ import TwoColumnView from './views/TwoColumnView';
 import GitHubLink from './components/GitHubLink';
 import Sidebar from './components/Sidebar';
 import TransgenicLineView from './views/TransgenicLineView';
+import { FIRST, SECOND } from '../utils/const';
 
 import {
   VIEW_GENE,
@@ -69,7 +70,7 @@ function App() {
         entityName='Gene'
         firstName='symbol'
         secondName='description'
-        warningKey={1}
+        warningKey={FIRST}
         createApi={createGene}
         getApi={getGenes}
         updateApi={updateGene}
@@ -84,7 +85,7 @@ function App() {
         entityName='Strain'
         firstName='code'
         secondName='name'
-        warningKey={3}
+        warningKey={FIRST | SECOND}
         createApi={createStrain}
         getApi={getStrains}
         updateApi={updateStrain}

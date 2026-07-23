@@ -19,6 +19,7 @@ function DoubleParamForm({
   warning,
   deleteArmed,
   hasChanges,
+  createFieldWarning,
   onChangeFirstField,
   onChangeSecondField,
   onSubmit,
@@ -47,7 +48,7 @@ function DoubleParamForm({
 
                       onChangeFirstField(
                           value,
-                          validateNonLessThenZeroAndRequiredAndMaxLength(value)
+                          createFieldWarning(value, secondValue)
                       );
                   }}
                 >
@@ -73,7 +74,7 @@ function DoubleParamForm({
 
                     onChangeFirstField(
                       value,
-                      validateRequiredAndMaxLength(value)
+                      createFieldWarning(value, secondValue)
                     );
                   }}
                   maxLength={VAR_MAX_LENGTH}
@@ -98,7 +99,7 @@ function DoubleParamForm({
 
                   onChangeSecondField(
                     value,
-                    validateRequiredAndMaxLength(value, MAX_TARANSLINE_NAME)
+                    createFieldWarning(firstValue, value)
                   );
                 }}
                 maxLength={firstInputType === 'select' ? MAX_TARANSLINE_NAME : undefined}

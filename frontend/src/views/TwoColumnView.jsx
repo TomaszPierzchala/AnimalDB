@@ -2,9 +2,11 @@ import { useEffect, useState } from 'react';
 
 import ErrorBanner from '../components/ErrorBanner';
 import { firstCapital } from '../utils/textUtils';
+import { FIRST, SECOND } from '../utils/const';
 import DoubleParamForm from './DoubleParamForm';
 import TwoColumnTable from './TwoColumnTable';
 import { validateRequiredAndMaxLength, validateNonLessThenZeroAndRequiredAndMaxLength } from './textValidation';
+import { VAR_MAX_LENGTH, MAX_TARANSLINE_NAME } from './textValidation';
 
 import './View.css';
 
@@ -12,7 +14,7 @@ function TwoColumnView({
   entityName,
   firstName,
   secondName,
-  warningKey = 3,/* int -> binary contains information about warnings e.g. 3 = b11 means warning for 1st &2nd field */
+  warningKey = FIRST | SECOND,/* int -> binary contains information about warnings e.g. 3 = b11 means warning for 1st &2nd field */
 
   firstRequestName = firstName,
   firstEditName = firstName,
@@ -117,27 +119,31 @@ function TwoColumnView({
   }
 
   function openCreatePopup() {
+    const initialFirstValue = firstValueSelect;
+    const initialSecondValue = '';
+
     setEntity(null);
-    setFirstValue(firstValueSelect);
-    setSecondValue('');
+    setFirstValue(initialFirstValue);
+    setSecondValue(initialSecondValue);
     setDeleteArmed(false);
-    setFieldWarning('');
+
+    setFieldWarning(createFieldWarning(initialFirstValue, initialSecondValue));
+
     setPopupOpen(true);
   }
 
   function openEditPopup(selectedEntity) {
+    const editFirstValue = String(selectedEntity[firstEditName] ?? '');
+
+    const editSecondValue =  selectedEntity[secondName] ?? '';
+
     setEntity(selectedEntity);
-
-    const editValue =
-      selectedEntity[firstEditName] ?? '';
-
-    setFirstValue(String(editValue));
-    setSecondValue(
-      selectedEntity[secondName] ?? ''
-    );
-
+    setFirstValue(editFirstValue);
+    setSecondValue(editSecondValue);
     setDeleteArmed(false);
-    setFieldWarning('');
+
+    setFieldWarning(createFieldWarning(editFirstValue, editSecondValue));
+
     setPopupOpen(true);
   }
 
@@ -158,22 +164,8 @@ function TwoColumnView({
   async function handleSubmit(event) {
     event.preventDefault();
 
-    const firstWarning =
-      (warningKey & FIRST) !== 0
-        ? firstInputType === 'select'
-          ? validateNonLessThenZeroAndRequiredAndMaxLength(firstValue)
-          : validateRequiredAndMaxLength(firstValue)
-        : '';
-
-    const secondWarning =
-      (warningKey & SECOND) !== 0
-        ? validateRequiredAndMaxLength(secondValue)
-        : '';
-
-    const validationMessage =
-      firstWarning && secondWarning
-        ? 'Please correct both field values.'
-        : firstWarning || secondWarning;
+	const validationMessage =
+	    createFieldWarning(firstValue, secondValue);
 
     if (validationMessage) {
       setFieldWarning(validationMessage);
@@ -220,6 +212,28 @@ function TwoColumnView({
     }
   }
 
+  function createFieldWarning(first, second){
+	const maxLength = (entityName==='Transgenic Line') ?  MAX_TARANSLINE_NAME : VAR_MAX_LENGTH;
+	const firstWarning =
+	  (warningKey & FIRST) !== 0
+	    ? firstInputType === 'select'
+	      ? validateNonLessThenZeroAndRequiredAndMaxLength(first, maxLength)
+	      : validateRequiredAndMaxLength(first, maxLength)
+	    : '';
+
+	const secondWarning =
+	  (warningKey & SECOND) !== 0
+	    ? validateRequiredAndMaxLength(second, maxLength)
+	    : '';
+
+	const validationMessage =
+	  firstWarning && secondWarning
+	    ? 'Please correct both field values.'
+	    : firstWarning || secondWarning;
+
+	return validationMessage;
+  }
+
   async function handleDelete() {
     if (entity === null) {
       return;
@@ -259,8 +273,6 @@ function TwoColumnView({
     firstValue !== originalFirstValue ||
     secondValue !== originalSecondValue;
 
-  const FIRST = 1, SECOND = 2;
-
   return (
     <section>
       <ErrorBanner
@@ -296,6 +308,7 @@ function TwoColumnView({
           deleteArmed={deleteArmed}
           hasChanges={hasChanges}
 
+          createFieldWarning={createFieldWarning}
           onChangeFirstField={
             (value, warning) => {
               setFirstValue(value);

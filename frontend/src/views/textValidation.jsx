@@ -8,7 +8,7 @@ export function validateRequiredAndMaxLength(value, maxLength = VAR_MAX_LENGTH) 
     return 'Value is required.';
   }
 
-  if (text.length > maxLength) {
+  if (text.length >= maxLength) {
     return `Maximum length (${maxLength}) exceeded.`;
   }
 
