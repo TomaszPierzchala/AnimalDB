@@ -18,6 +18,7 @@ function TransgenicLineView() {
       firstEditName="strainId"
 
       secondName="name"
+      warningKey = {3}
 
       firstInputType="select"
       getFirstOptionsApi={getStrains}

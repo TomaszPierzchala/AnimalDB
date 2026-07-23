@@ -1,7 +1,8 @@
 import {
   VAR_MAX_LENGTH,
   MAX_TARANSLINE_NAME,
-  validateEmptyAndMax
+  validateRequiredAndMaxLength,
+  validateNonLessThenZeroAndRequiredAndMaxLength
 } from './textValidation';
 
 function DoubleParamForm({
@@ -41,11 +42,16 @@ function DoubleParamForm({
               {firstInputType === 'select' ? (
                 <select className='strain-select'
                   value={firstValue}
-                  onChange={event =>
-                    onChangeFirstField(event.target.value)
-                  }
+                  onChange={event => {
+                      const value = event.target.value;
+
+                      onChangeFirstField(
+                          value,
+                          validateNonLessThenZeroAndRequiredAndMaxLength(value)
+                      );
+                  }}
                 >
-                  <option value="">
+                  <option value="-1">
                     Select {firstName}
                   </option>
 
@@ -67,7 +73,7 @@ function DoubleParamForm({
 
                     onChangeFirstField(
                       value,
-                      validateEmptyAndMax(value)
+                      validateRequiredAndMaxLength(value)
                     );
                   }}
                   maxLength={VAR_MAX_LENGTH}
@@ -87,19 +93,14 @@ function DoubleParamForm({
               <input
                 type="text"
                 value={secondValue}
-                onChange={firstInputType !== 'select' ? (
-                  event => onChangeSecondField(event.target.value)
-                  ) : (
-                  event => {
-                            const value = event.target.value;
+                onChange={event => {
+                  const value = event.target.value;
 
-                            onChangeSecondField(
-                              value,
-                              validateEmptyAndMax(value, MAX_TARANSLINE_NAME)
-                            );
-                           }
-                  )
-                }
+                  onChangeSecondField(
+                    value,
+                    validateRequiredAndMaxLength(value, MAX_TARANSLINE_NAME)
+                  );
+                }}
                 maxLength={firstInputType === 'select' ? MAX_TARANSLINE_NAME : undefined}
               />
             </label>

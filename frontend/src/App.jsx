@@ -69,6 +69,7 @@ function App() {
         entityName='Gene'
         firstName='symbol'
         secondName='description'
+        warningKey={1}
         createApi={createGene}
         getApi={getGenes}
         updateApi={updateGene}
@@ -83,6 +84,7 @@ function App() {
         entityName='Strain'
         firstName='code'
         secondName='name'
+        warningKey={3}
         createApi={createStrain}
         getApi={getStrains}
         updateApi={updateStrain}
