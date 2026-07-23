@@ -13,13 +13,17 @@ import './View.css';
 function TwoColumnView({
   entityName,
   firstName,
+  firstName2 = null,
   secondName,
   warningKey = FIRST | SECOND,/* int -> binary contains information about warnings e.g. 3 = b11 means warning for 1st &2nd field */
 
   firstRequestName = firstName,
   firstEditName = firstName,
   firstInputType = 'text',
-  getFirstOptionsApi,
+  getSubEntityApi,
+
+  subEntityLabelName = 'code',
+  subEntitySecondLabelName = null,
 
   createApi,
   getApi,
@@ -48,18 +52,20 @@ function TwoColumnView({
   }, [getApi]);
 
   useEffect(() => {
-    if (!getFirstOptionsApi) {
+    if (!getSubEntityApi) {
       return;
     }
 
     async function loadFirstOptions() {
       try {
-        const data = await getFirstOptionsApi();
+        const data = await getSubEntityApi();
 
         const options = Array.isArray(data)
           ? data.map(item => ({
               value: item.id,
-              label: item.code
+              label: subEntitySecondLabelName
+                      ? `${item[subEntityLabelName]} - ${item[subEntitySecondLabelName]}`
+                      : item[subEntityLabelName]
             }))
           : [];
 
@@ -73,7 +79,7 @@ function TwoColumnView({
     }
 
     loadFirstOptions();
-  }, [getFirstOptionsApi]);
+  }, [getSubEntityApi]);
 
   useEffect(() => {
     if (!error) {
@@ -288,6 +294,7 @@ function TwoColumnView({
         onCreate={openCreatePopup}
         entityName={entityName}
         firstName={firstName}
+        firstName2={firstName2}
         secondName={secondName}
       />
 

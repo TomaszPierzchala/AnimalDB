@@ -15,6 +15,7 @@ function TransgenicLineView() {
       entityName="Transgenic Line"
 
       firstName="strainCode"
+      firstName2="strainName"
       firstRequestName="strainId"
       firstEditName="strainId"
 
@@ -22,7 +23,10 @@ function TransgenicLineView() {
       warningKey = {FIRST | SECOND}
 
       firstInputType="select"
-      getFirstOptionsApi={getStrains}
+      getSubEntityApi={getStrains}
+
+      subEntityLabelName="code"
+      subEntitySecondLabelName="name"
 
       createApi={createTransLine}
       getApi={getTransLines}
