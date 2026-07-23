@@ -44,7 +44,6 @@ function DoubleParamForm({
                   onChange={event =>
                     onChangeFirstField(event.target.value)
                   }
-                  required
                 >
                   <option value="">
                     Select {firstName}
@@ -71,15 +70,12 @@ function DoubleParamForm({
                       validateEmptyAndMax(value)
                     );
                   }}
-                  required
                   maxLength={VAR_MAX_LENGTH}
                 />
               )}
-              {firstInputType !== 'select' && (
-                <small className="field-warning">
-                  {warning}
-                </small>
-              )}
+              <small className="field-warning pulsing-text">
+                {warning}
+              </small>
 
             </label>
           </div>
@@ -106,11 +102,6 @@ function DoubleParamForm({
                 }
                 maxLength={firstInputType === 'select' ? MAX_TARANSLINE_NAME : undefined}
               />
-              {firstInputType === 'select' && (
-                <small className="field-warning">
-                  {warning}
-                </small>
-              )}
             </label>
           </div>
 

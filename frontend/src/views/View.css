@@ -156,13 +156,28 @@ tbody tr:nth-child(even) {
   display: block;
 
   min-height: 16px;
-  margin-top: 4px;
+  margin-top: 8px;
 
-  color: darkred;
+  color: red;
 
   font-size: 14px;
   font-weight: normal;
   line-height: 16px;
+}
+
+.pulsing-text {
+  animation: change-opacity 15s ease-in-out infinite;
+}
+
+@keyframes change-opacity {
+  0%,
+  100% {
+    opacity: 1.;
+  }
+
+  50% {
+    opacity: 0.5
+  }
 }
 
 /* =========================
