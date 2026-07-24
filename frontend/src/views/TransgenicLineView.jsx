@@ -1,5 +1,4 @@
 import TwoColumnView from './TwoColumnView';
-import { FIRST, SECOND } from '../utils/const';
 
 import {
   createTransLine,
@@ -7,6 +6,7 @@ import {
   getTransLines,
   updateTransLine
 } from '../api/transgenicLineApi';
+
 import { getStrains } from '../api/strainApi';
 
 function TransgenicLineView() {
@@ -16,15 +16,16 @@ function TransgenicLineView() {
 
       firstName="strainCode"
       firstName2="strainName"
+      firstLabel="Strain code - strain name"
+
       firstRequestName="strainId"
       firstEditName="strainId"
+      firstInputType="select"
 
       secondName="name"
-      warningKey = {FIRST | SECOND}
+      secondLabel="Name"
 
-      firstInputType="select"
       getSubEntityApi={getStrains}
-
       subEntityLabelName="code"
       subEntitySecondLabelName="name"
 

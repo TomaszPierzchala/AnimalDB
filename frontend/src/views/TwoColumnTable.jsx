@@ -1,11 +1,24 @@
-import { firstCapital } from '../utils/textUtils';
-
 function TwoColumnTable({
   records,
   onEdit,
   onCreate,
-  entityName, firstName, secondName, firstName2
+  entityName,
+
+  firstName,
+  firstName2,
+  firstLabel,
+
+  secondName,
+  secondLabel
 }) {
+  function getFirstColumnValue(record) {
+    if (!firstName2) {
+      return record[firstName];
+    }
+
+    return `${record[firstName] ?? ''} - ${record[firstName2] ?? ''}`;
+  }
+
   return (
     <table>
       <colgroup>
@@ -17,21 +30,29 @@ function TwoColumnTable({
       <thead>
         <tr>
           <th className="id-column">ID</th>
-          <th>{firstName2 ? `${firstName} - ${firstName2}` : firstName }</th>
-          <th>{firstCapital(secondName)}</th>
+          <th>{firstLabel}</th>
+          <th>{secondLabel}</th>
         </tr>
       </thead>
 
       <tbody>
-        {records.map((record) => (
+        {records.map(record => (
           <tr
             key={record.id}
             className="clickable-row"
             onClick={() => onEdit(record)}
           >
-            <td className="id-column">{record.id}</td>
-            <td>{firstName2 ? `${record[firstName]} - ${record[firstName2]}`: record[firstName]}</td>
-            <td>{record[secondName]}</td>
+            <td className="id-column">
+              {record.id}
+            </td>
+
+            <td>
+              {getFirstColumnValue(record)}
+            </td>
+
+            <td>
+              {record[secondName]}
+            </td>
           </tr>
         ))}
 

@@ -5,23 +5,33 @@ import { firstCapital } from '../utils/textUtils';
 import { FIRST, SECOND } from '../utils/const';
 import DoubleParamForm from './DoubleParamForm';
 import TwoColumnTable from './TwoColumnTable';
-import { validateRequiredAndMaxLength, validateNonLessThenZeroAndRequiredAndMaxLength } from './textValidation';
-import { VAR_MAX_LENGTH, MAX_TARANSLINE_NAME } from './textValidation';
+
+import {
+  MAX_TARANSLINE_NAME,
+  VAR_MAX_LENGTH,
+  validateNonLessThenZeroAndRequiredAndMaxLength,
+  validateRequiredAndMaxLength
+} from './textValidation';
 
 import './View.css';
 
 function TwoColumnView({
   entityName,
+
   firstName,
   firstName2 = null,
+  firstLabel = firstCapital(firstName),
+
   secondName,
-  warningKey = FIRST | SECOND,/* int -> binary contains information about warnings e.g. 3 = b11 means warning for 1st &2nd field */
+  secondLabel = firstCapital(secondName),
+
+  warningKey = FIRST | SECOND,
 
   firstRequestName = firstName,
   firstEditName = firstName,
   firstInputType = 'text',
-  getSubEntityApi,
 
+  getSubEntityApi,
   subEntityLabelName = 'code',
   subEntitySecondLabelName = null,
 
@@ -30,25 +40,38 @@ function TwoColumnView({
   updateApi,
   deleteApi
 }) {
+  const initialFirstValue =
+    firstInputType === 'select' ? '-1' : '';
 
-  const firstValueSelect = (firstInputType === 'select') ? -1 : '';
+  const secondMaxLength =
+    entityName === 'Transgenic Line'
+      ? MAX_TARANSLINE_NAME
+      : VAR_MAX_LENGTH;
+
   const [records, setRecords] = useState([]);
   const [firstOptions, setFirstOptions] = useState([]);
 
   const [error, setError] = useState('');
   const [errorFading, setErrorFading] = useState(false);
-  const [refreshAfterError, setRefreshAfterError] = useState(false);
+  const [refreshAfterError, setRefreshAfterError] =
+    useState(false);
 
   const [popupOpen, setPopupOpen] = useState(false);
   const [entity, setEntity] = useState(null);
   const [deleteArmed, setDeleteArmed] = useState(false);
 
-  const [firstValue, setFirstValue] = useState(firstValueSelect);
+  const [firstValue, setFirstValue] =
+    useState(initialFirstValue);
+
   const [secondValue, setSecondValue] = useState('');
   const [fieldWarning, setFieldWarning] = useState('');
 
   useEffect(() => {
-    loadRecords();
+    async function load() {
+      await loadRecords();
+    }
+
+    load();
   }, [getApi]);
 
   useEffect(() => {
@@ -56,30 +79,33 @@ function TwoColumnView({
       return;
     }
 
-    async function loadFirstOptions() {
+    async function loadOptions() {
       try {
         const data = await getSubEntityApi();
 
         const options = Array.isArray(data)
           ? data.map(item => ({
-              value: item.id,
+              value: String(item.id),
               label: subEntitySecondLabelName
-                      ? `${item[subEntityLabelName]} - ${item[subEntitySecondLabelName]}`
-                      : item[subEntityLabelName]
+                ? `${item[subEntityLabelName]} - ${item[subEntitySecondLabelName]}`
+                : item[subEntityLabelName]
             }))
           : [];
 
         setFirstOptions(options);
       } catch (err) {
         showError(
-          'Could not load available options.\n' +
-          err.message
+          `Could not load available options.\n${err.message}`
         );
       }
     }
 
-    loadFirstOptions();
-  }, [getSubEntityApi]);
+    loadOptions();
+  }, [
+    getSubEntityApi,
+    subEntityLabelName,
+    subEntitySecondLabelName
+  ]);
 
   useEffect(() => {
     if (!error) {
@@ -113,9 +139,7 @@ function TwoColumnView({
       setRecords(Array.isArray(data) ? data : []);
       setError('');
     } catch (err) {
-      showError(
-        'Could not load data.\n' + err.message
-      );
+      showError(`Could not load data.\n${err.message}`);
     }
   }
 
@@ -124,39 +148,76 @@ function TwoColumnView({
     setError(message);
   }
 
+  function createFieldWarning(first, second) {
+    const firstWarning =
+      (warningKey & FIRST) !== 0
+        ? firstInputType === 'select'
+          ? validateNonLessThenZeroAndRequiredAndMaxLength(
+              {
+                name: firstLabel,
+                value: first
+              },
+              VAR_MAX_LENGTH
+            )
+          : validateRequiredAndMaxLength(
+              {
+                name: firstLabel,
+                value: first
+              },
+              VAR_MAX_LENGTH
+            )
+        : '';
+
+    const secondWarning =
+      (warningKey & SECOND) !== 0
+        ? validateRequiredAndMaxLength(
+            {
+              name: secondLabel,
+              value: second
+            },
+            secondMaxLength
+          )
+        : '';
+
+    if (firstWarning && secondWarning) {
+      return 'Please correct both field values.';
+    }
+
+    return firstWarning || secondWarning;
+  }
+
   function openCreatePopup() {
-    const initialFirstValue = firstValueSelect;
-    const initialSecondValue = '';
+    const first = initialFirstValue;
+    const second = '';
 
     setEntity(null);
-    setFirstValue(initialFirstValue);
-    setSecondValue(initialSecondValue);
+    setFirstValue(first);
+    setSecondValue(second);
     setDeleteArmed(false);
-
-    setFieldWarning(createFieldWarning(initialFirstValue, initialSecondValue));
-
+    setFieldWarning(createFieldWarning(first, second));
     setPopupOpen(true);
   }
 
   function openEditPopup(selectedEntity) {
-    const editFirstValue = String(selectedEntity[firstEditName] ?? '');
+    const first = String(
+      selectedEntity[firstEditName] ?? initialFirstValue
+    );
 
-    const editSecondValue =  selectedEntity[secondName] ?? '';
+    const second =
+      selectedEntity[secondName] ?? '';
 
     setEntity(selectedEntity);
-    setFirstValue(editFirstValue);
-    setSecondValue(editSecondValue);
+    setFirstValue(first);
+    setSecondValue(second);
     setDeleteArmed(false);
-
-    setFieldWarning(createFieldWarning(editFirstValue, editSecondValue));
-
+    setFieldWarning(createFieldWarning(first, second));
     setPopupOpen(true);
   }
 
   function closePopup() {
     setPopupOpen(false);
     setEntity(null);
-    setFirstValue(firstValueSelect);
+    setFirstValue(initialFirstValue);
     setSecondValue('');
     setDeleteArmed(false);
     setFieldWarning('');
@@ -170,8 +231,8 @@ function TwoColumnView({
   async function handleSubmit(event) {
     event.preventDefault();
 
-	const validationMessage =
-	    createFieldWarning(firstValue, secondValue);
+    const validationMessage =
+      createFieldWarning(firstValue, secondValue);
 
     if (validationMessage) {
       setFieldWarning(validationMessage);
@@ -182,13 +243,12 @@ function TwoColumnView({
       return;
     }
 
-    const requestFirstValue =
-      firstInputType === 'select'
-        ? Number(firstValue)
-        : firstValue;
-
     const requestBody = {
-      [firstRequestName]: requestFirstValue,
+      [firstRequestName]:
+        firstInputType === 'select'
+          ? Number(firstValue)
+          : firstValue,
+
       [secondName]: secondValue
     };
 
@@ -201,14 +261,11 @@ function TwoColumnView({
 
       await refreshAfterPopup();
     } catch (err) {
+      const operation =
+        entity === null ? 'create a new' : 'update the';
+
       showError(
-        (
-          entity === null
-            ? `Could not create a new ${entityName.toLowerCase()}.`
-            : `Could not update the ${entityName.toLowerCase()}.`
-        ) +
-        '\n' +
-        err.message
+        `Could not ${operation} ${entityName.toLowerCase()}.\n${err.message}`
       );
 
       if (entity !== null) {
@@ -216,28 +273,6 @@ function TwoColumnView({
         setRefreshAfterError(true);
       }
     }
-  }
-
-  function createFieldWarning(first, second){
-	const maxLength = (entityName==='Transgenic Line') ?  MAX_TARANSLINE_NAME : VAR_MAX_LENGTH;
-	const firstWarning =
-	  (warningKey & FIRST) !== 0
-	    ? firstInputType === 'select'
-	      ? validateNonLessThenZeroAndRequiredAndMaxLength({name: firstName, value: first}, maxLength)
-	      : validateRequiredAndMaxLength({name: firstName, value: first}, maxLength)
-	    : '';
-
-	const secondWarning =
-	  (warningKey & SECOND) !== 0
-	    ? validateRequiredAndMaxLength({name: secondName, value: second}, maxLength)
-	    : '';
-
-	const validationMessage =
-	  firstWarning && secondWarning
-	    ? 'Please correct both field values.'
-	    : firstWarning || secondWarning;
-
-	return validationMessage;
   }
 
   async function handleDelete() {
@@ -255,8 +290,7 @@ function TwoColumnView({
       await refreshAfterPopup();
     } catch (err) {
       showError(
-        `Could not delete the ${entityName.toLowerCase()}.\n` +
-        err.message
+        `Could not delete the ${entityName.toLowerCase()}.\n${err.message}`
       );
 
       closePopup();
@@ -266,8 +300,8 @@ function TwoColumnView({
 
   const originalFirstValue =
     entity === null
-      ? ''
-      : String(entity[firstEditName] ?? '');
+      ? initialFirstValue
+      : String(entity[firstEditName] ?? initialFirstValue);
 
   const originalSecondValue =
     entity === null
@@ -295,41 +329,40 @@ function TwoColumnView({
         entityName={entityName}
         firstName={firstName}
         firstName2={firstName2}
+        firstLabel={firstLabel}
         secondName={secondName}
+        secondLabel={secondLabel}
       />
 
       {popupOpen && (
         <DoubleParamForm
           entity={entity}
           entityName={entityName}
-
-          firstName={firstCapital(firstName)}
+          firstName={firstLabel}
           firstValue={firstValue}
           firstInputType={firstInputType}
           firstOptions={firstOptions}
-
-          secondName={firstCapital(secondName)}
+          secondName={secondLabel}
           secondValue={secondValue}
-
+          secondMaxLength={secondMaxLength}
           warning={fieldWarning}
           deleteArmed={deleteArmed}
           hasChanges={hasChanges}
-
           createFieldWarning={createFieldWarning}
-          onChangeFirstField={
-            (value, warning) => {
-              setFirstValue(value);
-              (warningKey & FIRST) && setFieldWarning(warning);
-            }
-          }
+          onChangeFirstField={(value, warning) => {
+            setFirstValue(value);
 
-          onChangeSecondField={
-            (value, warning) => {
-              setSecondValue(value);
-              (warningKey & SECOND) && setFieldWarning(warning);
+            if ((warningKey & FIRST) !== 0) {
+              setFieldWarning(warning);
             }
-          }
+          }}
+          onChangeSecondField={(value, warning) => {
+            setSecondValue(value);
 
+            if ((warningKey & SECOND) !== 0) {
+              setFieldWarning(warning);
+            }
+          }}
           onSubmit={handleSubmit}
           onDelete={handleDelete}
           onCancel={closePopup}

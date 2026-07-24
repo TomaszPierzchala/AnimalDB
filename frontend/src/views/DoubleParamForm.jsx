@@ -1,22 +1,22 @@
-import {
-  VAR_MAX_LENGTH,
-  MAX_TARANSLINE_NAME
-} from './textValidation';
+import { VAR_MAX_LENGTH } from './textValidation';
 
 function DoubleParamForm({
-  editing,
+  entity,
   entityName,
+
   firstName,
   firstValue,
-  secondName,
-  secondValue,
-
   firstInputType,
   firstOptions,
+
+  secondName,
+  secondValue,
+  secondMaxLength,
 
   warning,
   deleteArmed,
   hasChanges,
+
   createFieldWarning,
   onChangeFirstField,
   onChangeSecondField,
@@ -24,13 +24,15 @@ function DoubleParamForm({
   onDelete,
   onCancel
 }) {
+  const editing = entity !== null;
+
   return (
     <div className="popup-backdrop">
       <div className="popup">
         <h2>
-          {editing === null
-            ? `Add ${entityName}`
-            : `Edit ${entityName}`}
+          {editing
+            ? `Edit ${entityName}`
+            : `Add ${entityName}`}
         </h2>
 
         <form onSubmit={onSubmit}>
@@ -39,19 +41,23 @@ function DoubleParamForm({
               {firstName}:
 
               {firstInputType === 'select' ? (
-                <select className='strain-select'
+                <select
+                  className="strain-select"
                   value={firstValue}
                   onChange={event => {
-                      const value = event.target.value;
+                    const value = event.target.value;
 
-                      onChangeFirstField(
-                          value,
-                          createFieldWarning(value, secondValue)
-                      );
+                    onChangeFirstField(
+                      value,
+                      createFieldWarning(
+                        value,
+                        secondValue
+                      )
+                    );
                   }}
                 >
                   <option value="-1">
-                    Select {firstName}
+                    Select from drop-down menu
                   </option>
 
                   {firstOptions.map(option => (
@@ -67,21 +73,24 @@ function DoubleParamForm({
                 <input
                   type="text"
                   value={firstValue}
+                  maxLength={VAR_MAX_LENGTH}
                   onChange={event => {
                     const value = event.target.value;
 
                     onChangeFirstField(
                       value,
-                      createFieldWarning(value, secondValue)
+                      createFieldWarning(
+                        value,
+                        secondValue
+                      )
                     );
                   }}
-                  maxLength={VAR_MAX_LENGTH}
                 />
               )}
+
               <small className="field-warning pulsing-text">
                 {warning}
               </small>
-
             </label>
           </div>
 
@@ -92,22 +101,25 @@ function DoubleParamForm({
               <input
                 type="text"
                 value={secondValue}
+                maxLength={secondMaxLength}
                 onChange={event => {
                   const value = event.target.value;
 
                   onChangeSecondField(
                     value,
-                    createFieldWarning(firstValue, value)
+                    createFieldWarning(
+                      firstValue,
+                      value
+                    )
                   );
                 }}
-                maxLength={firstInputType === 'select' ? MAX_TARANSLINE_NAME : VAR_MAX_LENGTH}
               />
             </label>
           </div>
 
           <div className="popup-buttons">
             <div>
-              {editing !== null && (
+              {editing && (
                 <button
                   type="button"
                   className={
@@ -127,14 +139,9 @@ function DoubleParamForm({
             <div className="popup-main-buttons">
               <button
                 type="submit"
-                disabled={
-                  editing !== null &&
-                  !hasChanges
-                }
+                disabled={editing && !hasChanges}
               >
-                {editing === null
-                  ? 'Add'
-                  : 'Save'}
+                {editing ? 'Save' : 'Add'}
               </button>
 
               <button

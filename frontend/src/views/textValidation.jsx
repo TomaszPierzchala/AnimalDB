@@ -24,7 +24,7 @@ export function validateNonLessThenZeroAndRequiredAndMaxLength(
   { name = 'Value', value },
   maxLength = VAR_MAX_LENGTH) {
   if (Number(value)<0) {
-	return `Select a ${firstCapital(name)} from the drop-down menue`;
+	return `Select a "${firstCapital(name)}"`;
   }
   return validateRequiredAndMaxLength({name: name, value: value}, maxLength);
 }
