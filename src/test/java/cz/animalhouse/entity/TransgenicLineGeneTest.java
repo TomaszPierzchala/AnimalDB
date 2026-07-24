@@ -59,7 +59,7 @@ class TransgenicLineGeneTest {
 
         assertThat(saved.toString())
                 .contains("TransgenicLineGene [EmbeddedId=")
-                .contains("(transgenicLineId=" + transgenicLine.getId())
+                .contains("[transgenicLineId=" + transgenicLine.getId())
                 .contains(", geneId=" + gene.getId());
     }
 

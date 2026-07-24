@@ -30,8 +30,8 @@ class TransgenicLineGeneIdTest {
         TransgenicLineGeneId id =
                 new TransgenicLineGeneId(10L, 20L);
 
-        assertThat(id.getTransgenicLineId()).isEqualTo(10L);
-        assertThat(id.getGeneId()).isEqualTo(20L);
+        assertThat(id.transgenicLineId()).isEqualTo(10L);
+        assertThat(id.geneId()).isEqualTo(20L);
     }
     
     @Test
@@ -96,6 +96,6 @@ class TransgenicLineGeneIdTest {
                 new TransgenicLineGeneId(10L, 20L);
 
         assertThat(id.toString())
-                .isEqualTo("(transgenicLineId=10, geneId=20)");
+                .isEqualTo("TransgenicLineGeneId[transgenicLineId=10, geneId=20]");
     }
 }
