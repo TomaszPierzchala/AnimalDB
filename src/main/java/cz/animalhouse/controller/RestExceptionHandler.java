@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import cz.animalhouse.exception.DuplicateGeneSymbolException;
 import cz.animalhouse.exception.DuplicateStrainCodeException;
+import cz.animalhouse.exception.TransgenicLineGeneNotFoundException;
 
 @RestControllerAdvice
 public class RestExceptionHandler {
@@ -25,6 +26,12 @@ public class RestExceptionHandler {
     @ExceptionHandler(DuplicateStrainCodeException.class)
     @ResponseStatus(HttpStatus.CONFLICT)
     public ErrorResponse handleDuplicateStrainCode(DuplicateStrainCodeException ex) {
+        return new ErrorResponse(ex.getMessage());
+    }
+    
+    @ExceptionHandler(TransgenicLineGeneNotFoundException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public ErrorResponse handleTransgenicLineGeneNotFoundException(TransgenicLineGeneNotFoundException ex) {
         return new ErrorResponse(ex.getMessage());
     }
 
