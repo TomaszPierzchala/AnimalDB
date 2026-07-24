@@ -5,12 +5,14 @@ import TwoColumnView from './views/TwoColumnView';
 import GitHubLink from './components/GitHubLink';
 import Sidebar from './components/Sidebar';
 import TransgenicLineView from './views/TransgenicLineView';
+import TransgenicLineGenesView from './views/TransgenicLineGenesView';
 import { FIRST, SECOND } from './utils/const';
 
 import {
   VIEW_GENE,
   VIEW_STRAIN,
-  VIEW_TRANSLINE
+  VIEW_TRANSLINE,
+  VIEW_TRANSLINEGENES
 } from './viewNames';
 
 import {
@@ -35,7 +37,8 @@ function App() {
     if (
       savedView === VIEW_GENE ||
       savedView === VIEW_STRAIN ||
-      savedView === VIEW_TRANSLINE
+      savedView === VIEW_TRANSLINE ||
+      savedView === VIEW_TRANSLINEGENES
     ) {
       return savedView;
     }
@@ -58,6 +61,9 @@ function App() {
 
       case VIEW_TRANSLINE:
         return renderTransgenicLineView();
+
+      case VIEW_TRANSLINEGENES:
+        return renderTransgenicLineGenesView();
 
       default:
         return renderGeneView();
@@ -96,6 +102,11 @@ function App() {
  
   function renderTransgenicLineView() {
     return <TransgenicLineView />;
+  }
+
+  function renderTransgenicLineGenesView() {
+	/*return <TransgenicLineGenesView />; */
+	return <TransgenicLineGenesView/>;
   }
 
   return (
