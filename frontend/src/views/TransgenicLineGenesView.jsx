@@ -4,6 +4,8 @@ import ErrorBanner from '../components/ErrorBanner';
 
 import { getGenes } from '../api/geneApi';
 import { getTransLines } from '../api/transgenicLineApi';
+import NewDoubleParamForm from './NewDoubleParamForm'
+import {createFieldWarning} from '../warnings/popupWarning'
 
 import {
   createTransLineGene,
@@ -15,6 +17,11 @@ import {
 import './View.css';
 
 function TransgenicLineGenesView() {
+  const firstName="Transgenic line"
+  const firstType="select"
+  const secondName="Gene"
+  const secondType="select"
+	
   const [rows, setRows] = useState([]);
   const [transgenicLines, setTransgenicLines] =
     useState([]);
@@ -31,8 +38,9 @@ function TransgenicLineGenesView() {
   const [geneId, setGeneId] = useState('-1');
 
   const [error, setError] = useState('');
-  const [errorFading, setErrorFading] =
-    useState(false);
+  const [errorFading, setErrorFading] = useState(false);
+  const [deleteArmed, setDeleteArmed] = useState(false);
+  const [fieldWarning, setFieldWarning] = useState('');
 
   useEffect(() => {
     async function load() {
@@ -98,7 +106,7 @@ function TransgenicLineGenesView() {
     setErrorFading(false);
     setError(message);
   }
-
+  
   async function loadAssignments() {
     const data = await getTransLineGenes();
 
@@ -110,6 +118,7 @@ function TransgenicLineGenesView() {
     setTransgenicLineId(String(preselectedLineId));
     setGeneId('-1');
     setPopupOpen(true);
+	setDeleteArmed(false);
   }
 
   function openEditPopup(
@@ -127,6 +136,7 @@ function TransgenicLineGenesView() {
 
     setGeneId(String(currentGeneId));
     setPopupOpen(true);
+	setDeleteArmed(false);
   }
 
   function closePopup() {
@@ -134,7 +144,10 @@ function TransgenicLineGenesView() {
     setEditingAssignment(null);
     setTransgenicLineId('-1');
     setGeneId('-1');
+	setDeleteArmed(false);
   }
+  
+  
 
   async function handleSubmit(event) {
     event.preventDefault();
@@ -181,6 +194,11 @@ function TransgenicLineGenesView() {
       return;
     }
 
+	if (!deleteArmed) {
+	      setDeleteArmed(true);
+	      return;
+	}
+
     try {
       await deleteTransLineGene(
         editingAssignment.transgenicLineId,
@@ -196,6 +214,22 @@ function TransgenicLineGenesView() {
     }
   }
 
+/*
+  const originalFirstValue =
+    entity === null
+      ? initialFirstValue
+      : String(entity[firstEditName] ?? initialFirstValue);
+
+  const originalSecondValue =
+    entity === null
+      ? ''
+      : entity[secondName] ?? '';
+
+  const hasChanges =
+    entity === null ||
+    firstValue !== originalFirstValue ||
+    secondValue !== originalSecondValue;
+*/
   return (
     <section>
       <ErrorBanner
@@ -277,103 +311,55 @@ function TransgenicLineGenesView() {
         </tbody>
       </table>
 
-      {popupOpen && (
-        <div className="popup-backdrop">
-          <div className="popup">
-            <h2>
-              {editingAssignment === null
-                ? 'Add gene assignment'
-                : 'Edit gene assignment'}
-            </h2>
+	  {popupOpen && (
+	    <NewDoubleParamForm
+	      entityName="gene assignment"
+	      editing={editingAssignment !== null}
 
-            <form onSubmit={handleSubmit}>
-              <label>
-                Transgenic line:
+	      firstName={firstName}
+	      firstType="select"
+	      firstValue={transgenicLineId}
+	      firstPlaceholder="Select transgenic line"
+	      firstOptions={transgenicLines.map(line => ({
+	        value: line.id,
+	        label: `${line.strainCode} - ${line.name}`
+	      }))}
 
-                <select
-                  value={transgenicLineId}
-                  onChange={event =>
-                    setTransgenicLineId(
-                      event.target.value
-                    )
-                  }
-                >
-                  <option value="-1">
-                    Select transgenic line
-                  </option>
+	      secondName="Gene"
+	      secondType="select"
+	      secondValue={geneId}
+	      secondPlaceholder="Select gene"
+	      secondOptions={genes.map(gene => ({
+	        value: gene.id,
+	        label: gene.description
+	          ? `${gene.symbol} - ${gene.description}`
+	          : gene.symbol
+	      }))}
 
-                  {transgenicLines.map(line => (
-                    <option
-                      key={line.id}
-                      value={line.id}
-                    >
-                      {line.strainCode}
-                      {' - '}
-                      {line.name}
-                    </option>
-                  ))}
-                </select>
-              </label>
+	      onChangeFirstField={value => {
+	        setTransgenicLineId(value);
+	        setFieldWarning(
+			  createFieldWarning(value, geneId, firstName, secondName, firstType, secondType)
+	        );
+	      }}
 
-              <label>
-                Gene:
+	      onChangeSecondField={value => {
+	        setGeneId(value);
+	        setFieldWarning(
+	          createFieldWarning(transgenicLineId, value, firstName, secondName, firstType, secondType)
+	        );
+	      }}
 
-                <select
-                  value={geneId}
-                  onChange={event =>
-                    setGeneId(event.target.value)
-                  }
-                >
-                  <option value="-1">
-                    Select gene
-                  </option>
+	      firstWarning={fieldWarning}
 
-                  {genes.map(gene => (
-                    <option
-                      key={gene.id}
-                      value={gene.id}
-                    >
-                      {gene.symbol}
-                      {gene.description
-                        ? ` - ${gene.description}`
-                        : ''}
-                    </option>
-                  ))}
-                </select>
-              </label>
+	      onSubmit={handleSubmit}
+	      onDelete={handleDelete}
+	      onCancel={closePopup}
 
-              <div className="popup-buttons">
-                <div>
-                  {editingAssignment !== null && (
-                    <button
-                      type="button"
-                      className="delete-button"
-                      onClick={handleDelete}
-                    >
-                      Delete
-                    </button>
-                  )}
-                </div>
-
-                <div className="popup-main-buttons">
-                  <button type="submit">
-                    {editingAssignment === null
-                      ? 'Add'
-                      : 'Save'}
-                  </button>
-
-                  <button
-                    type="button"
-                    onClick={closePopup}
-                  >
-                    Cancel
-                  </button>
-                </div>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
+	      deleteArmed={deleteArmed}
+	      hasChanges={true} //{hasChanges}
+	    />
+	  )}
     </section>
   );
 }
