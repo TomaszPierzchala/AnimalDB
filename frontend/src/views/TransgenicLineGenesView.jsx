@@ -4,6 +4,7 @@ import ErrorBanner from '../components/ErrorBanner';
 
 import { getGenes } from '../api/geneApi';
 import { getTransLines } from '../api/transgenicLineApi';
+import AddNewRecordRow from './AddNewRecordRow'
 import NewDoubleParamForm from './NewDoubleParamForm'
 import {createFieldWarning} from '../warnings/popupWarning'
 
@@ -240,9 +241,14 @@ function TransgenicLineGenesView() {
       <h1>Transgenic line - Genes</h1>
 
       <table>
+        <colgroup>
+          <col className="id-table-column" />
+          <col className="symbol-table-column" />
+          <col className="description-table-column" />
+        </colgroup>
         <thead>
           <tr>
-            <th>Transgenic line</th>
+            <th colSpan={2}>Transgenic line</th>
             <th>Genes</th>
           </tr>
         </thead>
@@ -250,7 +256,7 @@ function TransgenicLineGenesView() {
         <tbody>
           {rows.map(row => (
             <tr key={row.transgenicLineId}>
-              <td>
+              <td colSpan={2}>
                 <button
                   type="button"
                   className="table-link-button"
@@ -300,14 +306,10 @@ function TransgenicLineGenesView() {
             </tr>
           ))}
 
-          <tr
-            className="empty-row"
-            onClick={() => openCreatePopup()}
-          >
-            <td colSpan={2}>
-              + Add transgenic line-gene assignment
-            </td>
-          </tr>
+          <AddNewRecordRow
+              entityName='transgenic line-gene'
+              onCreate={openCreatePopup}
+          />
         </tbody>
       </table>
 

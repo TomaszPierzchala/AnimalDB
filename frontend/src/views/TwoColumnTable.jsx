@@ -1,3 +1,5 @@
+import AddNewRecordRow from './AddNewRecordRow'
+
 function TwoColumnTable({
   records,
   onEdit,
@@ -55,22 +57,10 @@ function TwoColumnTable({
             </td>
           </tr>
         ))}
-
-        <tr
-          className="empty-row"
-          onClick={onCreate}
-        >
-          <td className="id-column add-icon-cell">
-            <span className="add-icon">+</span>
-          </td>
-
-          <td
-            colSpan={2}
-            className="add-text-cell"
-          >
-            Click here to add a new {entityName}...
-          </td>
-        </tr>
+        <AddNewRecordRow
+            entityName={entityName}
+            onCreate={onCreate}
+        />
       </tbody>
     </table>
   );
