@@ -1,4 +1,4 @@
-import { VAR_MAX_LENGTH } from './textValidation';
+import { VAR_MAX_LENGTH } from '../validation/validation.jsx';
 
 function DoubleParamForm({
   entity,

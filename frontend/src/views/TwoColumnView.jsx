@@ -11,7 +11,7 @@ import {
   VAR_MAX_LENGTH,
   validateNonLessThenZeroAndRequiredAndMaxLength,
   validateRequiredAndMaxLength
-} from './textValidation';
+} from '../validation/validation.jsx';
 
 import './View.css';
 
