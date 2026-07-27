@@ -20,4 +20,8 @@ public interface TransgenicLineGeneRepository
             "gene"
     })
     List<TransgenicLineGene> findAll();
+
+    long deleteByTransgenicLine_Id(
+            Long transgenicLineId
+    );
 }

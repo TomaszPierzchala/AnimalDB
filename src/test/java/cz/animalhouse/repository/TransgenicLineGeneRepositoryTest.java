@@ -310,4 +310,103 @@ class TransgenicLineGeneRepositoryTest {
         assertThat(remaining.get(0).getGene().getSymbol())
                 .isEqualTo("GFP");
     }
+
+    @Test
+    void shouldDeleteAllAssignmentsForGivenTransgenicLine() {
+        Strain strain = strainRepository.save(
+                new Strain(
+                        "C57BL6",
+                        "C57BL/6"
+                )
+        );
+
+        TransgenicLine line1 =
+                transgenicLineRepository.save(
+                        new TransgenicLine(
+                                strain,
+                                "Line 1"
+                        )
+                );
+
+        TransgenicLine line2 =
+                transgenicLineRepository.save(
+                        new TransgenicLine(
+                                strain,
+                                "Line 2"
+                        )
+                );
+
+        Gene gene1 = geneRepository.save(
+                new Gene(
+                        "GENE1",
+                        "Gene 1"
+                )
+        );
+
+        Gene gene2 = geneRepository.save(
+                new Gene(
+                        "GENE2",
+                        "Gene 2"
+                )
+        );
+
+        Gene gene3 = geneRepository.save(
+                new Gene(
+                        "GENE3",
+                        "Gene 3"
+                )
+        );
+
+        transgenicLineGeneRepository.saveAll(
+                List.of(
+                        new TransgenicLineGene(
+                                line1,
+                                gene1
+                        ),
+                        new TransgenicLineGene(
+                                line1,
+                                gene2
+                        ),
+                        new TransgenicLineGene(
+                                line2,
+                                gene3
+                        )
+                )
+        );
+
+        entityManager.flush();
+        entityManager.clear();
+
+        long deletedCount =
+                transgenicLineGeneRepository
+                        .deleteByTransgenicLine_Id(
+                                line1.getId()
+                        );
+
+        entityManager.flush();
+        entityManager.clear();
+
+        assertThat(deletedCount).isEqualTo(2);
+
+        assertThat(transgenicLineGeneRepository.findAll())
+                .hasSize(1)
+                .allSatisfy(assignment ->
+                        assertThat(
+                                assignment
+                                        .getTransgenicLine()
+                                        .getId()
+                        ).isEqualTo(line2.getId())
+                );
+    }
+
+    @Test
+    void shouldReturnZeroWhenTransgenicLineHasNoAssignments() {
+        long deletedCount =
+                transgenicLineGeneRepository
+                        .deleteByTransgenicLine_Id(
+                                999L
+                        );
+
+        assertThat(deletedCount).isZero();
+    }
 }
