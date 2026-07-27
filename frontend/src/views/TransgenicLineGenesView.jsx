@@ -231,6 +231,11 @@ function TransgenicLineGenesView() {
     firstValue !== originalFirstValue ||
     secondValue !== originalSecondValue;
 */
+function onClickTransgenicLine(event, row){
+	event.stopPropagation();
+	openCreatePopup(row.transgenicLineId);
+}
+
   return (
     <section>
       <ErrorBanner
@@ -255,16 +260,14 @@ function TransgenicLineGenesView() {
 
         <tbody>
           {rows.map(row => (
-            <tr key={row.transgenicLineId}>
+            <tr key={row.transgenicLineId}
+                onClick={(event) => onClickTransgenicLine(event, row)}
+			>
               <td colSpan={2}>
                 <button
                   type="button"
                   className="table-link-button"
-                  onClick={() =>
-                    openCreatePopup(
-                      row.transgenicLineId
-                    )
-                  }
+                  onClick={(event) => onClickTransgenicLine(event, row)}
                 >
                   {row.strainCode}
                   {' — '}
@@ -279,28 +282,18 @@ function TransgenicLineGenesView() {
                       type="button"
                       className="gene-chip"
                       key={gene.id}
-                      onClick={() =>
+                      onClick={(event) => {
+                        event.stopPropagation();
                         openEditPopup(
                           row.transgenicLineId,
                           gene.id
-                        )
-                      }
+                        );
+                      }}
                     >
                       {gene.symbol}
                     </button>
                   ))}
 
-                  <button
-                    type="button"
-                    className="add-gene-button"
-                    onClick={() =>
-                      openCreatePopup(
-                        row.transgenicLineId
-                      )
-                    }
-                  >
-                    +
-                  </button>
                 </div>
               </td>
             </tr>
