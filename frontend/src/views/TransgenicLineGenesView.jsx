@@ -11,6 +11,7 @@ import {createFieldWarning} from '../warnings/popupWarning'
 import {
   createTransLineGene,
   deleteTransLineGene,
+  deleteTransLineGeneByTransgenicLine,
   getTransLineGenes,
   updateTransLineGene
 } from '../api/transgenicLineGeneApi';
@@ -190,21 +191,31 @@ function TransgenicLineGenesView() {
     }
   }
 
-  async function handleDelete() {
-    if (editingAssignment === null) {
+  async function handleDeleteAllOrOne(deleteAll = false) {
+    if (deleteAll) {
+      if (transgenicLineId === null) {
+        return;
+      }
+    } else if (editingAssignment === null) {
       return;
     }
 
-	if (!deleteArmed) {
-	      setDeleteArmed(true);
-	      return;
-	}
+    if (!deleteArmed) {
+      setDeleteArmed(true);
+      return;
+    }
 
     try {
-      await deleteTransLineGene(
-        editingAssignment.transgenicLineId,
-        editingAssignment.geneId
-      );
+      if (deleteAll) {
+        await deleteTransLineGeneByTransgenicLine(
+          transgenicLineId
+        );
+      } else {
+        await deleteTransLineGene(
+          editingAssignment.transgenicLineId,
+          editingAssignment.geneId
+        );
+      }
 
       closePopup();
       await loadAssignments();
@@ -309,7 +320,7 @@ function onClickTransgenicLine(event, row){
 	  {popupOpen && (
 	    <NewDoubleParamForm
 	      entityName="gene assignment"
-	      editing={editingAssignment !== null}
+	      editing={transgenicLineId !== null}
 
 	      firstName={firstName}
 	      firstType="select"
@@ -348,7 +359,7 @@ function onClickTransgenicLine(event, row){
 	      firstWarning={fieldWarning}
 
 	      onSubmit={handleSubmit}
-	      onDelete={handleDelete}
+	      onDelete={ () => handleDeleteAllOrOne(editingAssignment===null)}
 	      onCancel={closePopup}
 
 	      deleteArmed={deleteArmed}

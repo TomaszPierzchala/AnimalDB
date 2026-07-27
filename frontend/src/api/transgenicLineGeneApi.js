@@ -39,3 +39,11 @@ export function deleteTransLineGene(
     method: 'DELETE'
   });
 }
+
+export function deleteTransLineGeneByTransgenicLine(
+  transgenicLineId
+ ) {
+  return apiJson(`${TRANSLINEGENE_API_URL}/${transgenicLineId}`, {
+    method: 'DELETE'
+  });
+}
