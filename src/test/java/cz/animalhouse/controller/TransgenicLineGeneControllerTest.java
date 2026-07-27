@@ -383,4 +383,37 @@ class TransgenicLineGeneControllerTest {
 
         verify(service).delete(lineId, geneId);
     }
+
+	@Test
+	void shouldDeleteAllExistingAssignmentForGivenTransgenicId() throws Exception {
+
+		Long lineId = 10L;
+
+		when(service.deleteAllByTransgenicLineId(lineId)).thenReturn(7L);
+
+		mockMvc.perform(delete("/api/transgenic-line-genes/{transgenicLineId}", lineId))
+				.andExpect(status().isOk())
+				.andExpect(content().json("""
+						  {
+						  "deleted": 7
+						}
+						"""));
+
+		verify(service).deleteAllByTransgenicLineId(lineId);
+	}
+
+	@Test
+	void shouldReturnNotFoundWhenDeletingMissingTransgenicLineAssignment() throws Exception {
+
+		Long lineId = 10L;
+		Long geneId = 999L;
+
+		when(service.deleteAllByTransgenicLineId(lineId)).thenReturn(0L);
+
+		mockMvc.perform(delete("/api/transgenic-line-genes/{transgenicLineId}", lineId))
+				.andExpect(status().isNotFound())
+				.andExpect(content().string(""));
+
+		verify(service).deleteAllByTransgenicLineId(lineId);
+	}
 }

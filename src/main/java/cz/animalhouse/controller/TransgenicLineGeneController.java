@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
+import cz.animalhouse.dto.DeleteResponse;
 import cz.animalhouse.dto.TransgenicLineGeneRequest;
 import cz.animalhouse.dto.TransgenicLineGeneRowResponse;
 import cz.animalhouse.service.TransgenicLineGeneService;
@@ -77,4 +78,14 @@ public class TransgenicLineGeneController {
                 ? ResponseEntity.noContent().build()
                 : ResponseEntity.notFound().build();
     }
+
+	@DeleteMapping("/{transgenicLineId}")
+	public ResponseEntity<DeleteResponse> delete(@PathVariable Long transgenicLineId) {
+
+		long deleted = service.deleteAllByTransgenicLineId(transgenicLineId);
+
+		return deleted > 0
+				? ResponseEntity.ok(new DeleteResponse(deleted))
+				: ResponseEntity.notFound().build();
+	}
 }
