@@ -179,6 +179,16 @@ public class TransgenicLineGeneService {
         return true;
     }
 
+    @Transactional
+	public long deleteAllByTransgenicLineId(
+	        Long transgenicLineId) {
+
+	    return transgenicLineGeneRepository
+	            .deleteByTransgenicLine_Id(
+	                    transgenicLineId
+	            );
+	}
+
     private TransgenicLine findTransgenicLine(Long id) {
         return transgenicLineRepository.findById(id)
                 .orElseThrow(() ->
