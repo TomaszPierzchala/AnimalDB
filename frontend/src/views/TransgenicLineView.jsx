@@ -16,7 +16,7 @@ function TransgenicLineView() {
 
       firstName="strainCode"
       firstName2="strainName"
-      firstLabel="Strain code - strain name"
+      firstLabel="Strain code — strain name"
 
       firstRequestName="strainId"
       firstEditName="strainId"

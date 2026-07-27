@@ -18,7 +18,7 @@ function TwoColumnTable({
       return record[firstName];
     }
 
-    return `${record[firstName] ?? ''} - ${record[firstName2] ?? ''}`;
+    return `${record[firstName] ?? ''} — ${record[firstName2] ?? ''}`;
   }
 
   return (

@@ -87,7 +87,7 @@ function TwoColumnView({
           ? data.map(item => ({
               value: String(item.id),
               label: subEntitySecondLabelName
-                ? `${item[subEntityLabelName]} - ${item[subEntitySecondLabelName]}`
+                ? `${item[subEntityLabelName]} — ${item[subEntitySecondLabelName]}`
                 : item[subEntityLabelName]
             }))
           : [];

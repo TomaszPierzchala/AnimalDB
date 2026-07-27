@@ -238,7 +238,7 @@ function TransgenicLineGenesView() {
         fading={errorFading}
       />
 
-      <h1>Transgenic line - Genes</h1>
+      <h1>Transgenic line — Genes</h1>
 
       <table>
         <colgroup>
@@ -267,7 +267,7 @@ function TransgenicLineGenesView() {
                   }
                 >
                   {row.strainCode}
-                  {' - '}
+                  {' — '}
                   {row.transgenicLineName}
                 </button>
               </td>
@@ -324,7 +324,7 @@ function TransgenicLineGenesView() {
 	      firstPlaceholder="Select transgenic line"
 	      firstOptions={transgenicLines.map(line => ({
 	        value: line.id,
-	        label: `${line.strainCode} - ${line.name}`
+	        label: `${line.strainCode} — ${line.name}`
 	      }))}
 
 	      secondName="Gene"
@@ -334,7 +334,7 @@ function TransgenicLineGenesView() {
 	      secondOptions={genes.map(gene => ({
 	        value: gene.id,
 	        label: gene.description
-	          ? `${gene.symbol} - ${gene.description}`
+	          ? `${gene.symbol} — ${gene.description}`
 	          : gene.symbol
 	      }))}
 
