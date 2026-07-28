@@ -110,9 +110,13 @@ function TransgenicLineGenesView() {
   }
   
   async function loadAssignments() {
-    const data = await getTransLineGenes();
+      try {
+          const data = await getTransLineGenes();
 
-    setRows(Array.isArray(data) ? data : []);
+          setRows(Array.isArray(data) ? data : []);
+      } catch (err) {
+          showError(`Could not load data.\n${err.message}`);
+      }
   }
 
   function openCreatePopup(preselectedLineId = '-1') {
@@ -149,7 +153,11 @@ function TransgenicLineGenesView() {
 	setDeleteArmed(false);
   }
   
-  
+
+  async function refreshAfterPopup() {
+      closePopup();
+      await loadAssignments();
+  }
 
   async function handleSubmit(event) {
     event.preventDefault();
@@ -182,12 +190,16 @@ function TransgenicLineGenesView() {
         );
       }
 
-      closePopup();
-      await loadAssignments();
+      await refreshAfterPopup();
     } catch (err) {
-      showError(
-        `Could not save the assignment.\n${err.message}`
-      );
+        const operation =
+            editingAssignment === null ? 'create a new entity as' : 'update -';
+
+        showError(
+            `Cannot ${operation} ${err.message}`
+        );
+
+        await refreshAfterPopup();
     }
   }
 
@@ -217,12 +229,13 @@ function TransgenicLineGenesView() {
         );
       }
 
-      closePopup();
-      await loadAssignments();
+      await refreshAfterPopup();
     } catch (err) {
-      showError(
-        `Could not delete the assignment.\n${err.message}`
-      );
+        showError(
+            `Could not delete the ${firstName}_${secondName}.\n${err.message}`
+        );
+
+        await refreshAfterPopup();
     }
   }
 
