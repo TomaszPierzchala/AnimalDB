@@ -7,6 +7,7 @@ import { getTransLines } from '../api/transgenicLineApi';
 import AddNewRecordRow from './AddNewRecordRow'
 import NewDoubleParamForm from './NewDoubleParamForm'
 import {createFieldWarning} from '../warnings/popupWarning'
+import { ERROR_VISIBLE_TIME, ERROR_FADE_TIME } from '../utils/const'
 
 import {
   createTransLineGene,
@@ -91,12 +92,12 @@ function TransgenicLineGenesView() {
 
     const fadeTimer = setTimeout(() => {
       setErrorFading(true);
-    }, 3000);
+    }, ERROR_VISIBLE_TIME);
 
     const clearTimer = setTimeout(() => {
       setError('');
       setErrorFading(false);
-    }, 6500);
+    }, ERROR_VISIBLE_TIME + ERROR_FADE_TIME);
 
     return () => {
       clearTimeout(fadeTimer);
