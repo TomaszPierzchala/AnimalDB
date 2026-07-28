@@ -18,6 +18,6 @@ export const navigationItems = [
   },
   {
     id: VIEW_TRANSLINEGENES,
-    label: 'Transgenic lines — Genes'
+    label: 'Transgenic lines :\nGenes'
   }
 ];

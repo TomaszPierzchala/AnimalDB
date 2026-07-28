@@ -267,7 +267,7 @@ function onClickTransgenicLine(event, row){
         fading={errorFading}
       />
 
-      <h1>Transgenic line — Genes</h1>
+      <h1>Transgenic line : Genes</h1>
 
       <table>
         <colgroup>
@@ -324,7 +324,7 @@ function onClickTransgenicLine(event, row){
           ))}
 
           <AddNewRecordRow
-              entityName='transgenic line-gene'
+              entityName='transgenic line with genes'
               onCreate={openCreatePopup}
           />
         </tbody>
