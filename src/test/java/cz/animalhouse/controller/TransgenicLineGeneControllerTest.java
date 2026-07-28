@@ -331,7 +331,8 @@ class TransgenicLineGeneControllerTest {
                                         """))
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.message")
-                        .value(containsString("TransgenicLine_Gene assignment does not exist:")));
+                        .value(containsString("TransgenicLine_Gene : transgenicLineId=10, geneId=100 assignment no longer exists.\n"
+                                            + "Most probably was deleted by other user.")));
 
         verify(service).update(
                 eq(currentLineId),
