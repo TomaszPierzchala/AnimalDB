@@ -1,7 +1,6 @@
 import { firstCapital } from '../utils/textUtils'
 
 export const VAR_MAX_LENGTH = 50;
-export const MAX_TARANSLINE_NAME = 100;
 
 export function validateRequiredAndMaxLength(
   { name = 'Value', value },

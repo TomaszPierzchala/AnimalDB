@@ -53,8 +53,8 @@ function FormField({
 }
 
 export default function NewDoubleParamForm({
-  entityName,
   editing,
+  entityName,
 
   firstName,
   firstType = 'text',

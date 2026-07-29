@@ -1,7 +1,7 @@
 import { VAR_MAX_LENGTH } from '../validation/validation.jsx';
 
 function DoubleParamForm({
-  entity,
+  editing,
   entityName,
 
   firstName,
@@ -24,8 +24,6 @@ function DoubleParamForm({
   onDelete,
   onCancel
 }) {
-  const editing = entity !== null;
-
   return (
     <div className="popup-backdrop">
       <div className="popup">

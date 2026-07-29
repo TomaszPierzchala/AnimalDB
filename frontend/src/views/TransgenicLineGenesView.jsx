@@ -366,17 +366,17 @@ function onClickTransgenicLine(event, row){
 	      }))}
 
 	      onChangeFirstField={value => {
-	        setTransgenicLineId(value);
+	        setTransgenicLineId(value);// generalize
 	        setFieldWarning(
 			  createFieldWarning(value, geneId, firstName, secondName, firstType, secondType)
-	        );
+	        ); // remove it
 	      }}
 
 	      onChangeSecondField={value => {
-	        setGeneId(value);
+	        setGeneId(value);// generalise setSeondValue...
 	        setFieldWarning(
 	          createFieldWarning(transgenicLineId, value, firstName, secondName, firstType, secondType)
-	        );
+	        );// remove it - not nessesary
 	      }}
 
 	      firstWarning={fieldWarning}
@@ -386,7 +386,6 @@ function onClickTransgenicLine(event, row){
 	      onCancel={closePopup}
 
 	      deleteArmed={deleteArmed}
-	      hasChanges={true} //{hasChanges}
 	    />
 	  )}
     </section>

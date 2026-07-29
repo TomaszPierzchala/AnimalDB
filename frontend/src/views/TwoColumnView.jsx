@@ -3,11 +3,10 @@ import { useEffect, useState } from 'react';
 import ErrorBanner from '../components/ErrorBanner';
 import { firstCapital } from '../utils/textUtils';
 import { FIRST, SECOND, ERROR_VISIBLE_TIME, ERROR_FADE_TIME } from '../utils/const';
-import DoubleParamForm from './DoubleParamForm';
+import NewDoubleParamForm from './NewDoubleParamForm';
 import TwoColumnTable from './TwoColumnTable';
 
 import {
-  MAX_TARANSLINE_NAME,
   VAR_MAX_LENGTH,
   validateNonLessThenZeroAndRequiredAndMaxLength,
   validateRequiredAndMaxLength
@@ -21,9 +20,11 @@ function TwoColumnView({
   firstName,
   firstName2 = null,
   firstLabel = firstCapital(firstName),
+  firstMaxLength = 50,
 
   secondName,
   secondLabel = firstCapital(secondName),
+  secondMaxLength = 100,
 
   warningKey = FIRST | SECOND,
 
@@ -42,11 +43,6 @@ function TwoColumnView({
 }) {
   const initialFirstValue =
     firstInputType === 'select' ? '-1' : '';
-
-  const secondMaxLength =
-    entityName === 'Transgenic Line'
-      ? MAX_TARANSLINE_NAME
-      : VAR_MAX_LENGTH;
 
   const [records, setRecords] = useState([]);
   const [firstOptions, setFirstOptions] = useState([]);
@@ -335,33 +331,37 @@ function TwoColumnView({
       />
 
       {popupOpen && (
-        <DoubleParamForm
-          entity={entity}
+        <NewDoubleParamForm
+          editing={entity !== null}
           entityName={entityName}
+
           firstName={firstLabel}
+          firstType={firstInputType}
           firstValue={firstValue}
-          firstInputType={firstInputType}
+          firstMaxLength={firstMaxLength}
           firstOptions={firstOptions}
+          // firstPlaceholder=''
+          firstWarning={fieldWarning}
+
           secondName={secondLabel}
           secondValue={secondValue}
           secondMaxLength={secondMaxLength}
-          warning={fieldWarning}
+
           deleteArmed={deleteArmed}
           hasChanges={hasChanges}
-          createFieldWarning={createFieldWarning}
-          onChangeFirstField={(value, warning) => {
+
+          onChangeFirstField={value => {
             setFirstValue(value);
-
-            if ((warningKey & FIRST) !== 0) {
-              setFieldWarning(warning);
-            }
+            setFieldWarning(
+              createFieldWarning(value, secondValue, firstName, secondName, {firstInputType}, 'text', warningKey)
+            );
           }}
-          onChangeSecondField={(value, warning) => {
-            setSecondValue(value);
 
-            if ((warningKey & SECOND) !== 0) {
-              setFieldWarning(warning);
-            }
+          onChangeSecondField={value => {
+            setSecondValue(value);
+            setFieldWarning(
+              createFieldWarning(firstValue, value, firstName, secondName, {firstInputType}, 'text', warningKey)
+            );
           }}
           onSubmit={handleSubmit}
           onDelete={handleDelete}
