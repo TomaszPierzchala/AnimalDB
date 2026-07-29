@@ -42,6 +42,8 @@ function TransgenicLineGenesView() {
 
   const [error, setError] = useState('');
   const [errorFading, setErrorFading] = useState(false);
+  const [refreshAfterError, setRefreshAfterError] = useState(false);
+
   const [deleteArmed, setDeleteArmed] = useState(false);
   const [fieldWarning, setFieldWarning] = useState('');
 
@@ -94,16 +96,21 @@ function TransgenicLineGenesView() {
       setErrorFading(true);
     }, ERROR_VISIBLE_TIME);
 
-    const clearTimer = setTimeout(() => {
+    const clearTimer = setTimeout(async () => {
       setError('');
       setErrorFading(false);
+
+      if (refreshAfterError) {
+        setRefreshAfterError(false);
+        await loadAssignments();
+      }
     }, ERROR_VISIBLE_TIME + ERROR_FADE_TIME);
 
     return () => {
       clearTimeout(fadeTimer);
       clearTimeout(clearTimer);
     };
-  }, [error]);
+  }, [error, refreshAfterError]);
 
   function showError(message) {
     setErrorFading(false);
@@ -200,7 +207,8 @@ function TransgenicLineGenesView() {
             `Cannot ${operation} ${err.message}`
         );
 
-        await refreshAfterPopup();
+        closePopup();
+        setRefreshAfterError(true);
     }
   }
 
@@ -236,7 +244,8 @@ function TransgenicLineGenesView() {
             `Could not delete the ${firstName}_${secondName}.\n${err.message}`
         );
 
-        await refreshAfterPopup();
+        closePopup();
+        setRefreshAfterError(true);
     }
   }
 
