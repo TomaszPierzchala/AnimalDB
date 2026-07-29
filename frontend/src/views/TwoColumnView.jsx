@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react';
 import ErrorBanner from '../components/ErrorBanner';
 import { firstCapital } from '../utils/textUtils';
 import { FIRST, SECOND, ERROR_VISIBLE_TIME, ERROR_FADE_TIME } from '../utils/const';
-import NewDoubleParamForm from './NewDoubleParamForm';
+import DoubleParamForm from './DoubleParamForm';
 import TwoColumnTable from './TwoColumnTable';
 
 import {
@@ -331,7 +331,7 @@ function TwoColumnView({
       />
 
       {popupOpen && (
-        <NewDoubleParamForm
+        <DoubleParamForm
           editing={entity !== null}
           entityName={entityName}
 

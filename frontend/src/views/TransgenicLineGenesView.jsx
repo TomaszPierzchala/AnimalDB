@@ -5,7 +5,7 @@ import ErrorBanner from '../components/ErrorBanner';
 import { getGenes } from '../api/geneApi';
 import { getTransLines } from '../api/transgenicLineApi';
 import AddNewRecordRow from './AddNewRecordRow'
-import NewDoubleParamForm from './NewDoubleParamForm'
+import DoubleParamForm from './DoubleParamForm'
 import {createFieldWarning} from '../warnings/popupWarning'
 import { ERROR_VISIBLE_TIME, ERROR_FADE_TIME } from '../utils/const'
 
@@ -341,7 +341,7 @@ function onClickTransgenicLine(event, row){
       </table>
 
 	  {popupOpen && (
-	    <NewDoubleParamForm
+	    <DoubleParamForm
 	      entityName="gene assignment"
 	      editing={transgenicLineId !== null}
 

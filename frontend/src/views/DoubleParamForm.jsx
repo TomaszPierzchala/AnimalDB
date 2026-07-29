@@ -1,28 +1,85 @@
-import { VAR_MAX_LENGTH } from '../validation/validation.jsx';
+import { VAR_MAX_LENGTH } from '../validation/validation';
 
-function DoubleParamForm({
+function FormField({
+  name,
+  type = 'text',
+  value,
+  options = [],
+  placeholder = 'Select from drop-down menu',
+  maxLength = VAR_MAX_LENGTH,
+  onChange,
+  warning = ''
+}) {
+  return (
+    <div>
+      <label>
+        {name}:
+
+        {type === 'select' ? (
+          <select
+            value={value}
+            onChange={event => onChange(event.target.value)}
+          >
+            <option value="-1">
+              {placeholder}
+            </option>
+
+            {options.map(option => (
+              <option
+                key={option.value}
+                value={option.value}
+              >
+                {option.label}
+              </option>
+            ))}
+          </select>
+        ) : (
+          <input
+            type="text"
+            value={value}
+            maxLength={maxLength}
+            onChange={event => onChange(event.target.value)}
+          />
+        )}
+
+        {warning && (
+          <small className="field-warning pulsing-text">
+            {warning}
+          </small>
+        )}
+      </label>
+    </div>
+  );
+}
+
+export default function DoubleParamForm({
   editing,
   entityName,
 
   firstName,
+  firstType = 'text',
   firstValue,
-  firstInputType,
-  firstOptions,
+  firstOptions = [],
+  firstPlaceholder,
+  firstMaxLength = VAR_MAX_LENGTH,
+  firstWarning = '',
 
   secondName,
+  secondType = 'text',
   secondValue,
-  secondMaxLength,
+  secondOptions = [],
+  secondPlaceholder,
+  secondMaxLength = VAR_MAX_LENGTH,
+  secondWarning = '',
 
-  warning,
-  deleteArmed,
-  hasChanges,
-
-  createFieldWarning,
   onChangeFirstField,
   onChangeSecondField,
   onSubmit,
   onDelete,
-  onCancel
+  onCancel,
+
+  deleteArmed = false,
+  hasChanges = true
 }) {
   return (
     <div className="popup-backdrop">
@@ -34,90 +91,31 @@ function DoubleParamForm({
         </h2>
 
         <form onSubmit={onSubmit}>
-          <div>
-            <label>
-              {firstName}:
+          <FormField
+            name={firstName}
+            type={firstType}
+            value={firstValue}
+            options={firstOptions}
+            placeholder={firstPlaceholder}
+            maxLength={firstMaxLength}
+            warning={firstWarning}
+            onChange={onChangeFirstField}
+          />
 
-              {firstInputType === 'select' ? (
-                <select
-                  className="strain-select"
-                  value={firstValue}
-                  onChange={event => {
-                    const value = event.target.value;
-
-                    onChangeFirstField(
-                      value,
-                      createFieldWarning(
-                        value,
-                        secondValue
-                      )
-                    );
-                  }}
-                >
-                  <option value="-1">
-                    Select from drop-down menu
-                  </option>
-
-                  {firstOptions.map(option => (
-                    <option
-                      key={option.value}
-                      value={option.value}
-                    >
-                      {option.label}
-                    </option>
-                  ))}
-                </select>
-              ) : (
-                <input
-                  type="text"
-                  value={firstValue}
-                  maxLength={VAR_MAX_LENGTH}
-                  onChange={event => {
-                    const value = event.target.value;
-
-                    onChangeFirstField(
-                      value,
-                      createFieldWarning(
-                        value,
-                        secondValue
-                      )
-                    );
-                  }}
-                />
-              )}
-
-              <small className="field-warning pulsing-text">
-                {warning}
-              </small>
-            </label>
-          </div>
-
-          <div>
-            <label>
-              {secondName}:
-
-              <input
-                type="text"
-                value={secondValue}
-                maxLength={secondMaxLength}
-                onChange={event => {
-                  const value = event.target.value;
-
-                  onChangeSecondField(
-                    value,
-                    createFieldWarning(
-                      firstValue,
-                      value
-                    )
-                  );
-                }}
-              />
-            </label>
-          </div>
+          <FormField
+            name={secondName}
+            type={secondType}
+            value={secondValue}
+            options={secondOptions}
+            placeholder={secondPlaceholder}
+            maxLength={secondMaxLength}
+            warning={secondWarning}
+            onChange={onChangeSecondField}
+          />
 
           <div className="popup-buttons">
             <div>
-              {editing && (
+              {editing && onDelete && (
                 <button
                   type="button"
                   className={
@@ -155,5 +153,3 @@ function DoubleParamForm({
     </div>
   );
 }
-
-export default DoubleParamForm;
