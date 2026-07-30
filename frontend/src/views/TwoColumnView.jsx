@@ -253,7 +253,7 @@ function TwoColumnView({
   function createWarning(first, second) {
     return createFieldWarning(
 		first, second,
-		firstName, secondName, firstInputType, 'text',
+		firstLabel, secondLabel, firstInputType, 'text',
 		warningKey, firstMaxLength, secondMaxLength)
   }
 
@@ -298,7 +298,7 @@ function TwoColumnView({
           editing={entity !== null}
           entityName={entityName}
 
-          firstName={firstLabel}
+          firstLabel={firstLabel}
           firstType={firstInputType}
           firstValue={firstValue}
           firstMaxLength={firstMaxLength}
@@ -306,7 +306,7 @@ function TwoColumnView({
           // firstPlaceholder=''
           firstWarning={fieldWarning}
 
-          secondName={secondLabel}
+          secondLabel={secondLabel}
           secondValue={secondValue}
           secondMaxLength={secondMaxLength}
 

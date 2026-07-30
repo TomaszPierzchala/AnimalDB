@@ -20,9 +20,9 @@ import {
 import './View.css';
 
 function TransgenicLineGenesView() {
-  const firstName="Transgenic line"
+  const firstLabel="Transgenic line"
   const firstType="select"
-  const secondName="Gene"
+  const secondLabel="Gene"
   const secondType="select"
 	
   const [rows, setRows] = useState([]);
@@ -241,7 +241,7 @@ function TransgenicLineGenesView() {
       await refreshAfterPopup();
     } catch (err) {
         showError(
-            `Could not delete the ${firstName}_${secondName}.\n${err.message}`
+            `Could not delete the ${firstLabel}_${secondLabel}.\n${err.message}`
         );
 
         closePopup();
@@ -345,7 +345,7 @@ function onClickTransgenicLine(event, row){
 	      entityName="gene assignment"
 	      editing={transgenicLineId !== null}
 
-	      firstName={firstName}
+	      firstLabel={firstLabel}
 	      firstType="select"
 	      firstValue={transgenicLineId}
 	      firstPlaceholder="Select transgenic line"
@@ -354,7 +354,7 @@ function onClickTransgenicLine(event, row){
 	        label: `${line.strainCode} — ${line.name}`
 	      }))}
 
-	      secondName="Gene"
+	      secondLabel={secondLabel}
 	      secondType="select"
 	      secondValue={geneId}
 	      secondPlaceholder="Select gene"
@@ -366,17 +366,17 @@ function onClickTransgenicLine(event, row){
 	      }))}
 
 	      onChangeFirstField={value => {
-	        setTransgenicLineId(value);// generalize
+	        setTransgenicLineId(value);
 	        setFieldWarning(
-			  createFieldWarning(value, geneId, firstName, secondName, firstType, secondType)
-	        ); // remove it
+			  createFieldWarning(value, geneId, firstLabel, secondLabel, firstType, secondType)
+	        );
 	      }}
 
 	      onChangeSecondField={value => {
-	        setGeneId(value);// generalise setSeondValue...
+	        setGeneId(value);
 	        setFieldWarning(
-	          createFieldWarning(transgenicLineId, value, firstName, secondName, firstType, secondType)
-	        );// remove it - not nessesary
+	          createFieldWarning(transgenicLineId, value, firstLabel, secondLabel, firstType, secondType)
+	        );
 	      }}
 
 	      firstWarning={fieldWarning}

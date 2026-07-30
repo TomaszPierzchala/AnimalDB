@@ -1,7 +1,7 @@
 import { VAR_MAX_LENGTH } from '../utils/const';
 
 function FormField({
-  name,
+  label,
   type = 'text',
   value,
   options = [],
@@ -13,7 +13,7 @@ function FormField({
   return (
     <div>
       <label>
-        {name}:
+        {label}:
 
         {type === 'select' ? (
           <select
@@ -56,7 +56,7 @@ export default function DoubleParamForm({
   editing,
   entityName,
 
-  firstName,
+  firstLabel,
   firstType = 'text',
   firstValue,
   firstOptions = [],
@@ -64,7 +64,7 @@ export default function DoubleParamForm({
   firstMaxLength = VAR_MAX_LENGTH,
   firstWarning = '',
 
-  secondName,
+  secondLabel,
   secondType = 'text',
   secondValue,
   secondOptions = [],
@@ -92,7 +92,7 @@ export default function DoubleParamForm({
 
         <form onSubmit={onSubmit}>
           <FormField
-            name={firstName}
+            label={firstLabel}
             type={firstType}
             value={firstValue}
             options={firstOptions}
@@ -103,7 +103,7 @@ export default function DoubleParamForm({
           />
 
           <FormField
-            name={secondName}
+            label={secondLabel}
             type={secondType}
             value={secondValue}
             options={secondOptions}
