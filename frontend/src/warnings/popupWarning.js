@@ -1,11 +1,11 @@
-import { FIRST, SECOND } from '../utils/const';
-import { VAR_MAX_LENGTH, validateRequiredAndMaxLength, validateNonLessThenZeroAndRequiredAndMaxLength } from '../validation/validation'
+import { FIRST, SECOND, VAR_MAX_LENGTH } from '../utils/const';
+import { validateRequiredAndMaxLength, validateNonLessThenZeroAndRequiredAndMaxLength } from '../validation/validation'
 
 function warningMessage(
   label,
   value,
   type = 'text',
-  maxLength = VAR_MAX_LENGTH
+  maxLength
 ) {
   const validate =
     type === 'select'
@@ -28,9 +28,9 @@ export function createFieldWarning(
   secondLabel,
   firstType = 'select',
   secondType = 'select',
+  warningKey = FIRST | SECOND,
   firstMaxLength = VAR_MAX_LENGTH,
-  secondMaxLength = VAR_MAX_LENGTH,
-  warningKey = FIRST | SECOND
+  secondMaxLength = VAR_MAX_LENGTH
 ) {
   const firstWarning =
     (warningKey & FIRST) !== 0

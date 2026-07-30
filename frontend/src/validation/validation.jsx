@@ -1,6 +1,6 @@
 import { firstCapital } from '../utils/textUtils'
+import { VAR_MAX_LENGTH } from '../utils/const'
 
-export const VAR_MAX_LENGTH = 50;
 
 export function validateRequiredAndMaxLength(
   { name = 'Value', value },

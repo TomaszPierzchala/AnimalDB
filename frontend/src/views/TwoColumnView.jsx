@@ -2,15 +2,10 @@ import { useEffect, useState } from 'react';
 
 import ErrorBanner from '../components/ErrorBanner';
 import { firstCapital } from '../utils/textUtils';
-import { FIRST, SECOND, ERROR_VISIBLE_TIME, ERROR_FADE_TIME } from '../utils/const';
+import { createFieldWarning } from '../warnings/popupWarning'
+import { FIRST, SECOND, ERROR_VISIBLE_TIME, ERROR_FADE_TIME, VAR_MAX_LENGTH} from '../utils/const';
 import DoubleParamForm from './DoubleParamForm';
 import TwoColumnTable from './TwoColumnTable';
-
-import {
-  VAR_MAX_LENGTH,
-  validateNonLessThenZeroAndRequiredAndMaxLength,
-  validateRequiredAndMaxLength
-} from '../validation/validation.jsx';
 
 import './View.css';
 
@@ -24,7 +19,7 @@ function TwoColumnView({
 
   secondName,
   secondLabel = firstCapital(secondName),
-  secondMaxLength = 100,
+  secondMaxLength = VAR_MAX_LENGTH,
 
   warningKey = FIRST | SECOND,
 
@@ -144,44 +139,6 @@ function TwoColumnView({
     setError(message);
   }
 
-  function createFieldWarning(first, second) {
-    const firstWarning =
-      (warningKey & FIRST) !== 0
-        ? firstInputType === 'select'
-          ? validateNonLessThenZeroAndRequiredAndMaxLength(
-              {
-                name: firstLabel,
-                value: first
-              },
-              VAR_MAX_LENGTH
-            )
-          : validateRequiredAndMaxLength(
-              {
-                name: firstLabel,
-                value: first
-              },
-              VAR_MAX_LENGTH
-            )
-        : '';
-
-    const secondWarning =
-      (warningKey & SECOND) !== 0
-        ? validateRequiredAndMaxLength(
-            {
-              name: secondLabel,
-              value: second
-            },
-            secondMaxLength
-          )
-        : '';
-
-    if (firstWarning && secondWarning) {
-      return 'Please correct both field values.';
-    }
-
-    return firstWarning || secondWarning;
-  }
-
   function openCreatePopup() {
     const first = initialFirstValue;
     const second = '';
@@ -190,7 +147,7 @@ function TwoColumnView({
     setFirstValue(first);
     setSecondValue(second);
     setDeleteArmed(false);
-    setFieldWarning(createFieldWarning(first, second));
+    setFieldWarning(createWarning(first, second));
     setPopupOpen(true);
   }
 
@@ -206,7 +163,7 @@ function TwoColumnView({
     setFirstValue(first);
     setSecondValue(second);
     setDeleteArmed(false);
-    setFieldWarning(createFieldWarning(first, second));
+    setFieldWarning(createWarning(first, second));
     setPopupOpen(true);
   }
 
@@ -228,7 +185,7 @@ function TwoColumnView({
     event.preventDefault();
 
     const validationMessage =
-      createFieldWarning(firstValue, secondValue);
+      createWarning(firstValue, secondValue);
 
     if (validationMessage) {
       setFieldWarning(validationMessage);
@@ -293,6 +250,12 @@ function TwoColumnView({
       setRefreshAfterError(true);
     }
   }
+  function createWarning(first, second) {
+    return createFieldWarning(
+		first, second,
+		firstName, secondName, firstInputType, 'text',
+		warningKey, firstMaxLength, secondMaxLength)
+  }
 
   const originalFirstValue =
     entity === null
@@ -353,14 +316,14 @@ function TwoColumnView({
           onChangeFirstField={value => {
             setFirstValue(value);
             setFieldWarning(
-              createFieldWarning(value, secondValue, firstName, secondName, {firstInputType}, 'text', warningKey)
+              createWarning(value, secondValue)
             );
           }}
 
           onChangeSecondField={value => {
             setSecondValue(value);
             setFieldWarning(
-              createFieldWarning(firstValue, value, firstName, secondName, {firstInputType}, 'text', warningKey)
+              createWarning(firstValue, value)
             );
           }}
           onSubmit={handleSubmit}

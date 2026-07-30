@@ -1,4 +1,4 @@
-import { VAR_MAX_LENGTH } from '../validation/validation';
+import { VAR_MAX_LENGTH } from '../utils/const';
 
 function FormField({
   name,
