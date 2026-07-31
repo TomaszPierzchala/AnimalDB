@@ -37,8 +37,8 @@ function TransgenicLineGenesView() {
 
   const [transgenicLineId, setTransgenicLineId] =
     useState('-1');
-
   const [geneId, setGeneId] = useState('-1');
+  const [hasChanges, setChanged] = useState(false);
 
   const [error, setError] = useState('');
   const [errorFading, setErrorFading] = useState(false);
@@ -158,7 +158,8 @@ function TransgenicLineGenesView() {
     setEditingAssignment(null);
     setTransgenicLineId('-1');
     setGeneId('-1');
-	setDeleteArmed(false);
+    setChanged(false);
+    setDeleteArmed(false);
   }
   
 
@@ -249,22 +250,6 @@ function TransgenicLineGenesView() {
     }
   }
 
-/*
-  const originalFirstValue =
-    entity === null
-      ? initialFirstValue
-      : String(entity[firstEditName] ?? initialFirstValue);
-
-  const originalSecondValue =
-    entity === null
-      ? ''
-      : entity[secondName] ?? '';
-
-  const hasChanges =
-    entity === null ||
-    firstValue !== originalFirstValue ||
-    secondValue !== originalSecondValue;
-*/
 function onClickTransgenicLine(event, row){
 	event.stopPropagation();
 	openCreatePopup(row.transgenicLineId);
@@ -367,6 +352,7 @@ function onClickTransgenicLine(event, row){
 
 	      onChangeFirstField={value => {
 	        setTransgenicLineId(value);
+	        setChanged(true);
 	        setFieldWarning(
 			  createFieldWarning(value, geneId, firstLabel, secondLabel, firstType, secondType)
 	        );
@@ -374,6 +360,7 @@ function onClickTransgenicLine(event, row){
 
 	      onChangeSecondField={value => {
 	        setGeneId(value);
+	        setChanged(true);
 	        setFieldWarning(
 	          createFieldWarning(transgenicLineId, value, firstLabel, secondLabel, firstType, secondType)
 	        );
@@ -386,6 +373,7 @@ function onClickTransgenicLine(event, row){
 	      onCancel={closePopup}
 
 	      deleteArmed={deleteArmed}
+	      hasChanges={hasChanges}
 	    />
 	  )}
     </section>
