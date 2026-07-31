@@ -48,6 +48,7 @@ function TwoColumnView({
     useState(false);
 
   const [popupOpen, setPopupOpen] = useState(false);
+  const [initialPopupState, setInitialPopupState] = useState({});
   const [entity, setEntity] = useState(null);
   const [deleteArmed, setDeleteArmed] = useState(false);
 
@@ -55,6 +56,7 @@ function TwoColumnView({
     useState(initialFirstValue);
 
   const [secondValue, setSecondValue] = useState('');
+  const [hasChanges, setChanged] = useState(false);
   const [fieldWarning, setFieldWarning] = useState('');
 
   useEffect(() => {
@@ -139,9 +141,53 @@ function TwoColumnView({
     setError(message);
   }
 
+  function isCurrentInitialPopupStateChosen(first, second) {
+    const firstIsRequired =
+      (warningKey & FIRST) !== 0;
+
+    const secondIsRequired =
+      (warningKey & SECOND) !== 0;
+
+    const firstIsChosen =
+      !firstIsRequired ||
+      (
+        first !== null &&
+        first !== undefined &&
+        String(first).trim() !== '' &&
+        String(first) !== '-1'
+      );
+
+    const secondIsChosen =
+      !secondIsRequired ||
+      (
+        second !== null &&
+        second !== undefined &&
+        String(second).trim() !== ''
+      );
+
+    return firstIsChosen && secondIsChosen;
+  }
+
+    function currentInitaialPopupState(entity = null) {
+        return {
+            firstValue: entity === null
+                ? initialFirstValue
+                : String(entity[firstEditName] ?? initialFirstValue),
+            secondValue: entity === null
+                ? ''
+                : entity[secondName] ?? ''
+        };
+    }
+
   function openCreatePopup() {
-    const first = initialFirstValue;
-    const second = '';
+    const popupState = currentInitaialPopupState();
+
+    setInitialPopupState(popupState);
+
+    const {
+       firstValue: first,
+       secondValue: second
+    } = popupState;
 
     setEntity(null);
     setFirstValue(first);
@@ -152,12 +198,14 @@ function TwoColumnView({
   }
 
   function openEditPopup(selectedEntity) {
-    const first = String(
-      selectedEntity[firstEditName] ?? initialFirstValue
-    );
+    const popupState = currentInitaialPopupState(selectedEntity);
 
-    const second =
-      selectedEntity[secondName] ?? '';
+    setInitialPopupState(popupState);
+
+    const {
+      firstValue: first,
+      secondValue: second
+    } = popupState;
 
     setEntity(selectedEntity);
     setFirstValue(first);
@@ -172,6 +220,8 @@ function TwoColumnView({
     setEntity(null);
     setFirstValue(initialFirstValue);
     setSecondValue('');
+    setInitialPopupState({});
+    setChanged(false);
     setDeleteArmed(false);
     setFieldWarning('');
   }
@@ -257,21 +307,6 @@ function TwoColumnView({
 		warningKey, firstMaxLength, secondMaxLength)
   }
 
-  const originalFirstValue =
-    entity === null
-      ? initialFirstValue
-      : String(entity[firstEditName] ?? initialFirstValue);
-
-  const originalSecondValue =
-    entity === null
-      ? ''
-      : entity[secondName] ?? '';
-
-  const hasChanges =
-    entity === null ||
-    firstValue !== originalFirstValue ||
-    secondValue !== originalSecondValue;
-
   return (
     <section>
       <ErrorBanner
@@ -315,6 +350,7 @@ function TwoColumnView({
 
           onChangeFirstField={value => {
             setFirstValue(value);
+            setChanged(initialPopupState.firstValue !== value  && isCurrentInitialPopupStateChosen(value, secondValue))
             setFieldWarning(
               createWarning(value, secondValue)
             );
@@ -322,6 +358,7 @@ function TwoColumnView({
 
           onChangeSecondField={value => {
             setSecondValue(value);
+            setChanged(initialPopupState.secondValue !== value  && isCurrentInitialPopupStateChosen(firstValue, value))
             setFieldWarning(
               createWarning(firstValue, value)
             );
