@@ -6,8 +6,8 @@ import { getGenes } from '../api/geneApi';
 import { getTransLines } from '../api/transgenicLineApi';
 import AddNewRecordRow from './AddNewRecordRow'
 import DoubleParamForm from './DoubleParamForm'
-import {createFieldWarning} from '../warnings/popupWarning'
-import { ERROR_VISIBLE_TIME, ERROR_FADE_TIME } from '../utils/const'
+import { createFieldWarning, isCurrentInitialPopupStateChosen } from '../warnings/popupWarning'
+import { FIRST, ERROR_VISIBLE_TIME, ERROR_FADE_TIME } from '../utils/const'
 
 import {
   createTransLineGene,
@@ -31,6 +31,7 @@ function TransgenicLineGenesView() {
   const [genes, setGenes] = useState([]);
 
   const [popupOpen, setPopupOpen] = useState(false);
+  const [initialPopupState, setInitialPopupState] = useState({});
 
   const [editingAssignment, setEditingAssignment] =
     useState(null);
@@ -127,30 +128,38 @@ function TransgenicLineGenesView() {
       }
   }
 
-  function openCreatePopup(preselectedLineId = '-1') {
+  function openCreatePopup() {
+    const popupState =
+      {
+          transgenicLineId: '-1',
+          geneId: '-1'
+      };
+    setInitialPopupState(popupState);
     setEditingAssignment(null);
-    setTransgenicLineId(String(preselectedLineId));
-    setGeneId('-1');
+    setTransgenicLineId(popupState.transgenicLineId);
+    setGeneId(popupState.geneId);
     setPopupOpen(true);
-	setDeleteArmed(false);
+    setDeleteArmed(false);
   }
 
   function openEditPopup(
     currentTransgenicLineId,
     currentGeneId
   ) {
-    setEditingAssignment({
+
+    const popupState = {
       transgenicLineId: currentTransgenicLineId,
       geneId: currentGeneId
-    });
+    };
+    setInitialPopupState(popupState);
+    setEditingAssignment(popupState);
 
     setTransgenicLineId(
       String(currentTransgenicLineId)
     );
-
     setGeneId(String(currentGeneId));
     setPopupOpen(true);
-	setDeleteArmed(false);
+    setDeleteArmed(false);
   }
 
   function closePopup() {
@@ -158,6 +167,7 @@ function TransgenicLineGenesView() {
     setEditingAssignment(null);
     setTransgenicLineId('-1');
     setGeneId('-1');
+    setInitialPopupState({});
     setChanged(false);
     setDeleteArmed(false);
   }
@@ -250,10 +260,10 @@ function TransgenicLineGenesView() {
     }
   }
 
-function onClickTransgenicLine(event, row){
+  function onClickTransgenicLine(event, row){
 	event.stopPropagation();
 	openCreatePopup(row.transgenicLineId);
-}
+  }
 
   return (
     <section>
@@ -352,15 +362,15 @@ function onClickTransgenicLine(event, row){
 
 	      onChangeFirstField={value => {
 	        setTransgenicLineId(value);
-	        setChanged(true);
+	        setChanged(initialPopupState.transgenicLineId != value && isCurrentInitialPopupStateChosen(value, geneId, FIRST));
 	        setFieldWarning(
-			  createFieldWarning(value, geneId, firstLabel, secondLabel, firstType, secondType)
+	          createFieldWarning(value, geneId, firstLabel, secondLabel, firstType, secondType)
 	        );
 	      }}
 
 	      onChangeSecondField={value => {
 	        setGeneId(value);
-	        setChanged(true);
+	        setChanged(initialPopupState.geneId != value  && isCurrentInitialPopupStateChosen(transgenicLineId, value, FIRST));
 	        setFieldWarning(
 	          createFieldWarning(transgenicLineId, value, firstLabel, secondLabel, firstType, secondType)
 	        );

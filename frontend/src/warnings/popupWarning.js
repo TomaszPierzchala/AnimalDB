@@ -58,3 +58,37 @@ export function createFieldWarning(
 
   return firstWarning || secondWarning;
 }
+
+export function isCurrentInitialPopupStateChosen(first, second, dropDown = FIRST|SECOND, warningKey = FIRST|SECOND) {
+  const firstIsRequired =
+    (warningKey & FIRST) !== 0;
+
+  const firstIsDropDown =
+    (dropDown & FIRST) != 0;
+
+  const secondIsRequired =
+    (warningKey & SECOND) !== 0;
+
+  const secondIsDropDown =
+	  (dropDown & SECOND) != 0;
+
+  const firstIsChosen =
+    !firstIsRequired ||
+    (
+      first !== null &&
+      first !== undefined &&
+      String(first).trim() !== '' &&
+      (!firstIsDropDown || String(first) !== '-1' ) // firstIsDropDown => (String(first) !== '-1')
+    );
+
+  const secondIsChosen =
+    !secondIsRequired ||
+    (
+      second !== null &&
+      second !== undefined &&
+      String(second).trim() !== '' &&
+      (!secondIsDropDown || String(second) !== '-1' ) // secondIsDropDown => (String(second) !== '-1')
+    );
+
+  return firstIsChosen && secondIsChosen;
+}
