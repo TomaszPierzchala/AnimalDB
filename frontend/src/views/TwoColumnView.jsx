@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 
 import ErrorBanner from '../components/ErrorBanner';
 import { firstCapital } from '../utils/textUtils';
-import { createFieldWarning } from '../warnings/popupWarning'
+import { createFieldWarning, isCurrentInitialPopupStateChosen } from '../warnings/popupWarning'
 import { FIRST, SECOND, ERROR_VISIBLE_TIME, ERROR_FADE_TIME, VAR_MAX_LENGTH} from '../utils/const';
 import DoubleParamForm from './DoubleParamForm';
 import TwoColumnTable from './TwoColumnTable';
@@ -139,33 +139,6 @@ function TwoColumnView({
   function showError(message) {
     setErrorFading(false);
     setError(message);
-  }
-
-  function isCurrentInitialPopupStateChosen(first, second) {
-    const firstIsRequired =
-      (warningKey & FIRST) !== 0;
-
-    const secondIsRequired =
-      (warningKey & SECOND) !== 0;
-
-    const firstIsChosen =
-      !firstIsRequired ||
-      (
-        first !== null &&
-        first !== undefined &&
-        String(first).trim() !== '' &&
-        String(first) !== '-1'
-      );
-
-    const secondIsChosen =
-      !secondIsRequired ||
-      (
-        second !== null &&
-        second !== undefined &&
-        String(second).trim() !== ''
-      );
-
-    return firstIsChosen && secondIsChosen;
   }
 
     function currentInitaialPopupState(entity = null) {
@@ -350,7 +323,7 @@ function TwoColumnView({
 
           onChangeFirstField={value => {
             setFirstValue(value);
-            setChanged(initialPopupState.firstValue !== value  && isCurrentInitialPopupStateChosen(value, secondValue))
+            setChanged(initialPopupState.firstValue !== value  && isCurrentInitialPopupStateChosen(value, secondValue, /*dropDown*/ 0))
             setFieldWarning(
               createWarning(value, secondValue)
             );
@@ -358,7 +331,7 @@ function TwoColumnView({
 
           onChangeSecondField={value => {
             setSecondValue(value);
-            setChanged(initialPopupState.secondValue !== value  && isCurrentInitialPopupStateChosen(firstValue, value))
+            setChanged(initialPopupState.secondValue !== value  && isCurrentInitialPopupStateChosen(firstValue, value, /*dropDown*/ 0))
             setFieldWarning(
               createWarning(firstValue, value)
             );
