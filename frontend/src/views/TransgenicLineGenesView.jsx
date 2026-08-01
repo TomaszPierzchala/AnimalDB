@@ -7,7 +7,7 @@ import { getTransLines } from '../api/transgenicLineApi';
 import AddNewRecordRow from './AddNewRecordRow'
 import DoubleParamForm from './DoubleParamForm'
 import { createFieldWarning, isCurrentInitialPopupStateChosen } from '../warnings/popupWarning'
-import { FIRST, ERROR_VISIBLE_TIME, ERROR_FADE_TIME } from '../utils/const'
+import { ERROR_VISIBLE_TIME, ERROR_FADE_TIME } from '../utils/const'
 
 import {
   createTransLineGene,
@@ -39,7 +39,7 @@ function TransgenicLineGenesView() {
   const [transgenicLineId, setTransgenicLineId] =
     useState('-1');
   const [geneId, setGeneId] = useState('-1');
-  const [hasChanges, setChanged] = useState(false);
+  const [isSaveEnabled, setIsSaveEnabled] = useState(false);
 
   const [error, setError] = useState('');
   const [errorFading, setErrorFading] = useState(false);
@@ -154,10 +154,8 @@ function TransgenicLineGenesView() {
     setInitialPopupState(popupState);
     setEditingAssignment(popupState);
 
-    setTransgenicLineId(
-      String(currentTransgenicLineId)
-    );
-    setGeneId(String(currentGeneId));
+    setTransgenicLineId(currentTransgenicLineId);
+    setGeneId(currentGeneId);
     setPopupOpen(true);
     setDeleteArmed(false);
   }
@@ -168,7 +166,7 @@ function TransgenicLineGenesView() {
     setTransgenicLineId('-1');
     setGeneId('-1');
     setInitialPopupState({});
-    setChanged(false);
+    setIsSaveEnabled(false);
     setDeleteArmed(false);
   }
   
@@ -361,16 +359,18 @@ function TransgenicLineGenesView() {
 	      }))}
 
 	      onChangeFirstField={value => {
-	        setTransgenicLineId(value);
-	        setChanged(initialPopupState.transgenicLineId != value && isCurrentInitialPopupStateChosen(value, geneId, FIRST));
+	        setTransgenicLineId(Number(value));
+	        setIsSaveEnabled( (initialPopupState.transgenicLineId !== Number(value) || initialPopupState.geneId !== geneId)
+	                        && isCurrentInitialPopupStateChosen(value, geneId));
 	        setFieldWarning(
 	          createFieldWarning(value, geneId, firstLabel, secondLabel, firstType, secondType)
 	        );
 	      }}
 
 	      onChangeSecondField={value => {
-	        setGeneId(value);
-	        setChanged(initialPopupState.geneId != value  && isCurrentInitialPopupStateChosen(transgenicLineId, value, FIRST));
+	        setGeneId(Number(value));
+	        setIsSaveEnabled((initialPopupState.transgenicLineId !== transgenicLineId || initialPopupState.geneId !== Number(value))
+	                        && isCurrentInitialPopupStateChosen(transgenicLineId, value));
 	        setFieldWarning(
 	          createFieldWarning(transgenicLineId, value, firstLabel, secondLabel, firstType, secondType)
 	        );
@@ -383,7 +383,7 @@ function TransgenicLineGenesView() {
 	      onCancel={closePopup}
 
 	      deleteArmed={deleteArmed}
-	      hasChanges={hasChanges}
+	      isSaveEnabled={isSaveEnabled}
 	    />
 	  )}
     </section>

@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react';
 import ErrorBanner from '../components/ErrorBanner';
 import { firstCapital } from '../utils/textUtils';
 import { createFieldWarning, isCurrentInitialPopupStateChosen } from '../warnings/popupWarning'
-import { FIRST, SECOND, ERROR_VISIBLE_TIME, ERROR_FADE_TIME, VAR_MAX_LENGTH} from '../utils/const';
+import { ZERO, FIRST, SECOND, ERROR_VISIBLE_TIME, ERROR_FADE_TIME, VAR_MAX_LENGTH} from '../utils/const';
 import DoubleParamForm from './DoubleParamForm';
 import TwoColumnTable from './TwoColumnTable';
 
@@ -22,6 +22,7 @@ function TwoColumnView({
   secondMaxLength = VAR_MAX_LENGTH,
 
   warningKey = FIRST | SECOND,
+  dropDown = ZERO,
 
   firstRequestName = firstName,
   firstEditName = firstName,
@@ -56,7 +57,7 @@ function TwoColumnView({
     useState(initialFirstValue);
 
   const [secondValue, setSecondValue] = useState('');
-  const [hasChanges, setChanged] = useState(false);
+  const [isSaveEnabled, setIsSaveEnabled] = useState(false);
   const [fieldWarning, setFieldWarning] = useState('');
 
   useEffect(() => {
@@ -194,7 +195,7 @@ function TwoColumnView({
     setFirstValue(initialFirstValue);
     setSecondValue('');
     setInitialPopupState({});
-    setChanged(false);
+    setIsSaveEnabled(false);
     setDeleteArmed(false);
     setFieldWarning('');
   }
@@ -215,7 +216,7 @@ function TwoColumnView({
       return;
     }
 
-    if (entity !== null && !hasChanges) {
+    if (entity !== null && !isSaveEnabled) {
       return;
     }
 
@@ -319,11 +320,11 @@ function TwoColumnView({
           secondMaxLength={secondMaxLength}
 
           deleteArmed={deleteArmed}
-          hasChanges={hasChanges}
+          isSaveEnabled={isSaveEnabled}
 
           onChangeFirstField={value => {
             setFirstValue(value);
-            setChanged(initialPopupState.firstValue !== value  && isCurrentInitialPopupStateChosen(value, secondValue, /*dropDown*/ 0))
+            setIsSaveEnabled(initialPopupState.firstValue !== value  && isCurrentInitialPopupStateChosen(value, secondValue, dropDown))
             setFieldWarning(
               createWarning(value, secondValue)
             );
@@ -331,7 +332,7 @@ function TwoColumnView({
 
           onChangeSecondField={value => {
             setSecondValue(value);
-            setChanged(initialPopupState.secondValue !== value  && isCurrentInitialPopupStateChosen(firstValue, value, /*dropDown*/ 0))
+            setIsSaveEnabled(initialPopupState.secondValue !== value  && isCurrentInitialPopupStateChosen(firstValue, value, dropDown))
             setFieldWarning(
               createWarning(firstValue, value)
             );

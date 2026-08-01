@@ -1,4 +1,6 @@
 import TwoColumnView from './TwoColumnView';
+import { FIRST } from '../utils/const'
+
 
 import {
   createTransLine,
@@ -18,12 +20,14 @@ function TransgenicLineView() {
       firstName2="strainName"
       firstLabel="Strain code — strain name"
 
+      secondName="name"
+      secondLabel="Name"
+
       firstRequestName="strainId"
       firstEditName="strainId"
       firstInputType="select"
 
-      secondName="name"
-      secondLabel="Name"
+      dropDown={FIRST}
 
       getSubEntityApi={getStrains}
       subEntityLabelName="code"

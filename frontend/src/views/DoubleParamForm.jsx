@@ -79,7 +79,7 @@ export default function DoubleParamForm({
   onCancel,
 
   deleteArmed = false,
-  hasChanges = true
+  isSaveEnabled = true
 }) {
   return (
     <div className="popup-backdrop">
@@ -135,7 +135,7 @@ export default function DoubleParamForm({
             <div className="popup-main-buttons">
               <button
                 type="submit"
-                disabled={editing && !hasChanges}
+                disabled={editing && !isSaveEnabled}
               >
                 {editing ? 'Save' : 'Add'}
               </button>
