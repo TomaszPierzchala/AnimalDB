@@ -324,7 +324,8 @@ function TwoColumnView({
 
           onChangeFirstField={value => {
             setFirstValue(value);
-            setIsSaveEnabled(initialPopupState.firstValue !== value  && isCurrentInitialPopupStateChosen(value, secondValue, dropDown))
+            setIsSaveEnabled((initialPopupState.firstValue !== value || initialPopupState.secondValue !== secondValue)
+                             && isCurrentInitialPopupStateChosen(value, secondValue, dropDown))
             setFieldWarning(
               createWarning(value, secondValue)
             );
@@ -332,7 +333,8 @@ function TwoColumnView({
 
           onChangeSecondField={value => {
             setSecondValue(value);
-            setIsSaveEnabled(initialPopupState.secondValue !== value  && isCurrentInitialPopupStateChosen(firstValue, value, dropDown))
+            setIsSaveEnabled((initialPopupState.firstValue !== firstValue || initialPopupState.secondValue !== value)
+                             && isCurrentInitialPopupStateChosen(firstValue, value, dropDown))
             setFieldWarning(
               createWarning(firstValue, value)
             );
