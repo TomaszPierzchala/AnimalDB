@@ -164,6 +164,9 @@ class TransgenicLineRepositoryTest {
                         strain,
                         "OT-I"));
 
+        transgenicLineRepository.flush();
+        entityManager.clear();
+
         assertThat(
                 transgenicLineRepository.existsByName("OT-I")
         ).isTrue();
@@ -192,6 +195,9 @@ class TransgenicLineRepositoryTest {
                         new TransgenicLine(
                                 strain,
                                 "OT-II"));
+
+        transgenicLineRepository.flush();
+        entityManager.clear();
 
         assertThat(
                 transgenicLineRepository

@@ -132,6 +132,9 @@ class StrainRepositoryTest {
 
         strainRepository.save(strain);
 
+        strainRepository.flush();
+        entityManager.clear();
+
         boolean exists = strainRepository.existsByCode("C57BL6");
 
         assertThat(exists).isTrue();
@@ -145,6 +148,9 @@ class StrainRepositoryTest {
                 "C57BL/6");
 
         strainRepository.save(strain);
+
+        strainRepository.flush();
+        entityManager.clear();
 
         boolean exists = strainRepository.existsByCode("BALBC");
 
@@ -164,6 +170,9 @@ class StrainRepositoryTest {
                         "BALBC",
                         "BALB/c"));
 
+        strainRepository.flush();
+        entityManager.clear();
+
         boolean exists = strainRepository.existsByCodeAndIdNot(
                 "C57BL6",
                 strain2.getId());
@@ -178,6 +187,9 @@ class StrainRepositoryTest {
                 new Strain(
                         "C57BL6",
                         "C57BL/6"));
+
+        strainRepository.flush();
+        entityManager.clear();
 
         boolean exists = strainRepository.existsByCodeAndIdNot(
                 "C57BL6",

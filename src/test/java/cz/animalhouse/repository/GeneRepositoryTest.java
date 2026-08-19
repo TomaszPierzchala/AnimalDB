@@ -40,6 +40,8 @@ class GeneRepositoryTest {
 
         geneRepository.saveAll(List.of(gene1, gene2));
 
+        geneRepository.flush();
+        entityManager.clear();
         List<Gene> genes = geneRepository.findAll();
 
         assertThat(genes).hasSize(2);
