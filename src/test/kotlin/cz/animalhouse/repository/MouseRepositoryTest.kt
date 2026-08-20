@@ -4,6 +4,8 @@ import cz.animalhouse.entity.Mouse
 import cz.animalhouse.entity.Strain
 import cz.animalhouse.entity.Mouse.Sex
 import org.assertj.core.api.Assertions.assertThat
+import org.junit.jupiter.api.assertThrows
+import org.springframework.dao.DataIntegrityViolationException
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.data.jpa.test.autoconfigure.DataJpaTest
@@ -100,5 +102,119 @@ class MouseRepositoryTest {
 
         assertThat(loaded.note)
             .isEqualTo("Test mouse")
+    }
+
+    @Test
+    fun `should find all mice`() {
+        val strain = strainRepository.save(
+            Strain(
+                "BALBC",
+                "BALB-c"
+            )
+        )
+
+        mouseRepository.save(
+            Mouse(
+                2001,
+                Sex.F,
+                strain,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null
+            )
+        )
+
+        mouseRepository.save(
+            Mouse(
+                2002,
+                Sex.M,
+                strain,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null
+            )
+        )
+
+        mouseRepository.flush()
+        entityManager.clear()
+
+        val result = mouseRepository.findAll()
+
+        assertThat(result)
+            .hasSize(2)
+
+        assertThat(result)
+            .extracting<Int> { it.animalNumber }
+            .containsExactlyInAnyOrder(
+                2001,
+                2002
+            )
+    }
+
+    @Test
+    fun `should not allow duplicate animal number`() {
+        val strain = strainRepository.save(
+            Strain(
+                "C57",
+                "C57"
+            )
+        )
+
+        val first = Mouse(
+            3001,
+            Sex.M,
+            strain,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+        )
+
+        val second = Mouse(
+            3001,
+            Sex.F,
+            strain,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+        )
+
+        mouseRepository.save(first)
+        mouseRepository.flush()
+
+        assertThrows<DataIntegrityViolationException> {
+            mouseRepository.saveAndFlush(second)
+        }
     }
 }
