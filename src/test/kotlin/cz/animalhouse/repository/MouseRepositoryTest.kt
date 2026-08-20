@@ -49,17 +49,12 @@ class MouseRepositoryTest {
             1001,
             Sex.M,
             strain,
-            null,
-            null,
-            null,
-            null,
-            LocalDate.of(2026, 8, 1),
-            null,
-            "Room 1",
-            "Rack A",
-            "Cage 12",
-            "Prague",
-            "Test mouse"
+            birthDate = LocalDate.of(2026, 8, 1),
+            room = "Room 1",
+            rack = "Rack A",
+            cage = "Cage 12",
+            origin = "Prague",
+            note = "Test mouse"
         )
 
         val saved = mouseRepository.save(mouse)
@@ -67,7 +62,11 @@ class MouseRepositoryTest {
         mouseRepository.flush()
         entityManager.clear()
 
-        val found = mouseRepository.findById(saved.id)
+        val savedId = requireNotNull(saved.id) {
+            "Saved mouse should have an id"
+        }
+
+        val found = mouseRepository.findById(savedId)
 
         assertThat(found).isPresent
 
@@ -118,17 +117,6 @@ class MouseRepositoryTest {
                 2001,
                 Sex.F,
                 strain,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null
             )
         )
 
@@ -137,17 +125,6 @@ class MouseRepositoryTest {
                 2002,
                 Sex.M,
                 strain,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null
             )
         )
 
@@ -180,34 +157,12 @@ class MouseRepositoryTest {
             3001,
             Sex.M,
             strain,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null
         )
 
         val second = Mouse(
             3001,
             Sex.F,
             strain,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null
         )
 
         mouseRepository.save(first)
