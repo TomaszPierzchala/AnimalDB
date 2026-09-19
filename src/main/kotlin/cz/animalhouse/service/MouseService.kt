@@ -8,6 +8,8 @@ import cz.animalhouse.exception.DuplicateMouseAnimalNumberException
 import cz.animalhouse.repository.MouseRepository
 import cz.animalhouse.repository.StrainRepository
 import cz.animalhouse.repository.TransgenicLineRepository
+import org.springframework.data.domain.Page
+import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDate
@@ -21,8 +23,8 @@ class MouseService(
 ) {
 
     @Transactional(readOnly = true)
-    fun findAll(): List<MouseResponse> =
-        mouseRepository.findAll()
+    fun findAll(pageable: Pageable): Page<MouseResponse> =
+        mouseRepository.findAll(pageable)
             .map { it.toResponse() }
 
     @Transactional(readOnly = true)

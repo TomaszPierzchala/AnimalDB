@@ -22,6 +22,9 @@ import org.mockito.kotlin.any
 import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
+import org.springframework.data.domain.Page
+import org.springframework.data.domain.PageImpl
+import org.springframework.data.domain.PageRequest
 import org.springframework.test.util.ReflectionTestUtils
 import java.time.LocalDate
 import java.util.Optional
@@ -79,28 +82,41 @@ class MouseServiceTest {
             animalNumber = 1002,
             sex = Mouse.Sex.F
         )
+        val PAGE_SIZE = 10
+        val FAKE_TOTAL_ITEMS_IN_DB = 231L
+        val FAKE_TOTAL_PAGES = FAKE_TOTAL_ITEMS_IN_DB / PAGE_SIZE + 1
+        val pageable = PageRequest.of(0, PAGE_SIZE)
 
-        whenever(mouseRepository.findAll())
-            .thenReturn(listOf(mouse1, mouse2))
+        whenever(mouseRepository.findAll(pageable))
+            .thenReturn(
+                PageImpl(
+                    listOf(mouse1, mouse2),
+                    pageable,
+                    FAKE_TOTAL_ITEMS_IN_DB
+                )
+            )
 
-        val result: List<MouseResponse> =
-            mouseService.findAll()
+        val result: Page<MouseResponse> =
+            mouseService.findAll(pageable)
 
-        assertThat(result).hasSize(2)
+        assertThat(result.content).hasSize(2)
 
-        assertThat(result.map { it.animalNumber })
-        .containsExactly(
+        assertThat(result.content.map { it.animalNumber })
+            .containsExactly(
                 1001,
                 1002
-        )
+            )
 
-        assertThat(result.map { it.sex })
-        .containsExactly(
+        assertThat(result.content.map { it.sex })
+            .containsExactly(
                 Mouse.Sex.M,
                 Mouse.Sex.F
-        )
-    
-        verify(mouseRepository).findAll()
+            )
+
+        assertThat(result.totalElements).isEqualTo(FAKE_TOTAL_ITEMS_IN_DB)
+        assertThat(result.totalPages).isEqualTo(FAKE_TOTAL_PAGES)
+
+        verify(mouseRepository).findAll(pageable)
     }
 
     @Test
