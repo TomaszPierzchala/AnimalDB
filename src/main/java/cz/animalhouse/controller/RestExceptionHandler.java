@@ -1,8 +1,9 @@
 package cz.animalhouse.controller;
 
-import java.util.LinkedHashMap;
-import java.util.Map;
-
+import cz.animalhouse.exception.DuplicateGeneSymbolException;
+import cz.animalhouse.exception.DuplicateMouseAnimalNumberException;
+import cz.animalhouse.exception.DuplicateStrainCodeException;
+import cz.animalhouse.exception.TransgenicLineGeneNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -10,9 +11,9 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
-import cz.animalhouse.exception.DuplicateGeneSymbolException;
-import cz.animalhouse.exception.DuplicateStrainCodeException;
-import cz.animalhouse.exception.TransgenicLineGeneNotFoundException;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.NoSuchElementException;
 
 @RestControllerAdvice
 public class RestExceptionHandler {
@@ -53,5 +54,32 @@ public class RestExceptionHandler {
         return ResponseEntity
                 .status(HttpStatus.BAD_REQUEST)
                 .body(response);
+    }
+
+    @ExceptionHandler(NoSuchElementException.class)
+    public ResponseEntity<String> handleNotFound(
+            NoSuchElementException ex) {
+
+        return ResponseEntity
+                .status(HttpStatus.NOT_FOUND)
+                .body(ex.getMessage());
+    }
+
+    @ExceptionHandler(DuplicateMouseAnimalNumberException.class)
+    public ResponseEntity<String> handleDuplicate(
+            DuplicateMouseAnimalNumberException ex) {
+
+        return ResponseEntity
+                .status(HttpStatus.CONFLICT)
+                .body(ex.getMessage());
+    }
+
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<String> handleInvalidArgument(
+            IllegalArgumentException ex) {
+
+        return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
+                .body(ex.getMessage());
     }
 }

@@ -4,12 +4,15 @@ import cz.animalhouse.dto.MouseRequest
 import cz.animalhouse.dto.MouseResponse
 import cz.animalhouse.entity.Mouse
 import cz.animalhouse.service.MouseService
+import cz.animalhouse.exception.DuplicateMouseAnimalNumberException
 
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 
 import org.mockito.kotlin.any
 import org.mockito.kotlin.argumentCaptor
+import org.mockito.kotlin.eq
+import org.mockito.kotlin.doThrow
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
@@ -198,7 +201,7 @@ class MouseControllerTest {
 
         whenever(
             mouseService.update(
-                org.mockito.kotlin.eq(1L),
+                eq(1L),
                 any<MouseRequest>()
             )
         ).thenReturn(response)
@@ -221,7 +224,7 @@ class MouseControllerTest {
         val requestCaptor = argumentCaptor<MouseRequest>()
 
         verify(mouseService).update(
-            org.mockito.kotlin.eq(1L),
+            eq(1L),
             requestCaptor.capture()
         )
 
@@ -246,6 +249,169 @@ class MouseControllerTest {
             .andExpect(content().string(""))
 
         verify(mouseService).delete(1L)
+    }
+
+    @Test
+    fun shouldReturn404WhenFindingMissingMouse() {
+
+        whenever(mouseService.findById(999L))
+            .thenThrow(
+                NoSuchElementException(
+                    "Mouse with id=999 not found"
+                )
+            )
+
+        mockMvc.perform(
+            get("/api/mice/999")
+        )
+            .andExpect(status().isNotFound)
+
+        verify(mouseService).findById(999L)
+    }
+
+    @Test
+    fun shouldReturn404WhenUpdatingMissingMouse() {
+
+        whenever(
+            mouseService.update(
+                eq(999L),
+                any<MouseRequest>()
+            )
+        ).thenThrow(
+            NoSuchElementException(
+                "Mouse with id=999 not found"
+            )
+        )
+
+        mockMvc.perform(
+            put("/api/mice/999")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(createRequestJson())
+        )
+            .andExpect(status().isNotFound)
+
+        verify(mouseService).update(
+            eq(999L),
+            any<MouseRequest>()
+        )
+    }
+
+    @Test
+    fun shouldReturn404WhenDeletingMissingMouse() {
+
+        doThrow(
+            NoSuchElementException(
+                "Mouse with id=999 not found"
+            )
+        ).whenever(mouseService).delete(999L)
+
+        mockMvc.perform(
+            delete("/api/mice/999")
+        )
+            .andExpect(status().isNotFound)
+
+        verify(mouseService).delete(999L)
+    }
+
+    @Test
+    fun shouldReturn409WhenCreatingMouseWithDuplicateAnimalNumber() {
+
+        whenever(
+            mouseService.create(any<MouseRequest>())
+        ).thenThrow(
+            DuplicateMouseAnimalNumberException(1001)
+        )
+
+        mockMvc.perform(
+            post("/api/mice")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(createRequestJson())
+        )
+            .andExpect(status().isConflict)
+
+        verify(mouseService).create(any<MouseRequest>())
+    }
+
+    @Test
+    fun shouldReturn409WhenUpdatingMouseWithDuplicateAnimalNumber() {
+
+        whenever(
+            mouseService.update(
+                eq(1L),
+                any<MouseRequest>()
+            )
+        ).thenThrow(
+            DuplicateMouseAnimalNumberException(2001)
+        )
+
+        mockMvc.perform(
+            put("/api/mice/1")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(
+                    createRequestJson(animalNumber = 2001)
+                )
+        )
+            .andExpect(status().isConflict)
+
+        verify(mouseService).update(
+            eq(1L),
+            any<MouseRequest>()
+        )
+    }
+
+    @Test
+    fun shouldReturn400WhenDeathDateIsBeforeBirthDate() {
+
+        whenever(
+            mouseService.create(any<MouseRequest>())
+        ).thenThrow(
+            IllegalArgumentException(
+                "Death date cannot be before birth date"
+            )
+        )
+
+        val requestJson = """
+        {
+            "animalNumber": 1001,
+            "sex": "M",
+            "strainId": 10,
+            "birthDate": "2026-01-10",
+            "deathDate": "2026-01-09"
+        }
+    """.trimIndent()
+
+        mockMvc.perform(
+            post("/api/mice")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(requestJson)
+        )
+            .andExpect(status().isBadRequest)
+
+        verify(mouseService).create(any<MouseRequest>())
+    }
+
+    @Test
+    fun shouldReturn400WhenSexIsInvalid() {
+
+        val requestJson = """
+        {
+            "animalNumber": 1001,
+            "sex": "X",
+            "strainId": 10
+        }
+    """.trimIndent()
+
+        mockMvc.perform(
+            post("/api/mice")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(requestJson)
+        )
+            .andExpect(status().isBadRequest)
+
+        verify(
+            mouseService,
+            org.mockito.kotlin.never()
+        ).create(any<MouseRequest>())
     }
 
     // -------------------------------------------------
