@@ -1,9 +1,11 @@
 package cz.animalhouse.dto
 
 import cz.animalhouse.entity.Mouse.Sex
+import jakarta.validation.constraints.Positive
 import java.time.LocalDate
 
 data class MouseRequest(
+    @field:Positive
     val animalNumber: Int,
     val sex: Sex,
     val strainId: Long,

@@ -414,6 +414,26 @@ class MouseControllerTest {
         ).create(any<MouseRequest>())
     }
 
+    @Test
+    fun shouldReturn400WhenAnimalNumberIsNegative() {
+
+        val requestJson = createRequestJson(
+            animalNumber = -1
+        )
+
+        mockMvc.perform(
+            post("/api/mice")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(requestJson)
+        )
+            .andExpect(status().isBadRequest)
+
+        verify(
+            mouseService,
+            org.mockito.kotlin.never()
+        ).create(any<MouseRequest>())
+    }
+
     // -------------------------------------------------
     // Helpers
     // -------------------------------------------------
