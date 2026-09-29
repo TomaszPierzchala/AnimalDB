@@ -1,18 +1,21 @@
+
 # AnimalDB
 
 AnimalDB is a laboratory animal management system for tracking mice, breeding, genealogy, transgenic lines, genes, and experimental data.
 
-This project is a Spring Boot backend application that uses PostgreSQL for data storage. It provides a REST API for managing laboratory animal data, which will be consumed by a React frontend.
+The application consists of a Spring Boot backend, a PostgreSQL database, and a React frontend.
 
-The application is designed for a real animal facility use case and focuses on clean relational data modelling, traceability, and future extensibility.
+It is designed for a real laboratory animal facility use case, with an emphasis on clean relational data modelling, traceability, maintainability, and future extensibility.
 
-Live demo: [AnimalDB on Render](https://animaldb-frontend.onrender.com/)
+**Live demo:** [AnimalDB on Render](https://animaldb-frontend.onrender.com/)
 
-> The application uses Render's free service tier. The first load may take approximately two minutes because inactive services are put to sleep.
+> The application uses Render's free service tier. After a period of inactivity, services may be put to sleep. The first load can take approximately two minutes.
 
 ## Project purpose
 
 The goal of AnimalDB is to support the daily work of a laboratory animal facility by providing a structured system for managing information about laboratory mice, their genetic background, breeding history, genealogy, and procedures performed by laboratory staff.
+
+The project aims to replace spreadsheet-based record keeping with a relational database and a user-friendly web interface.
 
 ## Main features
 
@@ -24,27 +27,29 @@ The goal of AnimalDB is to support the daily work of a laboratory animal facilit
 - Laboratory procedure management
 - Assignment of technicians and directors to procedures
 - PostgreSQL schema versioning with Flyway
-- REST API backend for future React frontend integration
+- REST API integration with the React frontend
 
-## Current frontend prototype
+## Frontend
 
-AnimalDB includes an initial React frontend prototype for managing gene records.
+AnimalDB includes a React frontend for managing laboratory animal data.
 
-The current Gene & Strain views provide a simple table-based interface for displaying, adding, editing, and deleting gene definitions stored in the backend PostgreSQL database through the REST API.
+The interface uses table-based views and popup forms to provide straightforward access to records stored in PostgreSQL through the backend REST API.
+
+### Gene view — Reference implementation
+
+The Gene view is an example of a fully functional CRUD interface in AnimalDB. It demonstrates the integration between the React frontend, Spring Boot REST API, and PostgreSQL database.
 
 <img src="docs/animaldb-gene-view.png" alt="AnimalDB Gene view" width="900">
 
-### Gene view functionality
+The view supports:
 
-The Gene & Strain views currently support:
+- Displaying gene records retrieved from the backend
+- Adding a new gene through a popup form
+- Editing an existing gene by clicking a table row
+- Deleting an existing gene from the edit popup
+- Refreshing the list after create, update, or delete operations
 
-- displaying all gene records from the backend,
-- adding a new gene through a popup form,
-- editing an existing gene by clicking a table row,
-- deleting an existing gene from the edit popup,
-- refreshing the list after create, update, or delete operations.
-
-For example the Gene View frontend communicates with the backend using the following REST endpoints:
+The frontend communicates with the backend using the following REST endpoints:
 
 ```text
 GET    /api/genes       List all genes
@@ -53,32 +58,58 @@ PUT    /api/genes/{id}  Update an existing gene
 DELETE /api/genes/{id}  Delete an existing gene
 ```
 
-The interface is intentionally simple at this stage. It is used as the first working frontend slice for validating the full application flow:
+The application follows a layered architecture:
 
-React UI -> REST Controller -> Service -> Repository -> PostgreSQL
+```text
+React UI
+    |
+    v
+REST Controller
+    |
+    v
+Service
+    |
+    v
+Repository
+    |
+    v
+PostgreSQL
+```
 
-This first frontend screen will be used as a pattern for implementing additional AnimalDB views, such as mice, strains, transgenic lines, mating records, and laboratory procedures.
+The frontend is built using React and Vite.
 
-## Live demo
+Vite provides a development server with hot module replacement (HMR) and produces optimized frontend assets for production deployment.
 
-A deployed version of the application is available at:
-
-[https://animaldb-frontend.onrender.com/](https://animaldb-frontend.onrender.com/)
-
-The application is hosted on Render using the free service tier. After a period of inactivity, the service may be put to sleep, so the first load can take approximately two minutes while the backend service starts.
+The Gene view serves as a reference implementation for developing additional views for mice, strains, transgenic lines, mating records, and laboratory procedures.
 
 ## Technology stack
 
-- Java 21
+### Backend
+
+- Java 21 / Kotlin
 - Spring Boot
 - Spring Data JPA / Hibernate
 - PostgreSQL
 - Flyway
-- Testcontainers
-- JUnit 5
-- React
 - Maven
-- Docker / Docker Compose
+
+### Frontend
+
+- React
+- JavaScript
+- Vite
+- Node.js / npm
+
+### Testing
+
+- JUnit 5
+- Mockito
+- Testcontainers
+
+### Infrastructure
+
+- Docker
+- Render (cloud deployment)
 
 ## Database schema
 
@@ -111,85 +142,177 @@ Current public database model:
 
 ## Example domain model
 
-AnimalDB models laboratory mice as the central entity. Each mouse can be linked to:
+AnimalDB models laboratory mice as the central entity.
 
-- a strain,
-- a transgenic line,
-- mother and father records for genealogy tracking,
-- genes and genotype data,
-- laboratory procedures,
-- mating records as male or female parent.
+Each mouse can be linked to:
+
+- A strain
+- A transgenic line
+- Mother and father records for genealogy tracking
+- Genes and genotype data
+- Laboratory procedures
+- Mating records as a male or female parent
 
 This structure allows the system to represent both biological relationships and operational laboratory workflows.
 
 ## Getting started
 
-Before running the application for the first time, create the PostgreSQL database and application user as described in the **Local Database Setup** guide:
-
-[dev.database/README.md](dev.database/README.md)
-
-Then start the application:
-
-```bash
-./mvnw spring-boot:run
-```
-
-Flyway migrations are executed automatically during application startup.
-
-## Running the application
+The following instructions describe how to run AnimalDB locally.
 
 ### Prerequisites
 
+Before running the application, make sure the following tools are installed:
+
 - Java 21
-- Maven
-- PostgreSQL or Docker
-- Docker Desktop, if running integration tests with Testcontainers
+- PostgreSQL
+- Node.js and npm
+- Docker Desktop (required for integration tests using Testcontainers)
 
-### Run PostgreSQL with Docker Compose
+The project includes a Maven Wrapper (`mvnw`), so a separate Maven installation is not required.
 
-```bash
-docker compose up -d
-```
+### 1. Start PostgreSQL
 
-### Run the backend
+Follow the instructions in the [Local Database Setup](dev.database/README.md) guide to install and configure PostgreSQL and create the application database and user.
+
+Make sure PostgreSQL is running before starting the backend.
+
+### 2. Start the backend
+
+From the project root directory, run:
 
 ```bash
 ./mvnw spring-boot:run
 ```
 
-## Tests
+The Spring Boot application starts and connects to PostgreSQL.
 
-Run all tests with:
+Flyway automatically executes pending database migrations during application startup.
+
+By default, the REST API is available under:
+
+```text
+http://localhost:8080/api
+```
+
+### 3. Start the frontend
+
+Open a separate terminal and navigate to the React frontend directory:
+
+```bash
+cd frontend
+```
+
+Install the dependencies:
+
+```bash
+npm install
+```
+
+Start the Vite development server:
+
+```bash
+npm run dev
+```
+
+By default, the frontend is available at:
+
+```text
+http://localhost:5173
+```
+
+Open this address in your browser to access AnimalDB.
+
+The frontend communicates with the Spring Boot backend through its REST API.
+
+Make sure the backend is running before using functionality that requires database access.
+
+### 4. Run tests
+
+From the project root directory, run:
 
 ```bash
 ./mvnw test
 ```
 
-### JPA entity tests
+Integration tests require Docker to be running.
 
-JPA entity tests use `testcontainers-junit-jupiter`, so a local Docker Desktop installation is required.
+## Tests
 
-These tests start a PostgreSQL container and verify persistence mappings against a real PostgreSQL database instead of an in-memory database.
+AnimalDB uses JUnit 5 and Mockito for unit testing and Testcontainers for database integration testing.
 
-## Project status
+### Unit tests
 
-This project is currently under active development. The backend data model and database schema are being designed and implemented first. An initial React frontend prototype has been added for the Gene entity and will be extended to other parts of the domain model.
+Unit tests verify service-layer business logic, including:
+
+- CRUD operations
+- Input validation
+- Duplicate record detection
+- Exception handling
+- Entity-to-DTO mapping
+
+Repository dependencies are mocked to isolate the tested services.
+
+### Integration tests
+
+JPA integration tests use Testcontainers to start a PostgreSQL container.
+
+These tests verify persistence mappings and database interactions against a real PostgreSQL database rather than an in-memory database.
+
+This approach helps identify database-specific issues that might not be detected when testing against a different database engine.
+
+## Deployment
+
+AnimalDB is deployed on Render.
+
+The backend is packaged as an executable JAR using Maven and deployed in a Docker container.
+
+The Dockerfile uses a multi-stage build:
+
+1. The build stage uses Eclipse Temurin JDK 21 to compile and package the application.
+2. The runtime stage uses Eclipse Temurin JRE 21 to run the packaged application.
+
+This separates the build environment from the runtime environment and reduces the size of the final Docker image.
+
+The React frontend is built using Vite and deployed as a static web application.
+
+The deployed application is available at:
+
+[https://animaldb-frontend.onrender.com/](https://animaldb-frontend.onrender.com/)
 
 ## Repository structure
 
 ```text
-src/main/java/                 Java source code
-src/main/resources/            Application configuration and Flyway migrations
-src/main/resources/db/migration/ Flyway database migrations
-src/test/java/                 Unit and integration tests
-dev.database/                 Local PostgreSQL setup documentation
-docs/                          Project documentation and database diagrams
+AnimalDB/
+├── src/
+│   ├── main/
+│   │   ├── java/                  Java backend source code
+│   │   ├── kotlin/                Kotlin backend source code
+│   │   └── resources/
+│   │       └── db/
+│   │           └── migration/     Flyway database migrations
+│   └── test/
+│       ├── java/                  Java tests
+│       └── kotlin/                Kotlin tests
+├── frontend/                      React frontend application
+├── dev.database/                  Local PostgreSQL setup documentation
+├── docs/                          Project documentation and diagrams
+├── Dockerfile                     Backend Docker image definition
+├── pom.xml                        Maven configuration
+└── README.md
 ```
+
+## Project status
+
+AnimalDB is under active development.
+
+The project includes a PostgreSQL database, a Spring Boot REST API, and a React frontend.
+
+Development focuses on extending the frontend, implementing additional business logic, and improving automated test coverage.
+
+The application is designed to evolve incrementally as additional requirements from laboratory animal management workflows are implemented.
 
 ## Author
 
-Tomasz Pierzchała
+**Tomasz Pierzchała**
 
 GitHub: [TomaszPierzchala](https://github.com/TomaszPierzchala)
-
-Live demo: [AnimalDB on Render](https://animaldb-frontend.onrender.com/)
