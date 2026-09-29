@@ -63,12 +63,15 @@ The application follows a layered architecture:
 ```text
 React UI
     |
+    | JSON
     v
 REST Controller
     |
+    | DTO
     v
 Service
     |
+    | Entity
     v
 Repository
     |
