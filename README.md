@@ -263,24 +263,75 @@ These tests verify persistence mappings and database interactions against a real
 
 This approach helps identify database-specific issues that might not be detected when testing against a different database engine.
 
-## Deployment
+## Deployment on Render
 
-AnimalDB is deployed on Render.
+AnimalDB is deployed on [Render](https://render.com/) using three services grouped in the `Demo` environment.
 
-The backend is packaged as an executable JAR using Maven and deployed in a Docker container.
+| Service | Render service type | Runtime | Region |
+|---|---|---|---|
+| `animaldb_backend` | Web Service | Docker / Java 21 | Frankfurt |
+| `animaldb-postgres` | PostgreSQL | PostgreSQL 18 | Frankfurt |
+| `animaldb-frontend` | Static Site | React / Vite | Global |
+
+### Backend
+
+The Spring Boot backend is deployed as a Docker-based Web Service.
 
 The Dockerfile uses a multi-stage build:
 
-1. The build stage uses Eclipse Temurin JDK 21 to compile and package the application.
-2. The runtime stage uses Eclipse Temurin JRE 21 to run the packaged application.
+1. Eclipse Temurin JDK 21 compiles and packages the application using Maven.
+2. Eclipse Temurin JRE 21 runs the resulting executable JAR.
 
 This separates the build environment from the runtime environment and reduces the size of the final Docker image.
 
-The React frontend is built using Vite and deployed as a static web application.
+The backend connects to PostgreSQL using environment variables configured in the Render dashboard.
+
+### Database
+
+PostgreSQL is provided by Render as a managed database service.
+
+The backend connects to the database through Render's internal network.
+
+Database credentials and other application configuration values are stored as environment variables rather than being included in the source code.
+
+Flyway automatically applies pending database migrations when the backend starts.
+
+### Frontend
+
+The React frontend is deployed as a Static Site.
+
+The `VITE_API_URL` environment variable specifies the public URL of the backend REST API.
+
+It must be configured in the frontend service before building the application.
+
+The Render Static Site configuration is:
+
+**Root Directory:**
+```text
+frontend
+```
+
+**Build Command:**
+```bash
+npm install && npm run build
+```
+
+**Publish Directory:**
+```text
+dist
+```
+
+Vite generates the production-ready HTML, JavaScript, and CSS files in the `dist` directory.
+
+The frontend communicates with the backend through its REST API.
+
+### Live application
 
 The deployed application is available at:
 
-[https://animaldb-frontend.onrender.com/](https://animaldb-frontend.onrender.com/)
+[AnimalDB on Render](https://animaldb-frontend.onrender.com/)
+
+> The application uses Render's free service tier. After a period of inactivity, services may be put to sleep. The first load can take approximately two minutes.
 
 ## Repository structure
 
