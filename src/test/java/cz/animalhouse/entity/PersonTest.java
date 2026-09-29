@@ -9,9 +9,11 @@ import org.springframework.boot.data.jpa.test.autoconfigure.DataJpaTest;
 import org.springframework.boot.jdbc.test.autoconfigure.AutoConfigureTestDatabase;
 import org.springframework.boot.jpa.test.autoconfigure.TestEntityManager;
 import org.springframework.boot.testcontainers.service.connection.ServiceConnection;
+import org.springframework.test.context.ActiveProfiles;
 import org.testcontainers.postgresql.PostgreSQLContainer;
 
 @DataJpaTest
+@ActiveProfiles("test")
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 class PersonTest {
 
@@ -67,6 +69,7 @@ class PersonTest {
 
         Person saved = entityManager.find(Person.class, person.getId());
 
+        assert saved != null;
         assertThat(saved.getName()).isEqualTo("John Doe");
         assertThat(saved.getDescription())
                 .isEqualTo("Animal facility director");
@@ -84,6 +87,7 @@ class PersonTest {
 
         Person saved = entityManager.find(Person.class, person.getId());
 
+        assert saved != null;
         assertThat(saved.getDescription()).isNull();
     }
 

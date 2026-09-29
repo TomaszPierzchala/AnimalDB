@@ -15,8 +15,10 @@ import org.testcontainers.postgresql.PostgreSQLContainer
 import java.time.LocalDate
 
 import jakarta.persistence.EntityManager;
+import org.springframework.test.context.ActiveProfiles
 
 @DataJpaTest
+@ActiveProfiles("test")
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 class MouseRepositoryTest {
 

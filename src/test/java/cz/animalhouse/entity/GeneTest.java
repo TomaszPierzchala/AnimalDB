@@ -9,9 +9,11 @@ import org.springframework.boot.data.jpa.test.autoconfigure.DataJpaTest;
 import org.springframework.boot.jdbc.test.autoconfigure.AutoConfigureTestDatabase;
 import org.springframework.boot.jpa.test.autoconfigure.TestEntityManager;
 import org.springframework.boot.testcontainers.service.connection.ServiceConnection;
+import org.springframework.test.context.ActiveProfiles;
 import org.testcontainers.postgresql.PostgreSQLContainer;
 
 @DataJpaTest
+@ActiveProfiles("test")
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 class GeneTest {
 
@@ -66,6 +68,7 @@ class GeneTest {
 
         Gene saved = entityManager.find(Gene.class, gene.getId());
 
+        assert saved != null;
         assertThat(saved.getDescription())
                 .isEqualTo("Improved Cre recombinase");
     }

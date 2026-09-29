@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.data.jpa.test.autoconfigure.DataJpaTest;
 import org.springframework.boot.jdbc.test.autoconfigure.AutoConfigureTestDatabase;
 import org.springframework.boot.testcontainers.service.connection.ServiceConnection;
+import org.springframework.test.context.ActiveProfiles;
 import org.testcontainers.postgresql.PostgreSQLContainer;
 
 import cz.animalhouse.entity.Gene;
@@ -20,6 +21,7 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceUnitUtil;
 
 @DataJpaTest
+@ActiveProfiles("test")
 @AutoConfigureTestDatabase(
         replace = AutoConfigureTestDatabase.Replace.NONE
 )
@@ -212,7 +214,7 @@ class TransgenicLineGeneRepositoryTest {
         assertThat(assignments).hasSize(1);
 
         TransgenicLineGene assignment =
-                assignments.get(0);
+                assignments.getFirst();
 
         PersistenceUnitUtil persistenceUnitUtil =
                 entityManager
@@ -307,7 +309,7 @@ class TransgenicLineGeneRepositoryTest {
 
         assertThat(remaining).hasSize(1);
 
-        assertThat(remaining.get(0).getGene().getSymbol())
+        assertThat(remaining.getFirst().getGene().getSymbol())
                 .isEqualTo("GFP");
     }
 

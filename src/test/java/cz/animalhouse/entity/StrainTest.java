@@ -9,9 +9,11 @@ import org.springframework.boot.data.jpa.test.autoconfigure.DataJpaTest;
 import org.springframework.boot.jdbc.test.autoconfigure.AutoConfigureTestDatabase;
 import org.springframework.boot.jpa.test.autoconfigure.TestEntityManager;
 import org.springframework.boot.testcontainers.service.connection.ServiceConnection;
+import org.springframework.test.context.ActiveProfiles;
 import org.testcontainers.postgresql.PostgreSQLContainer;
 
 @DataJpaTest
+@ActiveProfiles("test")
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 class StrainTest {
 
@@ -58,7 +60,8 @@ class StrainTest {
 
 		Strain saved = entityManager.find(Strain.class, strain.getId());
 
-		assertThat(saved.getName()).isEqualTo("BALB/c");
+        assert saved != null;
+        assertThat(saved.getName()).isEqualTo("BALB/c");
 	}
 
 	@Test
