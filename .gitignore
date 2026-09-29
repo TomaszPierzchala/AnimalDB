@@ -46,6 +46,6 @@ build/
 .local/
 *Test_Local.java
 OPIS.md
-animaldb_schema.sql
+animaldb_*.sql
 ### temporary sql files ####
 *.sql_*
