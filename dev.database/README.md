@@ -50,7 +50,7 @@ $ psql -d postgres -f cancel-connection-and-drop-db.sql
 ```
 ### or recrete an empty animaldb
 ```bash
-$ ./recreate-db.sh
+$ ./recreate-no_shcema_db.sh
 ```
 
 ## 3. Configure Spring Boot
