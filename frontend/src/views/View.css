@@ -295,3 +295,57 @@ button[type="submit"] {
   font-size: 14px;
   background-color: white;
 }
+
+.mouse-header-row {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+
+  margin: 32px 0 20px;
+}
+
+.mouse-title {
+  margin: 32px 0 0;
+  text-align: center;
+}
+
+.column-selector {
+  justify-self: end;
+}
+
+.column-selector summary {
+  cursor: pointer;
+  text-align: right;
+}
+
+.column-selector-menu {
+  position: absolute;
+  right: 0;
+
+  min-width: 220px;
+  padding: 10px;
+
+  border: 1px solid #cccccc;
+  background-color: white;
+
+  z-index: 10;
+}
+
+.column-selector-menu label {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+
+  gap: 8px;
+  padding: 3px 0;
+
+  font-weight: normal;
+}
+.pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  gap: 12px;
+  margin-top: 16px;
+}

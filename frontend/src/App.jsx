@@ -6,13 +6,17 @@ import GitHubLink from './components/GitHubLink';
 import Sidebar from './components/Sidebar';
 import TransgenicLineView from './views/TransgenicLineView';
 import TransgenicLineGenesView from './views/TransgenicLineGenesView';
+import MiceView from './views/MiceView';
+
 import { FIRST, SECOND } from './utils/const';
 
 import {
   VIEW_GENE,
   VIEW_STRAIN,
   VIEW_TRANSLINE,
-  VIEW_TRANSLINEGENES
+  VIEW_TRANSLINEGENES,
+  VIEW_MICE,
+  navigationItems
 } from './viewNames';
 
 import {
@@ -34,16 +38,11 @@ function App() {
   const [activeView, setActiveView] = useState(() => {
     const savedView = localStorage.getItem('activeView');
 
-    if (
-      savedView === VIEW_GENE ||
-      savedView === VIEW_STRAIN ||
-      savedView === VIEW_TRANSLINE ||
-      savedView === VIEW_TRANSLINEGENES
-    ) {
-      return savedView;
-    }
-
-    return VIEW_GENE;
+    return navigationItems.some(
+        item => item.id === savedView
+    )
+        ? savedView
+        : VIEW_GENE;
   });
 
   function changeView(view) {
@@ -64,6 +63,9 @@ function App() {
 
       case VIEW_TRANSLINEGENES:
         return renderTransgenicLineGenesView();
+
+      case VIEW_MICE:
+        return renderMiceView();
 
       default:
         return renderGeneView();
@@ -105,8 +107,11 @@ function App() {
   }
 
   function renderTransgenicLineGenesView() {
-	/*return <TransgenicLineGenesView />; */
 	return <TransgenicLineGenesView/>;
+  }
+
+  function renderMiceView(){
+    return <MiceView/>;
   }
 
   return (

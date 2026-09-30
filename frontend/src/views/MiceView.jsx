@@ -1,0 +1,279 @@
+import { useEffect, useState } from 'react';
+
+import ErrorBanner from '../components/ErrorBanner';
+import { getMice } from '../api/miceApi';
+
+import './View.css';
+
+
+const COLUMNS = [
+    { name: 'animalNumber', label: 'Animal number' },
+    { name: 'sex', label: 'Sex' },
+    { name: 'strainId', label: 'Strain' },
+    { name: 'transgenicLineId', label: 'Transgenic line' },
+    { name: 'labProcedureId', label: 'Lab procedure' },
+    { name: 'motherId', label: 'Mother' },
+    { name: 'fatherId', label: 'Father' },
+    { name: 'birthDate', label: 'Birth date' },
+    { name: 'deathDate', label: 'Death date' },
+    { name: 'room', label: 'Room' },
+    { name: 'rack', label: 'Rack' },
+    { name: 'cage', label: 'Cage' },
+    { name: 'origin', label: 'Origin' },
+    { name: 'note', label: 'Note' }
+];
+
+const DEFAULT_COLUMNS = [
+    'animalNumber',
+    'sex',
+    'strainId'
+];
+
+const PAGE_SIZE = 20;
+
+
+function MiceView() {
+
+    const [mice, setMice] = useState([]);
+
+    const [selectedColumns, setSelectedColumns] =
+        useState(DEFAULT_COLUMNS);
+
+    const [page, setPage] = useState(0);
+    const [totalPages, setTotalPages] = useState(0);
+    const [totalElements, setTotalElements] = useState(0);
+
+    const [sortBy, setSortBy] =
+        useState('animalNumber');
+
+    const [direction, setDirection] =
+        useState('asc');
+
+    const [error, setError] = useState('');
+
+
+    useEffect(() => {
+        loadMice();
+    }, [page, sortBy, direction]);
+
+
+    async function loadMice() {
+        try {
+            const data = await getMice({
+                page,
+                size: PAGE_SIZE,
+                sortBy,
+                direction
+            });
+
+            setMice(data.content ?? []);
+            setTotalPages(data.totalPages ?? 0);
+            setTotalElements(data.totalElements ?? 0);
+
+            setError('');
+
+        } catch (err) {
+            setError(
+                `Could not load mice.\n${err.message}`
+            );
+        }
+    }
+
+
+    function toggleColumn(columnName) {
+        setSelectedColumns(currentColumns => {
+
+            if (currentColumns.includes(columnName)) {
+                return currentColumns.filter(
+                    name => name !== columnName
+                );
+            }
+
+            return [
+                ...currentColumns,
+                columnName
+            ];
+        });
+    }
+
+
+    function handleSort(columnName) {
+
+        if (sortBy === columnName) {
+            setDirection(
+                current =>
+                    current === 'asc'
+                        ? 'desc'
+                        : 'asc'
+            );
+        } else {
+            setSortBy(columnName);
+            setDirection('asc');
+        }
+
+        setPage(0);
+    }
+
+
+    function sortIndicator(columnName) {
+
+        if (sortBy !== columnName) {
+            return '';
+        }
+
+        return direction === 'asc'
+            ? ' ▲'
+            : ' ▼';
+    }
+
+
+    function displayValue(value) {
+
+        if (
+            value === null ||
+            value === undefined ||
+            value === ''
+        ) {
+            return '—';
+        }
+
+        return value;
+    }
+
+
+    const visibleColumns =
+        COLUMNS.filter(column =>
+            selectedColumns.includes(column.name)
+        );
+
+
+    return (
+        <section>
+
+            <ErrorBanner
+                message={error}
+                fading={false}
+            />
+
+            <div><h1 className="mouse-title">Mice</h1>
+
+                <details className="column-selector">
+                    <summary>Displayed columns</summary>
+
+                    <div className="column-selector-menu">
+                        {COLUMNS.map(column => (
+                            <label key={column.name}>
+                                <input
+                                    type="checkbox"
+                                    checked={selectedColumns.includes(column.name)}
+                                    onChange={() => toggleColumn(column.name)}
+                                />
+                                {column.label}
+                            </label>
+                        ))}
+                    </div>
+                </details>
+            </div>
+
+            <table>
+                <thead>
+                <tr>
+
+                    <th className="id-table-column">
+                        ID
+                    </th>
+
+                    {visibleColumns.map(column => (
+                        <th
+                            key={column.name}
+                            onClick={() =>
+                                handleSort(column.name)
+                            }
+                        >
+                            {column.label}
+                            {sortIndicator(column.name)}
+                        </th>
+                    ))}
+
+                </tr>
+                </thead>
+
+
+                <tbody>
+
+                {mice.map(mouse => (
+                    <tr
+                        key={mouse.id}
+                        className="clickable-row"
+                    >
+
+                        <td className="id-column">
+                            {mouse.id}
+                        </td>
+
+                        {visibleColumns.map(column => (
+                            <td key={column.name}>
+                                {displayValue(
+                                    mouse[column.name]
+                                )}
+                            </td>
+                        ))}
+
+                    </tr>
+                ))}
+
+                </tbody>
+
+            </table>
+
+
+            <div
+                style={{
+                    display: 'flex',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    gap: '12px',
+                    marginTop: '16px'
+                }}
+            >
+
+                <button
+                    type="button"
+                    disabled={page === 0}
+                    onClick={() =>
+                        setPage(current => current - 1)
+                    }
+                >
+                    Previous
+                </button>
+
+
+                <span>
+          Page {totalPages === 0 ? 0 : page + 1}
+                    {' '}of{' '}
+                    {totalPages}
+                    {' — '}
+                    {totalElements} mice
+        </span>
+
+
+                <button
+                    type="button"
+                    disabled={
+                        totalPages === 0 ||
+                        page >= totalPages - 1
+                    }
+                    onClick={() =>
+                        setPage(current => current + 1)
+                    }
+                >
+                    Next
+                </button>
+
+            </div>
+
+        </section>
+    );
+}
+
+export default MiceView;
