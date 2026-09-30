@@ -155,7 +155,7 @@ function MiceView() {
                 fading={false}
             />
 
-            <div><h1 className="mouse-title">Mice</h1>
+            <div><h1 className="mice-title">Mice</h1>
 
                 <details className="column-selector">
                     <summary>Displayed columns</summary>
@@ -175,67 +175,54 @@ function MiceView() {
                 </details>
             </div>
 
-            <table>
-                <thead>
-                <tr>
+            <div className="mice-table-scroll">
+                <table className="mice-table">
 
-                    <th className="id-table-column">
-                        ID
-                    </th>
-
-                    {visibleColumns.map(column => (
-                        <th
-                            key={column.name}
-                            onClick={() =>
-                                handleSort(column.name)
-                            }
-                        >
-                            {column.label}
-                            {sortIndicator(column.name)}
+                    <thead>
+                    <tr>
+                        <th className="id-column">
+                            ID
                         </th>
-                    ))}
-
-                </tr>
-                </thead>
-
-
-                <tbody>
-
-                {mice.map(mouse => (
-                    <tr
-                        key={mouse.id}
-                        className="clickable-row"
-                    >
-
-                        <td className="id-column">
-                            {mouse.id}
-                        </td>
 
                         {visibleColumns.map(column => (
-                            <td key={column.name}>
-                                {displayValue(
-                                    mouse[column.name]
-                                )}
-                            </td>
+                            <th
+                                key={column.name}
+                                className="mice-data-column"
+                                onClick={() => handleSort(column.name)}
+                            >
+                                {column.label}
+                                {sortIndicator(column.name)}
+                            </th>
                         ))}
-
                     </tr>
-                ))}
+                    </thead>
 
-                </tbody>
+                    <tbody>
+                    {mice.map(mouse => (
+                        <tr
+                            key={mouse.id}
+                            className="clickable-row"
+                        >
+                            <td className="id-column">
+                                {mouse.id}
+                            </td>
 
-            </table>
+                            {visibleColumns.map(column => (
+                                <td
+                                    key={column.name}
+                                    className="mice-data-column"
+                                >
+                                    {displayValue(mouse[column.name])}
+                                </td>
+                            ))}
+                        </tr>
+                    ))}
+                    </tbody>
 
+                </table>
+            </div>
 
-            <div
-                style={{
-                    display: 'flex',
-                    justifyContent: 'center',
-                    alignItems: 'center',
-                    gap: '12px',
-                    marginTop: '16px'
-                }}
-            >
+            <div className="pagination">
 
                 <button
                     type="button"
