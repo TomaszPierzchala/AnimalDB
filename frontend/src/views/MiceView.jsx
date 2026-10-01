@@ -37,7 +37,38 @@ function MiceView() {
     const [mice, setMice] = useState([]);
 
     const [selectedColumns, setSelectedColumns] =
-        useState(DEFAULT_COLUMNS);
+        useState(() => {
+            const savedColumns =
+                localStorage.getItem('miceSelectedColumns');
+
+            if (!savedColumns) {
+                return DEFAULT_COLUMNS;
+            }
+
+            try {
+                const parsed = JSON.parse(savedColumns);
+
+                if (!Array.isArray(parsed)) {
+                    return DEFAULT_COLUMNS;
+                }
+
+                const validColumnNames =
+                    COLUMNS.map(column => column.name);
+
+                const filtered = parsed.filter(name =>
+                    validColumnNames.includes(name)
+                );
+
+                const unique = [...new Set(filtered)];
+
+                return unique.length > 0
+                    ? unique
+                    : DEFAULT_COLUMNS;
+
+            } catch {
+                return DEFAULT_COLUMNS;
+            }
+        });
 
     const [page, setPage] = useState(0);
     const [totalPages, setTotalPages] = useState(0);
@@ -55,7 +86,12 @@ function MiceView() {
     useEffect(() => {
         loadMice();
     }, [page, sortBy, direction]);
-
+    useEffect(() => {
+        localStorage.setItem(
+            'miceSelectedColumns',
+            JSON.stringify(selectedColumns)
+        );
+    }, [selectedColumns]);
 
     async function loadMice() {
         try {
