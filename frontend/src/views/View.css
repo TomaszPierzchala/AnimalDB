@@ -318,7 +318,10 @@ button[type="submit"] {
 .mice-data-column {
   min-width: 180px;
 }
-
+.mice-add-table {
+  width: 100%;
+  table-layout: fixed;
+}
 .pagination {
   display: flex;
   align-items: center;

@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 
+import AddNewRecordRow from './AddNewRecordRow'
 import ErrorBanner from '../components/ErrorBanner';
 import { getMice } from '../api/miceApi';
 
@@ -257,6 +258,15 @@ function MiceView() {
 
                 </table>
             </div>
+            <table className="mice-add-table">
+                <tbody>
+                <AddNewRecordRow
+                    entityName="mouse"
+                    onCreate={null}
+                    colSpan={1}
+                />
+                </tbody>
+            </table>
 
             <div className="pagination">
 
