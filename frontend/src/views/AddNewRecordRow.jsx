@@ -1,6 +1,7 @@
 function AddNewRecordRow({
 	entityName,
-	onCreate
+	onCreate,
+	colSpan = 2
 }) {
 	return 	(
 	<tr
@@ -12,7 +13,7 @@ function AddNewRecordRow({
 	  </td>
 
 	  <td
-	    colSpan={2}
+	    colSpan={colSpan}
 	    className="add-text-cell"
 	  >
 	    Click here to add a new {entityName}...
