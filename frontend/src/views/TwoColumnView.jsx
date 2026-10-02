@@ -1,9 +1,10 @@
 import { useEffect, useState } from 'react';
 
 import ErrorBanner from '../components/ErrorBanner';
+import useFadingError from "../hooks/fadingError.js";
 import { firstCapital } from '../utils/textUtils';
 import { createFieldWarning, isCurrentInitialPopupStateChosen } from '../warnings/popupWarning'
-import { ZERO, FIRST, SECOND, ERROR_VISIBLE_TIME, ERROR_FADE_TIME, VAR_MAX_LENGTH} from '../utils/const';
+import { ZERO, FIRST, SECOND, VAR_MAX_LENGTH} from '../utils/const';
 import DoubleParamForm from './DoubleParamForm';
 import TwoColumnTable from './TwoColumnTable';
 
@@ -39,14 +40,14 @@ function TwoColumnView({
 }) {
   const initialFirstValue =
     firstInputType === 'select' ? '-1' : '';
+  const {
+    error,
+    errorFading,
+    showError
+  } = useFadingError();
 
   const [records, setRecords] = useState([]);
   const [firstOptions, setFirstOptions] = useState([]);
-
-  const [error, setError] = useState('');
-  const [errorFading, setErrorFading] = useState(false);
-  const [refreshAfterError, setRefreshAfterError] =
-    useState(false);
 
   const [popupOpen, setPopupOpen] = useState(false);
   const [initialPopupState, setInitialPopupState] = useState({});
@@ -101,45 +102,14 @@ function TwoColumnView({
     subEntitySecondLabelName
   ]);
 
-  useEffect(() => {
-    if (!error) {
-      return;
-    }
-
-    const fadeTimer = setTimeout(() => {
-      setErrorFading(true);
-    }, ERROR_VISIBLE_TIME);
-
-    const clearTimer = setTimeout(async () => {
-      setError('');
-      setErrorFading(false);
-
-      if (refreshAfterError) {
-        setRefreshAfterError(false);
-        await loadRecords();
-      }
-    }, ERROR_VISIBLE_TIME + ERROR_FADE_TIME);
-
-    return () => {
-      clearTimeout(fadeTimer);
-      clearTimeout(clearTimer);
-    };
-  }, [error, refreshAfterError]);
-
   async function loadRecords() {
     try {
       const data = await getApi();
 
       setRecords(Array.isArray(data) ? data : []);
-      setError('');
     } catch (err) {
       showError(`Could not load data.\n${err.message}`);
     }
-  }
-
-  function showError(message) {
-    setErrorFading(false);
-    setError(message);
   }
 
     function currentInitaialPopupState(entity = null) {
@@ -242,12 +212,16 @@ function TwoColumnView({
         entity === null ? 'create a new' : 'update the';
 
       showError(
-        `Could not ${operation} ${entityName.toLowerCase()}.\n${err.message}`
+        `Could not ${operation} ${entityName.toLowerCase()}.\n${err.message}`,
+          entity !== null
+              ? async () => {
+                await loadRecords();
+              }
+              : null
       );
 
       if (entity !== null) {
         closePopup();
-        setRefreshAfterError(true);
       }
     }
   }
@@ -267,11 +241,13 @@ function TwoColumnView({
       await refreshAfterPopup();
     } catch (err) {
       showError(
-        `Could not delete the ${entityName.toLowerCase()}.\n${err.message}`
+        `Could not delete the ${entityName.toLowerCase()}.\n${err.message}`,
+          async () => {
+            await loadRecords();
+          }
       );
 
       closePopup();
-      setRefreshAfterError(true);
     }
   }
   function createWarning(first, second) {
