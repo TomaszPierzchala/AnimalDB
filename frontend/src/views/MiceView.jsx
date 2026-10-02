@@ -2,6 +2,8 @@ import { useEffect, useState } from 'react';
 
 import AddNewRecordRow from './AddNewRecordRow'
 import ErrorBanner from '../components/ErrorBanner';
+import useFadingError from "../hooks/fadingError.js";
+
 import { getMice, getNextAnimalNumber } from '../api/miceApi';
 
 import './View.css';
@@ -83,8 +85,11 @@ function MiceView() {
     const [direction, setDirection] =
         useState('asc');
 
-    const [error, setError] = useState('');
-
+    const {
+        error,
+        errorFading,
+        showError
+    } = useFadingError();
 
     useEffect(() => {
         loadMice();
@@ -128,10 +133,8 @@ function MiceView() {
             setTotalPages(data.totalPages ?? 0);
             setTotalElements(data.totalElements ?? 0);
 
-            setError('');
-
         } catch (err) {
-            setError(
+            showError(
                 `Could not load mice.\n${err.message}`
             );
         }
@@ -149,7 +152,7 @@ function MiceView() {
             setAddingNewMouse(true);
 
         } catch (err) {
-            setError(
+            showError(
                 `Could not determine next animal number.\n${err.message}`
             );
         }
@@ -172,7 +175,7 @@ function MiceView() {
             await loadMice();
 
         } catch (err) {
-            setError(
+            showError(
                 `Could not create mouse.\n${err.message}`
             );
         }
@@ -250,7 +253,7 @@ function MiceView() {
 
             <ErrorBanner
                 message={error}
-                fading={false}
+                fading={errorFading}
             />
 
             <div><h1 className="mice-title">Mice</h1>
