@@ -144,6 +144,20 @@ class MouseControllerTest {
         verify(mouseService).findById(1L)
     }
 
+    @Test
+    fun shouldReturnNextAnimalNumber() {
+        whenever(mouseService.findNextAnimalNumber())
+            .thenReturn(13)
+
+        mockMvc.perform(
+            get("/api/mice/next-animal-number")
+        )
+            .andExpect(status().isOk)
+            .andExpect(content().string("13"))
+
+        verify(mouseService).findNextAnimalNumber()
+    }
+
     // -------------------------------------------------
     // POST /api/mice
     // -------------------------------------------------

@@ -174,4 +174,49 @@ class MouseRepositoryTest {
             mouseRepository.saveAndFlush(second)
         }
     }
+    @Test
+    fun `should return 1 when No mice exist`() {
+
+        mouseRepository.deleteAll()
+
+        val result =
+            mouseRepository.findNextAnimalNumber()
+
+        assertThat(result).isEqualTo(1)
+    }
+
+    @Test
+    fun `should return Max animalNumber + 1`() {
+        val strain = strainRepository.save(
+            Strain(
+                "C57BL6",
+                "C57BL/6"
+            )
+        )
+
+        mouseRepository.saveAll(
+            listOf(
+                Mouse(
+                    /*animalNumber*/5,
+                    Mouse.Sex.M,
+                    strain
+                ),
+                Mouse(
+                    /*animalNumber*/ 12,
+                    Mouse.Sex.F,
+                    strain
+                ),
+                Mouse(
+                    /*animalNumber*/ 8,
+                    Mouse.Sex.M,
+                    strain
+                )
+            )
+        )
+
+        val result =
+            mouseRepository.findNextAnimalNumber()
+
+        assertThat(result).isEqualTo(13)
+    }
 }

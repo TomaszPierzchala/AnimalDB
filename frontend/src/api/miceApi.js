@@ -18,6 +18,12 @@ export function getMice({
   return apiJson(`${MOUSE_API_URL}?${params}`);
 }
 
+export function getNextAnimalNumber() {
+    return apiJson(
+        `${MOUSE_API_URL}/next-animal-number`
+    );
+}
+
 export function createMouse(mouse) {
     return apiJson(MOUSE_API_URL, {
         method: 'POST',

@@ -152,6 +152,18 @@ class MouseServiceTest {
     }
 
     @Test
+    fun shouldFindNextAnimalNumber() {
+        whenever(mouseRepository.findNextAnimalNumber())
+            .thenReturn(13)
+
+        val result = mouseService.findNextAnimalNumber()
+
+        assertThat(result).isEqualTo(13)
+
+        verify(mouseRepository).findNextAnimalNumber()
+    }
+
+    @Test
     fun shouldThrowExceptionWhenFindingMissingMouse() {
         val id = 999L
 

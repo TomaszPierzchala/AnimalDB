@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 
 import AddNewRecordRow from './AddNewRecordRow'
 import ErrorBanner from '../components/ErrorBanner';
-import { getMice } from '../api/miceApi';
+import { getMice, getNextAnimalNumber } from '../api/miceApi';
 
 import './View.css';
 
@@ -30,23 +30,6 @@ const REQUIRED_COLUMNS = [
     'strainId'
 ];
 
-const EMPTY_MOUSE = {
-    animalNumber: '',
-    sex: 'M',
-    strainId: '',
-    transgenicLineId: null,
-    labProcedureId: null,
-    motherId: null,
-    fatherId: null,
-    birthDate: '',
-    deathDate: '',
-    room: '',
-    rack: '',
-    cage: '',
-    origin: '',
-    note: ''
-};
-
 const PAGE_SIZE = 20;
 
 
@@ -54,7 +37,7 @@ function MiceView() {
 
     const [mice, setMice] = useState([]);
     const [addingNewMouse, setAddingNewMouse] = useState(false);
-    const [newMouse, setNewMouse] = useState(EMPTY_MOUSE);
+    const [newMouse, setNewMouse] = useState(null);
 
     const [selectedColumns, setSelectedColumns] =
         useState(() => {
@@ -113,6 +96,25 @@ function MiceView() {
         );
     }, [selectedColumns]);
 
+    function createEmptyMouse(animalNumber) {
+        return {
+            animalNumber,
+            sex: 'M',
+            strainId: '',
+            transgenicLineId: null,
+            labProcedureId: null,
+            motherId: null,
+            fatherId: null,
+            birthDate: '',
+            deathDate: '',
+            room: '',
+            rack: '',
+            cage: '',
+            origin: '',
+            note: ''
+        };
+    }
+
     async function loadMice() {
         try {
             const data = await getMice({
@@ -135,9 +137,22 @@ function MiceView() {
         }
     }
 
-    function startAddingMouse() {
-        setAddingNewMouse(true);
-        setNewMouse(EMPTY_MOUSE);
+    async function startAddingMouse() {
+        try {
+            const nextAnimalNumber =
+                await getNextAnimalNumber();
+
+            setNewMouse(
+                createEmptyMouse(nextAnimalNumber)
+            );
+
+            setAddingNewMouse(true);
+
+        } catch (err) {
+            setError(
+                `Could not determine next animal number.\n${err.message}`
+            );
+        }
     }
 
     function changeNewMouseField(fieldName, value) {
@@ -152,7 +167,7 @@ function MiceView() {
             // await createMouse(newMouse);
 
             setAddingNewMouse(false);
-            setNewMouse(EMPTY_MOUSE);
+            setNewMouse(null);
 
             await loadMice();
 

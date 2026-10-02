@@ -29,6 +29,10 @@ class MouseController(
     ): MouseResponse =
         mouseService.findById(id)
 
+    @GetMapping("/next-animal-number")
+    fun getNextAnimalNumber(): Int =
+        mouseService.findNextAnimalNumber()
+
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     fun createMouse(

@@ -31,6 +31,10 @@ class MouseService(
     fun findById(id: Long): MouseResponse =
         findEntityById(id).toResponse()
 
+    @Transactional(readOnly = true)
+    fun findNextAnimalNumber(): Int =
+        mouseRepository.findNextAnimalNumber()
+
     @Transactional
     fun create(request: MouseRequest): MouseResponse {
         if (mouseRepository.existsByAnimalNumber(request.animalNumber)) {
