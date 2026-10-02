@@ -124,12 +124,17 @@ tbody tr:nth-child(even) {
 .empty-row:hover .add-icon {
   border-color: #4f91a6;
 
-  color: #ee0000;
   background-color: #cec4c8;
 }
 
-.empty-row:hover .add-text-cell {
-  color: #ee0000;
+.empty-row:hover .add-text-cell,
+.empty-row:hover .add-icon {
+  color: green;
+}
+.empty-row:hover .add-text-cell.accept-cell,
+.empty-row:hover .add-icon.accept-cell,
+.accept-cell {
+  color: darkorange;
 }
 
 /* =========================
@@ -172,7 +177,7 @@ tbody tr:nth-child(even) {
 @keyframes change-opacity {
   0%,
   100% {
-    opacity: 1.;
+    opacity: 1.0;
   }
 
   50% {
@@ -321,6 +326,9 @@ button[type="submit"] {
 .mice-add-table {
   width: 100%;
   table-layout: fixed;
+}
+.accept-text {
+  font-weight: bold;
 }
 .pagination {
   display: flex;

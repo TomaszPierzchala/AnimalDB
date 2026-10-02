@@ -1,7 +1,8 @@
 function AddNewRecordRow({
 	entityName,
 	onCreate,
-	colSpan = 2
+	colSpan = 2,
+	acceptText = null
 }) {
 	return 	(
 	<tr
@@ -9,14 +10,14 @@ function AddNewRecordRow({
 	  onClick={onCreate}
 	>
 	  <td className="id-column add-icon-cell">
-	    <span className="add-icon">+</span>
+	    <span className={acceptText ? "add-icon accept-cell": "add-icon" }>+</span>
 	  </td>
 
 	  <td
 	    colSpan={colSpan}
-	    className="add-text-cell"
+	    className={acceptText ? "add-text-cell accept-cell": "add-text-cell" }
 	  >
-	    Click here to add a new {entityName}...
+		  {acceptText ?? `Click here to add a new ${entityName}...`}
 	  </td>
 	</tr>
 	);

@@ -30,12 +30,31 @@ const REQUIRED_COLUMNS = [
     'strainId'
 ];
 
+const EMPTY_MOUSE = {
+    animalNumber: '',
+    sex: 'M',
+    strainId: '',
+    transgenicLineId: null,
+    labProcedureId: null,
+    motherId: null,
+    fatherId: null,
+    birthDate: '',
+    deathDate: '',
+    room: '',
+    rack: '',
+    cage: '',
+    origin: '',
+    note: ''
+};
+
 const PAGE_SIZE = 20;
 
 
 function MiceView() {
 
     const [mice, setMice] = useState([]);
+    const [addingNewMouse, setAddingNewMouse] = useState(false);
+    const [newMouse, setNewMouse] = useState(EMPTY_MOUSE);
 
     const [selectedColumns, setSelectedColumns] =
         useState(() => {
@@ -116,6 +135,33 @@ function MiceView() {
         }
     }
 
+    function startAddingMouse() {
+        setAddingNewMouse(true);
+        setNewMouse(EMPTY_MOUSE);
+    }
+
+    function changeNewMouseField(fieldName, value) {
+        setNewMouse(current => ({
+            ...current,
+            [fieldName]: value
+        }));
+    }
+
+    async function acceptNewMouse() {
+        try {
+            // await createMouse(newMouse);
+
+            setAddingNewMouse(false);
+            setNewMouse(EMPTY_MOUSE);
+
+            await loadMice();
+
+        } catch (err) {
+            setError(
+                `Could not create mouse.\n${err.message}`
+            );
+        }
+    }
 
     function toggleColumn(columnName) {
         setSelectedColumns(currentColumns => {
@@ -255,6 +301,34 @@ function MiceView() {
                             ))}
                         </tr>
                     ))}
+                    {addingNewMouse && (
+                        <tr className="new-mouse-row">
+
+                            <td className="id-column">
+                                —
+                            </td>
+
+                            {visibleColumns.map(column => (
+                                <td
+                                    key={column.name}
+                                    className="mice-data-column"
+                                >
+                                    <input
+                                        value={
+                                            newMouse[column.name] ?? ''
+                                        }
+                                        onChange={event =>
+                                            changeNewMouseField(
+                                                column.name,
+                                                event.target.value
+                                            )
+                                        }
+                                    />
+                                </td>
+                            ))}
+
+                        </tr>
+                    )}
                     </tbody>
 
                 </table>
@@ -263,7 +337,20 @@ function MiceView() {
                 <tbody>
                 <AddNewRecordRow
                     entityName="mouse"
-                    onCreate={null}
+                    onCreate={
+                        addingNewMouse
+                            ? acceptNewMouse
+                            : startAddingMouse
+                    }
+                    acceptText={
+                        addingNewMouse
+                            ? (
+                                <>
+                                    Click here to <span className="accept-text">accept</span> new mouse...
+                                </>
+                            )
+                            : null
+                    }
                     colSpan={1}
                 />
                 </tbody>
