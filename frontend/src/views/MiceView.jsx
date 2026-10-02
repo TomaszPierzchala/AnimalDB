@@ -24,7 +24,7 @@ const COLUMNS = [
     { name: 'note', label: 'Note' }
 ];
 
-const DEFAULT_COLUMNS = [
+const REQUIRED_COLUMNS = [
     'animalNumber',
     'sex',
     'strainId'
@@ -43,14 +43,14 @@ function MiceView() {
                 localStorage.getItem('miceSelectedColumns');
 
             if (!savedColumns) {
-                return DEFAULT_COLUMNS;
+                return REQUIRED_COLUMNS;
             }
 
             try {
                 const parsed = JSON.parse(savedColumns);
 
                 if (!Array.isArray(parsed)) {
-                    return DEFAULT_COLUMNS;
+                    return REQUIRED_COLUMNS;
                 }
 
                 const validColumnNames =
@@ -64,10 +64,10 @@ function MiceView() {
 
                 return unique.length > 0
                     ? unique
-                    : DEFAULT_COLUMNS;
+                    : REQUIRED_COLUMNS;
 
             } catch {
-                return DEFAULT_COLUMNS;
+                return REQUIRED_COLUMNS;
             }
         });
 
@@ -204,6 +204,7 @@ function MiceView() {
                                     type="checkbox"
                                     checked={selectedColumns.includes(column.name)}
                                     onChange={() => toggleColumn(column.name)}
+                                    disabled={REQUIRED_COLUMNS.includes(column.name)}
                                 />
                                 {column.label}
                             </label>
