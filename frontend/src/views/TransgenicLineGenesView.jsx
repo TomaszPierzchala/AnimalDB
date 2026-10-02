@@ -1,13 +1,13 @@
 import { useEffect, useState } from 'react';
 
 import ErrorBanner from '../components/ErrorBanner';
+import useFadingError from "../hooks/fadingError.js";
 
 import { getGenes } from '../api/geneApi';
 import { getTransLines } from '../api/transgenicLineApi';
 import AddNewRecordRow from './AddNewRecordRow'
 import DoubleParamForm from './DoubleParamForm'
 import { createFieldWarning, isCurrentInitialPopupStateChosen } from '../warnings/popupWarning'
-import { ERROR_VISIBLE_TIME, ERROR_FADE_TIME } from '../utils/const'
 
 import {
   createTransLineGene,
@@ -24,7 +24,12 @@ function TransgenicLineGenesView() {
   const firstType="select"
   const secondLabel="Gene"
   const secondType="select"
-	
+  const {
+    error,
+    errorFading,
+    showError
+  } = useFadingError();
+
   const [rows, setRows] = useState([]);
   const [transgenicLines, setTransgenicLines] =
     useState([]);
@@ -40,10 +45,6 @@ function TransgenicLineGenesView() {
     useState('-1');
   const [geneId, setGeneId] = useState('-1');
   const [isSaveEnabled, setIsSaveEnabled] = useState(false);
-
-  const [error, setError] = useState('');
-  const [errorFading, setErrorFading] = useState(false);
-  const [refreshAfterError, setRefreshAfterError] = useState(false);
 
   const [deleteArmed, setDeleteArmed] = useState(false);
   const [fieldWarning, setFieldWarning] = useState('');
@@ -87,36 +88,6 @@ function TransgenicLineGenesView() {
 
     load();
   }, []);
-
-  useEffect(() => {
-    if (!error) {
-      return;
-    }
-
-    const fadeTimer = setTimeout(() => {
-      setErrorFading(true);
-    }, ERROR_VISIBLE_TIME);
-
-    const clearTimer = setTimeout(async () => {
-      setError('');
-      setErrorFading(false);
-
-      if (refreshAfterError) {
-        setRefreshAfterError(false);
-        await loadAssignments();
-      }
-    }, ERROR_VISIBLE_TIME + ERROR_FADE_TIME);
-
-    return () => {
-      clearTimeout(fadeTimer);
-      clearTimeout(clearTimer);
-    };
-  }, [error, refreshAfterError]);
-
-  function showError(message) {
-    setErrorFading(false);
-    setError(message);
-  }
   
   async function loadAssignments() {
       try {
@@ -213,11 +184,13 @@ function TransgenicLineGenesView() {
             editingAssignment === null ? 'create a new entity as' : 'update -';
 
         showError(
-            `Cannot ${operation} ${err.message}`
+            `Cannot ${operation} ${err.message}`,
+            async () => {
+              await loadRecords();
+            }
         );
 
         closePopup();
-        setRefreshAfterError(true);
     }
   }
 
@@ -250,11 +223,13 @@ function TransgenicLineGenesView() {
       await refreshAfterPopup();
     } catch (err) {
         showError(
-            `Could not delete the ${firstLabel}_${secondLabel}.\n${err.message}`
+            `Could not delete the ${firstLabel}_${secondLabel}.\n${err.message}`,
+            async () => {
+              await loadRecords();
+            }
         );
 
         closePopup();
-        setRefreshAfterError(true);
     }
   }
 
