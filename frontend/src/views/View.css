@@ -367,3 +367,45 @@ button[type="submit"] {
 
   font-weight: normal;
 }
+
+.work-in-progress-wrapper {
+  margin-top: 120px;
+}
+
+.work-in-progress-bar {
+  width: 100%;
+  height: 24px;
+
+  border: 1px solid #222;
+  border-radius: 4px;
+
+  background: repeating-linear-gradient(
+          -45deg,
+          #111111 0px,
+          #111111 14px,
+          #f2d500 14px,
+          #f2d500 28px
+  );
+}
+.work-in-progress-text {
+  width: 100%;
+  box-sizing: border-box;
+
+  padding: 6px;
+
+  color: black;
+
+  background-color: #f2d500;
+  border: 8px solid darkred;
+
+  font-weight: bold;
+  font-style: italic;
+}
+.work-in-progress-text::before {
+   content: "⚠";
+   margin-right: 40px;
+ }
+.work-in-progress-text::after {
+  content: "⚠";
+  margin-left: 40px;
+}

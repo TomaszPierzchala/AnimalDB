@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 
 import AddNewRecordRow from './AddNewRecordRow'
+import WorkInProgressBar from "./WorkInProgress";
 import ErrorBanner from '../components/ErrorBanner';
 import useFadingError from "../hooks/fadingError.js";
 
@@ -410,7 +411,7 @@ function MiceView() {
                 </button>
 
             </div>
-
+            <WorkInProgressBar/>
         </section>
     );
 }
