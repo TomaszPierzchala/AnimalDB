@@ -39,11 +39,11 @@ body {
 }
 
 #root::before {
-  left: calc(50% - 563px);
+  left: calc(50% - 523px);
 }
 
 #root::after {
-  right: calc(50% - 563px);
+  right: calc(50% - 523px);
 }
 /* =========================
    SALL SCREANS
