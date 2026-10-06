@@ -409,3 +409,31 @@ button[type="submit"] {
   content: "⚠";
   margin-left: 40px;
 }
+
+.mice-select {
+  width: 100%;
+  box-sizing: border-box;
+
+  font-family: inherit;
+  font-size: inherit;
+  font-weight: normal;
+  color: #6b6375;
+
+  background-color: transparent;
+  border: none;
+
+  padding: 0;
+}
+
+.mouse-edit-actions-cell {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  padding: 8px;
+}
+
+.mouse-edit-main-actions {
+  display: flex;
+  gap: 12px;
+}

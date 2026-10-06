@@ -5,7 +5,8 @@ import WorkInProgressBar from "./WorkInProgress";
 import ErrorBanner from '../components/ErrorBanner';
 import useFadingError from "../hooks/fadingError.js";
 
-import {createMouse, getMice, getNextAnimalNumber} from '../api/miceApi';
+import {createMouse, deleteMouse, getMice, getNextAnimalNumber, updateMouse} from '../api/miceApi';
+import {getStrains} from "../api/strainApi.js";
 
 import './View.css';
 
@@ -33,6 +34,23 @@ const REQUIRED_COLUMNS = [
     'strainId'
 ];
 
+const EDITABLE_MOUSE_FIELDS = [
+    'animalNumber',
+    'sex',
+    'strainId',
+    'transgenicLineId',
+    'labProcedureId',
+    'motherId',
+    'fatherId',
+    'birthDate',
+    'deathDate',
+    'room',
+    'rack',
+    'cage',
+    'origin',
+    'note'
+];
+
 const PAGE_SIZE = 20;
 
 
@@ -41,6 +59,20 @@ function MiceView() {
     const [mice, setMice] = useState([]);
     const [addingNewMouse, setAddingNewMouse] = useState(false);
     const [newMouse, setNewMouse] = useState(null);
+
+    const [editingMouseId, setEditingMouseId] = useState(null);
+    const [editedMouse, setEditedMouse] = useState(null);
+    const [strainOptions, setStrainOptions] = useState([]);
+    const originalEditedMouse =
+        mice.find(mouse => mouse.id === editingMouseId);
+    const editedMouseChanged =
+        editedMouse !== null &&
+        originalEditedMouse !== undefined &&
+        EDITABLE_MOUSE_FIELDS.some(
+            fieldName =>
+                editedMouse[fieldName] !==
+                originalEditedMouse[fieldName]
+        );
 
     const [selectedColumns, setSelectedColumns] =
         useState(() => {
@@ -92,6 +124,11 @@ function MiceView() {
         errorFading,
         showError
     } = useFadingError();
+
+    const visibleColumns =
+        COLUMNS.filter(column =>
+            selectedColumns.includes(column.name)
+        );
 
     useEffect(() => {
         loadMice();
@@ -229,7 +266,6 @@ function MiceView() {
             : ' ▼';
     }
 
-
     function displayValue(mouse, columnName) {
         if (columnName === 'strainId') {
             return `${mouse.strainCode} — ${mouse.strainName}`;
@@ -240,11 +276,169 @@ function MiceView() {
         return value ?? '—';
     }
 
-    const visibleColumns =
-        COLUMNS.filter(column =>
-            selectedColumns.includes(column.name)
-        );
+    async function startEditingMouse(mouse) {
+        try {
+            const strains = await getStrains();
 
+            setStrainOptions(strains);
+            setEditingMouseId(mouse.id);
+            setEditedMouse({ ...mouse });
+        } catch (err) {
+            showError(`Could not load strains.\n${err.message}`);
+        }
+    }
+
+    function cancelEditingMouse() {
+        setEditingMouseId(null);
+        setEditedMouse(null);
+        setStrainOptions([]);
+    }
+
+    function toMouseRequest(mouse) {
+        return {
+            animalNumber: mouse.animalNumber,
+            sex: mouse.sex,
+            strainId: mouse.strainId,
+            transgenicLineId: mouse.transgenicLineId,
+            labProcedureId: mouse.labProcedureId,
+            motherId: mouse.motherId,
+            fatherId: mouse.fatherId,
+            birthDate: mouse.birthDate,
+            deathDate: mouse.deathDate,
+            room: mouse.room,
+            rack: mouse.rack,
+            cage: mouse.cage,
+            origin: mouse.origin,
+            note: mouse.note
+        };
+    }
+    async function saveEditedMouse() {
+        try {
+            await updateMouse(
+                editingMouseId,
+                toMouseRequest(editedMouse)
+            );
+
+            cancelEditingMouse();
+
+            await loadMice();
+
+        } catch (err) {
+            showError(
+                `Could not update mouse.\n${err.message}`
+            );
+        }
+    }
+
+    async function deleteEditedMouse() {
+        try {
+            await deleteMouse(editingMouseId);
+
+            cancelEditingMouse();
+
+            await loadMice();
+
+        } catch (err) {
+            showError(
+                `Could not delete mouse.\n${err.message}`
+            );
+        }
+    }
+
+    function changeEditedMouseField(fieldName, value) {
+        setEditedMouse(current => ({
+            ...current,
+            [fieldName]: value
+        }));
+    }
+
+    function renderEditableCell(column) {
+        if (column.name === 'strainId') {
+            return (
+                <select
+                    className="mice-select"
+                    value={editedMouse.strainId}
+                    onClick={event => event.stopPropagation()}
+                    onChange={event =>
+                        changeEditedMouseField(
+                            'strainId',
+                            Number(event.target.value)
+                        )
+                    }
+                >
+                    {strainOptions.map(strain => (
+                        <option
+                            key={strain.id}
+                            value={strain.id}
+                        >
+                            {strain.code} — {strain.name}
+                        </option>
+                    ))}
+                </select>
+            );
+        }
+        if (column.name === 'sex') {
+            return (
+                <select
+                    className="mice-select"
+                    value={editedMouse.sex}
+                    onClick={event => event.stopPropagation()}
+                    onChange={event =>
+                        changeEditedMouseField('sex', event.target.value)
+                    }
+                >
+                    <option value="M">M</option>
+                    <option value="F">F</option>
+                </select>
+            );
+        }
+        if (
+            column.name === 'birthDate' ||
+            column.name === 'deathDate'
+        ) {
+            return (
+                <input
+                    type="date"
+                    value={editedMouse[column.name] ?? ''}
+                    onClick={event => event.stopPropagation()}
+                    onChange={event =>
+                        changeEditedMouseField(
+                            column.name,
+                            event.target.value
+                        )
+                    }
+                />
+            );
+        }
+        if (column.name === 'animalNumber') {
+            return (
+                <input
+                    type="number"
+                    value={editedMouse.animalNumber}
+                    onClick={event => event.stopPropagation()}
+                    onChange={event =>
+                        changeEditedMouseField(
+                            'animalNumber',
+                            Number(event.target.value)
+                        )
+                    }
+                />
+            );
+        }
+
+        return (
+            <input
+                value={editedMouse[column.name] ?? ''}
+                onClick={event => event.stopPropagation()}
+                onChange={event =>
+                    changeEditedMouseField(
+                        column.name,
+                        event.target.value
+                    )
+                }
+            />
+        );
+    }
 
     return (
         <section>
@@ -302,17 +496,20 @@ function MiceView() {
                         <tr
                             key={mouse.id}
                             className="clickable-row"
+                            onClick={() => startEditingMouse(mouse)}
                         >
                             <td className="id-column">
                                 {mouse.id}
                             </td>
 
                             {visibleColumns.map(column => (
-                                <td
-                                    key={column.name}
-                                    className="mice-data-column"
-                                >
-                                    {displayValue(mouse, column.name)}
+                                <td key={column.name} className="mice-data-column">
+
+                                    {editingMouseId === mouse.id
+                                        ? renderEditableCell(column)
+                                        : displayValue(mouse, column.name)
+                                    }
+
                                 </td>
                             ))}
                         </tr>
@@ -351,27 +548,72 @@ function MiceView() {
             </div>
             <table className="mice-add-table">
                 <tbody>
-                <AddNewRecordRow
-                    entityName="mouse"
-                    onCreate={
-                        addingNewMouse
-                            ? acceptNewMouse
-                            : startAddingMouse
-                    }
-                    acceptText={
-                        addingNewMouse
-                            ? (
-                                <>
-                                    Click here to <span className="accept-text">accept</span> new mouse...
-                                </>
-                            )
-                            : null
-                    }
-                    colSpan={1}
-                />
+
+                {editingMouseId !== null ? (
+
+                    <tr className="mouse-edit-actions-row">
+
+                        <td className="mouse-edit-actions-cell">
+
+                            <button
+                                type="button"
+                                onClick={deleteEditedMouse}
+                            >
+                                Delete
+                            </button>
+
+                            <div className="mouse-edit-main-actions">
+
+                                <button
+                                    type="button"
+                                    disabled={!editedMouseChanged}
+                                    onClick={saveEditedMouse}
+                                >
+                                    Save
+                                </button>
+
+                                <button
+                                    type="button"
+                                    onClick={cancelEditingMouse}
+                                >
+                                    Cancel
+                                </button>
+
+                            </div>
+
+                        </td>
+
+                    </tr>
+
+                ) : (
+
+                    <AddNewRecordRow
+                        entityName="mouse"
+                        onCreate={
+                            addingNewMouse
+                                ? acceptNewMouse
+                                : startAddingMouse
+                        }
+                        acceptText={
+                            addingNewMouse
+                                ? (
+                                    <>
+                                        Click here to{' '}
+                                        <span className="accept-text">
+                                accept
+                            </span>
+                                        {' '}new mouse...
+                                    </>
+                                )
+                                : null
+                        }
+                        colSpan={1}
+                    />
+
+                )}
+
                 </tbody>
             </table>
-
             <div className="pagination">
 
                 <button
