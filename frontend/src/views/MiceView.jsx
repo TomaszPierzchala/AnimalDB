@@ -132,8 +132,8 @@ function MiceView() {
             });
 
             setMice(data.content ?? []);
-            setTotalPages(data.totalPages ?? 0);
-            setTotalElements(data.totalElements ?? 0);
+            setTotalPages(data.page.totalPages ?? 0);
+            setTotalElements(data.page.totalElements ?? 0);
 
         } catch (err) {
             showError(
