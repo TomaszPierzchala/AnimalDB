@@ -437,3 +437,12 @@ button[type="submit"] {
   display: flex;
   gap: 12px;
 }
+
+.add-row-action-cell {
+  width: 160px;
+  text-align: center;
+  border-left: none;
+}
+.add-row-main-cell {
+  border-right: none;
+}

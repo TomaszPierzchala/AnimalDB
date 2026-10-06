@@ -2,7 +2,8 @@ function AddNewRecordRow({
 	entityName,
 	onCreate,
 	colSpan = 2,
-	acceptText = null
+	acceptText = null,
+	action = null
 }) {
 	return 	(
 	<tr
@@ -15,10 +16,15 @@ function AddNewRecordRow({
 
 	  <td
 	    colSpan={colSpan}
-	    className={acceptText ? "add-text-cell accept-cell": "add-text-cell" }
+	    className={acceptText ? "add-text-cell add-row-main-cell accept-cell": "add-text-cell add-row-main-cell" }
 	  >
 		  {acceptText ?? `Click here to add a new ${entityName}...`}
 	  </td>
+	  {action && (
+		  <td className="add-row-action-cell">
+			  {action}
+		  </td>
+	  )}
 	</tr>
 	);
 }

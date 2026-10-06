@@ -440,6 +440,11 @@ function MiceView() {
         );
     }
 
+    function cancelAddingMouse() {
+        setAddingNewMouse(false);
+        setNewMouse(null);
+    }
+
     return (
         <section>
 
@@ -604,6 +609,21 @@ function MiceView() {
                             </span>
                                         {' '}new mouse...
                                     </>
+                                )
+                                : null
+                        }
+                        action={
+                            addingNewMouse
+                                ? (
+                                    <button
+                                        type="button"
+                                        onClick={event => {
+                                            event.stopPropagation();
+                                            cancelAddingMouse();
+                                        }}
+                                    >
+                                        Cancel
+                                    </button>
                                 )
                                 : null
                         }
