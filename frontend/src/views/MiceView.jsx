@@ -61,17 +61,18 @@ function MiceView() {
                 const validColumnNames =
                     COLUMNS.map(column => column.name);
 
-                const filtered = parsed.filter(name =>
+                const validParsed = parsed.filter(name =>
                     validColumnNames.includes(name)
                 );
+                const validParsedAndRequired = [...validParsed, ...REQUIRED_COLUMNS];
 
-                const unique = [...new Set(filtered)];
+                return [...new Set(validParsedAndRequired)]; // UNIQUE
 
-                return unique.length > 0
-                    ? unique
-                    : REQUIRED_COLUMNS;
-
-            } catch {
+            } catch(err) {
+                console.error(
+                    `Could not read saved 'miceSelectedColumns':`,
+                    err.message
+                );
                 return REQUIRED_COLUMNS;
             }
         });
