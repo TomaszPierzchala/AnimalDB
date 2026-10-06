@@ -7,7 +7,11 @@ data class MouseResponse(
     val id: Long,
     val animalNumber: Int,
     val sex: Sex,
+
     val strainId: Long,
+    val strainCode: String,
+    val strainName: String,
+
     val transgenicLineId: Long?,
     val labProcedureId: Long?,
     val motherId: Long?,

@@ -210,7 +210,11 @@ class MouseService(
             id = requireNotNull(id),
             animalNumber = animalNumber,
             sex = sex,
+
             strainId = requireNotNull(strain.id),
+            strainCode = requireNotNull(strain.code),
+            strainName = requireNotNull(strain.name),
+
             transgenicLineId = transgenicLine?.id,
             labProcedureId = labProcedure?.id,
             motherId = mother?.id,

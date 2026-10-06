@@ -462,6 +462,8 @@ class MouseControllerTest {
             animalNumber = animalNumber,
             sex = sex,
             strainId = 10L,
+            strainCode = "STR1",
+            strainName = "FIRST strain",
             transgenicLineId = null,
             labProcedureId = null,
             motherId = null,

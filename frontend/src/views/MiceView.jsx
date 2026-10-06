@@ -230,19 +230,15 @@ function MiceView() {
     }
 
 
-    function displayValue(value) {
-
-        if (
-            value === null ||
-            value === undefined ||
-            value === ''
-        ) {
-            return '—';
+    function displayValue(mouse, columnName) {
+        if (columnName === 'strainId') {
+            return `${mouse.strainCode} — ${mouse.strainName}`;
         }
 
-        return value;
-    }
+        const value = mouse[columnName];
 
+        return value ?? '—';
+    }
 
     const visibleColumns =
         COLUMNS.filter(column =>
@@ -316,7 +312,7 @@ function MiceView() {
                                     key={column.name}
                                     className="mice-data-column"
                                 >
-                                    {displayValue(mouse[column.name])}
+                                    {displayValue(mouse, column.name)}
                                 </td>
                             ))}
                         </tr>

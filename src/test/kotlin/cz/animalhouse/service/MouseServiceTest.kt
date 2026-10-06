@@ -44,7 +44,6 @@ class MouseServiceTest {
 //     @Mock
 //     private lateinit var labProcedureRepository: LabProcedureRepository
 
-    @Mock
     private lateinit var strain: Strain
 
     @Mock
@@ -63,11 +62,18 @@ class MouseServiceTest {
             transgenicLineRepository//,
             //labProcedureRepository
         )
-    }
 
-    private fun mockStrainId() {
-     whenever(strain.id).thenReturn(10L)
-}
+        strain = Strain(
+            "Strain Code",
+            "A Name of the Strain"
+        )
+
+        ReflectionTestUtils.setField(
+            strain,
+            "id",
+            10L
+        )
+    }
 
     @Test
     fun shouldFindAllMice() {
@@ -123,7 +129,6 @@ class MouseServiceTest {
     fun shouldFindMouseById() {
         val id = 13L
 
-        mockStrainId()
         val mouse = createMouse(
             id = id,
             animalNumber = 1001,
@@ -181,7 +186,6 @@ class MouseServiceTest {
 
     @Test
     fun shouldCreateMouse() {
-        mockStrainId()
 
         val request = MouseRequest(
             animalNumber = 1001,
