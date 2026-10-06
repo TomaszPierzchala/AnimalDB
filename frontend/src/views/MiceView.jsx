@@ -1,11 +1,11 @@
-import { useEffect, useState } from 'react';
+import {useEffect, useState} from 'react';
 
 import AddNewRecordRow from './AddNewRecordRow'
 import WorkInProgressBar from "./WorkInProgress";
 import ErrorBanner from '../components/ErrorBanner';
 import useFadingError from "../hooks/fadingError.js";
 
-import { getMice, getNextAnimalNumber } from '../api/miceApi';
+import {createMouse, getMice, getNextAnimalNumber} from '../api/miceApi';
 
 import './View.css';
 
@@ -169,7 +169,7 @@ function MiceView() {
 
     async function acceptNewMouse() {
         try {
-            // await createMouse(newMouse);
+            await createMouse(newMouse);
 
             setAddingNewMouse(false);
             setNewMouse(null);
