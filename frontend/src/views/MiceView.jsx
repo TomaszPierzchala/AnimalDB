@@ -10,7 +10,6 @@ import {getStrains} from "../api/strainApi.js";
 
 import './View.css';
 
-
 const COLUMNS = [
     { name: 'animalNumber', label: 'Animal number' },
     { name: 'sex', label: 'Sex' },
@@ -27,13 +26,11 @@ const COLUMNS = [
     { name: 'origin', label: 'Origin' },
     { name: 'note', label: 'Note' }
 ];
-
 const REQUIRED_COLUMNS = [
     'animalNumber',
     'sex',
     'strainId'
 ];
-
 const EDITABLE_MOUSE_FIELDS = [
     'animalNumber',
     'sex',
@@ -50,11 +47,51 @@ const EDITABLE_MOUSE_FIELDS = [
     'origin',
     'note'
 ];
-
 const PAGE_SIZE = 20;
 
+function createEmptyMouse(animalNumber) {
+    return {
+        animalNumber,
+        sex: 'M',
+        strainId: '',
+        transgenicLineId: null,
+        labProcedureId: null,
+        motherId: null,
+        fatherId: null,
+        birthDate: '',
+        deathDate: '',
+        room: '',
+        rack: '',
+        cage: '',
+        origin: '',
+        note: ''
+    };
+}
+
+function toMouseRequest(mouse) {
+    return {
+        animalNumber: mouse.animalNumber,
+        sex: mouse.sex,
+        strainId: mouse.strainId,
+        transgenicLineId: mouse.transgenicLineId,
+        labProcedureId: mouse.labProcedureId,
+        motherId: mouse.motherId,
+        fatherId: mouse.fatherId,
+        birthDate: mouse.birthDate,
+        deathDate: mouse.deathDate,
+        room: mouse.room,
+        rack: mouse.rack,
+        cage: mouse.cage,
+        origin: mouse.origin,
+        note: mouse.note
+    };
+}
 
 function MiceView() {
+
+    // =========================
+    // STATE
+    // =========================
 
     const [mice, setMice] = useState([]);
     const [addingNewMouse, setAddingNewMouse] = useState(false);
@@ -63,16 +100,6 @@ function MiceView() {
     const [editingMouseId, setEditingMouseId] = useState(null);
     const [editedMouse, setEditedMouse] = useState(null);
     const [strainOptions, setStrainOptions] = useState([]);
-    const originalEditedMouse =
-        mice.find(mouse => mouse.id === editingMouseId);
-    const editedMouseChanged =
-        editedMouse !== null &&
-        originalEditedMouse !== undefined &&
-        EDITABLE_MOUSE_FIELDS.some(
-            fieldName =>
-                editedMouse[fieldName] !==
-                originalEditedMouse[fieldName]
-        );
 
     const [selectedColumns, setSelectedColumns] =
         useState(() => {
@@ -125,14 +152,36 @@ function MiceView() {
         showError
     } = useFadingError();
 
+
+    // =========================
+    // DERIVED VALUES
+    // =========================
+
     const visibleColumns =
         COLUMNS.filter(column =>
             selectedColumns.includes(column.name)
         );
+    const originalEditedMouse =
+        mice.find(mouse => mouse.id === editingMouseId);
+
+    const editedMouseChanged =
+        editedMouse !== null &&
+        originalEditedMouse !== undefined &&
+        EDITABLE_MOUSE_FIELDS.some(
+            fieldName =>
+                editedMouse[fieldName] !==
+                originalEditedMouse[fieldName]
+        );
+
+
+    // =========================
+    // EFFECTS
+    // =========================
 
     useEffect(() => {
         loadMice();
     }, [page, sortBy, direction]);
+
     useEffect(() => {
         localStorage.setItem(
             'miceSelectedColumns',
@@ -140,24 +189,10 @@ function MiceView() {
         );
     }, [selectedColumns]);
 
-    function createEmptyMouse(animalNumber) {
-        return {
-            animalNumber,
-            sex: 'M',
-            strainId: '',
-            transgenicLineId: null,
-            labProcedureId: null,
-            motherId: null,
-            fatherId: null,
-            birthDate: '',
-            deathDate: '',
-            room: '',
-            rack: '',
-            cage: '',
-            origin: '',
-            note: ''
-        };
-    }
+
+    // =========================
+    // DATA LOADING
+    // =========================
 
     async function loadMice() {
         try {
@@ -178,6 +213,12 @@ function MiceView() {
             );
         }
     }
+
+
+    // =========================
+    // ADDING
+    // =========================
+
 
     async function startAddingMouse() {
         try {
@@ -220,61 +261,15 @@ function MiceView() {
         }
     }
 
-    function toggleColumn(columnName) {
-        setSelectedColumns(currentColumns => {
-
-            if (currentColumns.includes(columnName)) {
-                return currentColumns.filter(
-                    name => name !== columnName
-                );
-            }
-
-            return [
-                ...currentColumns,
-                columnName
-            ];
-        });
+    function cancelAddingMouse() {
+        setAddingNewMouse(false);
+        setNewMouse(null);
     }
 
 
-    function handleSort(columnName) {
-
-        if (sortBy === columnName) {
-            setDirection(
-                current =>
-                    current === 'asc'
-                        ? 'desc'
-                        : 'asc'
-            );
-        } else {
-            setSortBy(columnName);
-            setDirection('asc');
-        }
-
-        setPage(0);
-    }
-
-
-    function sortIndicator(columnName) {
-
-        if (sortBy !== columnName) {
-            return '';
-        }
-
-        return direction === 'asc'
-            ? ' ▲'
-            : ' ▼';
-    }
-
-    function displayValue(mouse, columnName) {
-        if (columnName === 'strainId') {
-            return `${mouse.strainCode} — ${mouse.strainName}`;
-        }
-
-        const value = mouse[columnName];
-
-        return value ?? '—';
-    }
+    // =========================
+    // EDITING
+    // =========================
 
     async function startEditingMouse(mouse) {
         try {
@@ -288,30 +283,19 @@ function MiceView() {
         }
     }
 
+    function changeEditedMouseField(fieldName, value) {
+        setEditedMouse(current => ({
+            ...current,
+            [fieldName]: value
+        }));
+    }
+
     function cancelEditingMouse() {
         setEditingMouseId(null);
         setEditedMouse(null);
         setStrainOptions([]);
     }
 
-    function toMouseRequest(mouse) {
-        return {
-            animalNumber: mouse.animalNumber,
-            sex: mouse.sex,
-            strainId: mouse.strainId,
-            transgenicLineId: mouse.transgenicLineId,
-            labProcedureId: mouse.labProcedureId,
-            motherId: mouse.motherId,
-            fatherId: mouse.fatherId,
-            birthDate: mouse.birthDate,
-            deathDate: mouse.deathDate,
-            room: mouse.room,
-            rack: mouse.rack,
-            cage: mouse.cage,
-            origin: mouse.origin,
-            note: mouse.note
-        };
-    }
     async function saveEditedMouse() {
         try {
             await updateMouse(
@@ -345,11 +329,68 @@ function MiceView() {
         }
     }
 
-    function changeEditedMouseField(fieldName, value) {
-        setEditedMouse(current => ({
-            ...current,
-            [fieldName]: value
-        }));
+
+    // =========================
+    // COLUMNS / SORTING
+    // =========================
+
+    function toggleColumn(columnName) {
+        setSelectedColumns(currentColumns => {
+
+            if (currentColumns.includes(columnName)) {
+                return currentColumns.filter(
+                    name => name !== columnName
+                );
+            }
+
+            return [
+                ...currentColumns,
+                columnName
+            ];
+        });
+    }
+
+    function handleSort(columnName) {
+
+        if (sortBy === columnName) {
+            setDirection(
+                current =>
+                    current === 'asc'
+                        ? 'desc'
+                        : 'asc'
+            );
+        } else {
+            setSortBy(columnName);
+            setDirection('asc');
+        }
+
+        setPage(0);
+    }
+
+    function sortIndicator(columnName) {
+
+        if (sortBy !== columnName) {
+            return '';
+        }
+
+        return direction === 'asc'
+            ? ' ▲'
+            : ' ▼';
+    }
+
+
+    // =========================
+    // RENDER HELPERS
+    // =========================
+
+    function displayValue(mouse, columnName) {
+        if (columnName === 'strainId') {
+            return `${mouse.strainCode} — ${mouse.strainName}`;
+        }
+
+        const value = mouse[columnName];
+
+        return value ?? '—';
     }
 
     function renderEditableCell(column) {
@@ -438,11 +479,6 @@ function MiceView() {
                 }
             />
         );
-    }
-
-    function cancelAddingMouse() {
-        setAddingNewMouse(false);
-        setNewMouse(null);
     }
 
     return (
