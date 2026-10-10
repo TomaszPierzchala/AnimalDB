@@ -52,13 +52,11 @@ tbody tr:nth-child(even) {
   background-color: #eef4f8;
 }
 
-.clickable-row,
-.empty-row {
+.clickable-row {
   cursor: pointer;
 }
 
-.clickable-row:hover,
-.empty-row:hover {
+.clickable-row:hover {
   background-color: #dde8ef;
 }
 
@@ -76,7 +74,6 @@ tbody tr:nth-child(even) {
 
 .id-column {
   text-align: center;
-  opacity: 0.25;
 }
 
 /* =========================
@@ -85,6 +82,7 @@ tbody tr:nth-child(even) {
 
 .add-icon-cell {
   width: 48px;
+  border-right: none;
 }
 
 .add-icon {
@@ -107,38 +105,97 @@ tbody tr:nth-child(even) {
 }
 
 .add-text-cell {
+  border-left: none;
+  border-right: none;
+
   color: #666666;
 
   text-align: center;
   font-style: italic;
 }
 
-.empty-row .add-icon-cell {
-  border-right: none;
-}
-
-.empty-row .add-text-cell {
+.add-row-action-cell {
+  width: 160px;
   border-left: none;
+
+  text-align: center;
 }
 
-.empty-row:hover .add-icon {
-  border-color: #4f91a6;
+/* clickable row */
 
+.empty-row {
+  cursor: pointer;
+}
+
+/* =========================
+   NORMAL ADD MODE
+   ========================= */
+
+/* normal add: hover highlights the whole row */
+
+.empty-row:not(.accept-row):hover {
+  background-color: #dde8ef;
+}
+
+.empty-row:not(.accept-row):hover .add-icon {
+  border-color: #4f91a6;
   background-color: #cec4c8;
 }
 
-.empty-row:hover .add-text-cell,
-.empty-row:hover .add-icon {
+.empty-row:not(.accept-row):hover .add-text-cell {
   color: green;
 }
-.empty-row:hover .add-text-cell.accept-cell,
-.empty-row:hover .add-icon.accept-cell,
-.accept-cell {
+
+/* =========================
+   ACCEPT MODE
+   ========================= */
+
+/* hover over plus ore accept:
+   highlight first and second cell */
+
+.accept-row:has(.add-icon-cell:hover) .add-icon-cell,
+.accept-row:has(.add-icon-cell:hover) .add-text-cell,
+.accept-row:has(.add-text-cell:hover) .add-icon-cell,
+.accept-row:has(.add-text-cell:hover) .add-text-cell {
+  background-color: #dde8ef;
+}
+
+/* hover over Cancel:
+   highlight Cancel and plus */
+
+.accept-row:has(.add-row-action-cell:hover) .add-icon-cell,
+.accept-row .add-row-action-cell:hover {
+  background-color: #dde8ef;
+}
+
+/* plus reacts whenever any cell is hovered */
+
+.accept-row:has(td:hover) .add-icon {
+  border-color: #4f91a6;
+  background-color: #cec4c8;
+}
+
+/* accept colors */
+
+.accept-row .add-icon,
+.accept-row .add-text-cell {
   color: darkorange;
 }
 
 /* =========================
-   ERROS
+   CANCEL
+   ========================= */
+
+.cancel-action {
+  color: darkred;
+  font-weight: bold;
+  font-style: normal;
+
+  cursor: pointer;
+}
+
+/* =========================
+   ERRORS
    ========================= */
 
 .error {
@@ -181,7 +238,7 @@ tbody tr:nth-child(even) {
   }
 
   50% {
-    opacity: 0.5
+    opacity: 0.5;
   }
 }
 
@@ -297,39 +354,50 @@ button[type="submit"] {
 .strain-select {
   margin-top: 4px;
   padding: 8px;
-  font-size: 14px;
+
   background-color: white;
+
+  font-size: 14px;
 }
 
 /* =========================
    MICE TABLE
    ========================= */
+
 .mice-title {
   margin: 32px 0 0;
+
   text-align: center;
 }
+
 .mice-table-scroll {
   width: 100%;
 
   overflow-x: auto;
   overflow-y: hidden;
 }
+
 .mice-table {
   width: max-content;
   min-width: 100%;
 
   table-layout: auto;
 }
+
 .mice-data-column {
   min-width: 180px;
 }
+
 .mice-add-table {
   width: 100%;
+
   table-layout: fixed;
 }
+
 .accept-text {
   font-weight: bold;
 }
+
 .pagination {
   display: flex;
   align-items: center;
@@ -338,13 +406,16 @@ button[type="submit"] {
   gap: 12px;
   margin-top: 16px;
 }
+
 .column-selector {
   justify-self: end;
 }
+
 .column-selector summary {
   cursor: pointer;
   text-align: right;
 }
+
 .column-selector-menu {
   position: absolute;
   right: 0;
@@ -357,6 +428,7 @@ button[type="submit"] {
 
   z-index: 10;
 }
+
 .column-selector-menu label {
   display: flex;
   flex-direction: row;
@@ -367,6 +439,10 @@ button[type="submit"] {
 
   font-weight: normal;
 }
+
+/* =========================
+   WORK IN PROGRESS
+   ========================= */
 
 .work-in-progress-wrapper {
   margin-top: 120px;
@@ -387,6 +463,7 @@ button[type="submit"] {
           #f2d500 28px
   );
 }
+
 .work-in-progress-text {
   width: 100%;
   box-sizing: border-box;
@@ -401,28 +478,35 @@ button[type="submit"] {
   font-weight: bold;
   font-style: italic;
 }
+
 .work-in-progress-text::before {
-   content: "⚠";
-   margin-right: 40px;
- }
+  content: "⚠";
+  margin-right: 40px;
+}
+
 .work-in-progress-text::after {
   content: "⚠";
   margin-left: 40px;
 }
 
+/* =========================
+   MICE EDITING
+   ========================= */
+
 .mice-select {
   width: 100%;
   box-sizing: border-box;
 
+  padding: 0;
+
+  border: none;
+  background-color: transparent;
+
+  color: #6b6375;
+
   font-family: inherit;
   font-size: inherit;
   font-weight: normal;
-  color: #6b6375;
-
-  background-color: transparent;
-  border: none;
-
-  padding: 0;
 }
 
 .mouse-edit-actions-cell {
@@ -436,13 +520,4 @@ button[type="submit"] {
 .mouse-edit-main-actions {
   display: flex;
   gap: 12px;
-}
-
-.add-row-action-cell {
-  width: 160px;
-  text-align: center;
-  border-left: none;
-}
-.add-row-main-cell {
-  border-right: none;
 }

@@ -648,19 +648,9 @@ function MiceView() {
                                 )
                                 : null
                         }
-                        action={
+                        cancelAction={
                             addingNewMouse
-                                ? (
-                                    <button
-                                        type="button"
-                                        onClick={event => {
-                                            event.stopPropagation();
-                                            cancelAddingMouse();
-                                        }}
-                                    >
-                                        Cancel
-                                    </button>
-                                )
+                                ? cancelAddingMouse
                                 : null
                         }
                         colSpan={1}
