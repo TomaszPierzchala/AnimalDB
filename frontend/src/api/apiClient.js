@@ -4,19 +4,25 @@ export async function apiJson(url, options = {}) {
     const response = await fetch(url, options);
 
     if (!response.ok) {
+      const contentType = response.headers.get('content-type');
+
       let errorMessage = `Server returned the error ${response.status}.`;
 
       try {
-        const errorBody = await response.json();
+        if (contentType?.includes('application/json')) {
+          const errorBody = await response.json();
 
-        if (
-          errorBody.message &&
-          errorBody.message.trim() !== ''
-        ) {
-          errorMessage = errorBody.message;
+          errorMessage +=
+              '\n' + (errorBody.message ?? JSON.stringify(errorBody));
+        } else {
+          const text = (await response.text()).trim();
+
+          if (text) {
+            errorMessage += '\n' + text;
+          }
         }
       } catch {
-        // Response body was empty or was not valid JSON.
+        // empty or improper body
       }
 
       throw new Error(errorMessage);
