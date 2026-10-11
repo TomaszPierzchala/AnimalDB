@@ -154,24 +154,18 @@ function MiceView() {
     // DERIVED VALUES
     // =========================
 
-    const isAddingMouse =
-        editedMouse !== null &&
-        editedMouse.id === null;
-
-    const isEditingMouse =
-        editedMouse?.id != null;
+    const isAddingMouse = editedMouse?.id === null;
+    const isEditingMouse = editedMouse?.id != null;
 
     const visibleColumns =
         COLUMNS.filter(column =>
             selectedColumns.includes(column.name)
         );
+
     const originalEditedMouse =
-        editedMouse?.id != null
-            ? mice.find(mouse => mouse.id === editedMouse.id)
-            : undefined;
+        mice.find(mouse => mouse.id === editedMouse?.id);
 
     const editedMouseChanged =
-        editedMouse !== null &&
         originalEditedMouse !== undefined &&
         EDITABLE_MOUSE_FIELDS.some(
             fieldName =>
@@ -198,6 +192,10 @@ function MiceView() {
     // =========================
     // DATA LOADING
     // =========================
+    async function loadStrainOptions() {
+        const strains = await getStrains();
+        setStrainOptions(strains);
+    }
 
     async function loadMice() {
         try {
@@ -230,13 +228,15 @@ function MiceView() {
             const nextAnimalNumber =
                 await getNextAnimalNumber();
 
+            await loadStrainOptions();
+
             setEditedMouse(
                 createEmptyMouse(nextAnimalNumber)
             );
 
         } catch (err) {
             showError(
-                `Could not determine next animal number.\n${err.message}`
+                `Could not start adding mouse.\n${err.message}`
             );
         }
     }
@@ -245,8 +245,7 @@ function MiceView() {
         try {
             await createMouse(editedMouse);
 
-            setEditedMouse(null);
-
+            clearEditedMouse();
             await loadMice();
 
         } catch (err) {
@@ -262,13 +261,13 @@ function MiceView() {
 
     async function startEditingMouse(mouse) {
         try {
-            const strains = await getStrains();
-
-            setStrainOptions(strains);
+            await loadStrainOptions();
             setEditedMouse({ ...mouse });
 
         } catch (err) {
-            showError(`Could not load strains.\n${err.message}`);
+            showError(
+                `Could not start editing mouse.\n${err.message}`
+            );
         }
     }
 
@@ -279,7 +278,7 @@ function MiceView() {
         }));
     }
 
-    function cancelEditingMouse() {
+    function clearEditedMouse() {
         setEditedMouse(null);
         setStrainOptions([]);
     }
@@ -291,7 +290,7 @@ function MiceView() {
                 toMouseRequest(editedMouse)
             );
 
-            cancelEditingMouse();
+            clearEditedMouse();
 
             await loadMice();
 
@@ -306,7 +305,7 @@ function MiceView() {
         try {
             await deleteMouse(editedMouse.id);
 
-            cancelEditingMouse();
+            clearEditedMouse();
 
             await loadMice();
 
@@ -551,21 +550,8 @@ function MiceView() {
                             </td>
 
                             {visibleColumns.map(column => (
-                                <td
-                                    key={column.name}
-                                    className="mice-data-column"
-                                >
-                                    <input
-                                        value={
-                                            editedMouse[column.name] ?? ''
-                                        }
-                                        onChange={event =>
-                                            changeEditedMouseField(
-                                                column.name,
-                                                event.target.value
-                                            )
-                                        }
-                                    />
+                                <td key={column.name} className="mice-data-column">
+                                    {renderEditableCell(column)}
                                 </td>
                             ))}
 
@@ -603,7 +589,7 @@ function MiceView() {
 
                                 <button
                                     type="button"
-                                    onClick={cancelEditingMouse}
+                                    onClick={clearEditedMouse}
                                 >
                                     Cancel
                                 </button>
@@ -638,7 +624,7 @@ function MiceView() {
                         }
                         cancelAction={
                             isAddingMouse
-                                ? cancelEditingMouse
+                                ? clearEditedMouse
                                 : null
                         }
                         colSpan={1}
