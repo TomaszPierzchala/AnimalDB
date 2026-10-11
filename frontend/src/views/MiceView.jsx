@@ -51,6 +51,7 @@ const PAGE_SIZE = 20;
 
 function createEmptyMouse(animalNumber) {
     return {
+        id: null,
         animalNumber,
         sex: 'M',
         strainId: '',
@@ -94,10 +95,6 @@ function MiceView() {
     // =========================
 
     const [mice, setMice] = useState([]);
-    const [addingNewMouse, setAddingNewMouse] = useState(false);
-    const [newMouse, setNewMouse] = useState(null);
-
-    const [editingMouseId, setEditingMouseId] = useState(null);
     const [editedMouse, setEditedMouse] = useState(null);
     const [strainOptions, setStrainOptions] = useState([]);
 
@@ -157,12 +154,21 @@ function MiceView() {
     // DERIVED VALUES
     // =========================
 
+    const isAddingMouse =
+        editedMouse !== null &&
+        editedMouse.id === null;
+
+    const isEditingMouse =
+        editedMouse?.id != null;
+
     const visibleColumns =
         COLUMNS.filter(column =>
             selectedColumns.includes(column.name)
         );
     const originalEditedMouse =
-        mice.find(mouse => mouse.id === editingMouseId);
+        editedMouse?.id != null
+            ? mice.find(mouse => mouse.id === editedMouse.id)
+            : undefined;
 
     const editedMouseChanged =
         editedMouse !== null &&
@@ -172,7 +178,6 @@ function MiceView() {
                 editedMouse[fieldName] !==
                 originalEditedMouse[fieldName]
         );
-
 
     // =========================
     // EFFECTS
@@ -225,11 +230,9 @@ function MiceView() {
             const nextAnimalNumber =
                 await getNextAnimalNumber();
 
-            setNewMouse(
+            setEditedMouse(
                 createEmptyMouse(nextAnimalNumber)
             );
-
-            setAddingNewMouse(true);
 
         } catch (err) {
             showError(
@@ -238,19 +241,11 @@ function MiceView() {
         }
     }
 
-    function changeNewMouseField(fieldName, value) {
-        setNewMouse(current => ({
-            ...current,
-            [fieldName]: value
-        }));
-    }
-
     async function acceptNewMouse() {
         try {
-            await createMouse(newMouse);
+            await createMouse(editedMouse);
 
-            setAddingNewMouse(false);
-            setNewMouse(null);
+            setEditedMouse(null);
 
             await loadMice();
 
@@ -261,12 +256,6 @@ function MiceView() {
         }
     }
 
-    function cancelAddingMouse() {
-        setAddingNewMouse(false);
-        setNewMouse(null);
-    }
-
-
     // =========================
     // EDITING
     // =========================
@@ -276,8 +265,8 @@ function MiceView() {
             const strains = await getStrains();
 
             setStrainOptions(strains);
-            setEditingMouseId(mouse.id);
             setEditedMouse({ ...mouse });
+
         } catch (err) {
             showError(`Could not load strains.\n${err.message}`);
         }
@@ -291,7 +280,6 @@ function MiceView() {
     }
 
     function cancelEditingMouse() {
-        setEditingMouseId(null);
         setEditedMouse(null);
         setStrainOptions([]);
     }
@@ -299,7 +287,7 @@ function MiceView() {
     async function saveEditedMouse() {
         try {
             await updateMouse(
-                editingMouseId,
+                editedMouse.id,
                 toMouseRequest(editedMouse)
             );
 
@@ -316,7 +304,7 @@ function MiceView() {
 
     async function deleteEditedMouse() {
         try {
-            await deleteMouse(editingMouseId);
+            await deleteMouse(editedMouse.id);
 
             cancelEditingMouse();
 
@@ -546,7 +534,7 @@ function MiceView() {
                             {visibleColumns.map(column => (
                                 <td key={column.name} className="mice-data-column">
 
-                                    {editingMouseId === mouse.id
+                                    {editedMouse?.id === mouse.id
                                         ? renderEditableCell(column)
                                         : displayValue(mouse, column.name)
                                     }
@@ -555,7 +543,7 @@ function MiceView() {
                             ))}
                         </tr>
                     ))}
-                    {addingNewMouse && (
+                    {isAddingMouse && (
                         <tr className="new-mouse-row">
 
                             <td className="id-column">
@@ -569,10 +557,10 @@ function MiceView() {
                                 >
                                     <input
                                         value={
-                                            newMouse[column.name] ?? ''
+                                            editedMouse[column.name] ?? ''
                                         }
                                         onChange={event =>
-                                            changeNewMouseField(
+                                            changeEditedMouseField(
                                                 column.name,
                                                 event.target.value
                                             )
@@ -590,7 +578,7 @@ function MiceView() {
             <table className="mice-add-table">
                 <tbody>
 
-                {editingMouseId !== null ? (
+                {isEditingMouse ? (
 
                     <tr className="mouse-edit-actions-row">
 
@@ -631,12 +619,12 @@ function MiceView() {
                     <AddNewRecordRow
                         entityName="mouse"
                         onCreate={
-                            addingNewMouse
+                            isAddingMouse
                                 ? acceptNewMouse
                                 : startAddingMouse
                         }
                         acceptText={
-                            addingNewMouse
+                            isAddingMouse
                                 ? (
                                     <>
                                         Click here to{' '}
@@ -649,8 +637,8 @@ function MiceView() {
                                 : null
                         }
                         cancelAction={
-                            addingNewMouse
-                                ? cancelAddingMouse
+                            isAddingMouse
+                                ? cancelEditingMouse
                                 : null
                         }
                         colSpan={1}
