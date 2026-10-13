@@ -341,13 +341,13 @@ button[type="submit"] {
   background-color: #f8eeee;
 }
 
-.delete-armed {
+.delete-button.delete-armed {
   color: #ffffff;
   background-color: #870000;
   border-color: #870000;
 }
 
-.delete-armed:hover {
+.delete-button.delete-armed:hover {
   background-color: #aa0000;
 }
 
@@ -516,17 +516,29 @@ button[type="submit"] {
 .mouse-edit-row td {
   cursor: pointer;
   text-align: center;
+
+  background-color: #f4f4f8;
 }
 
 .mouse-edit-row td:hover {
-  background-color: #dde8ef;
+  background-color: #f8eeee;
 }
 
 .mouse-edit-delete-cell {
   width: 160px;
 
-  color: darkred;
+  color: #870000;
+  border-color: #aa9999;
   font-weight: bold;
+}
+
+.mouse-edit-delete-cell.delete-armed {
+  color: #fff;
+  background-color: #870000;
+  border-color: #870000;
+}
+.mouse-edit-delete-cell.delete-armed:hover {
+  background-color: #aa0000;
 }
 
 .mouse-edit-save-cell {
@@ -537,7 +549,7 @@ button[type="submit"] {
 .mouse-edit-cancel-cell {
   width: 160px;
 
-  color: darkred;
+  color: #5f7f92;
   font-weight: bold;
 }
 
