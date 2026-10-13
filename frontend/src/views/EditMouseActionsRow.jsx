@@ -1,17 +1,34 @@
+import {useState} from 'react';
+
 function EditMouseActionsRow({
                                  canSave,
                                  onSave,
                                  onDelete,
                                  onCancel
                              }) {
+    const [deleteArmed, setDeleteArmed] = useState(false);
+
+    function handleDelete() {
+        if (!deleteArmed) {
+            setDeleteArmed(true);
+            return;
+        }
+
+        onDelete();
+    }
+
     return (
         <tr className="mouse-edit-row">
 
             <td
-                className="mouse-edit-delete-cell"
-                onClick={onDelete}
+                className={
+                    deleteArmed
+                        ? "mouse-edit-delete-cell delete-armed"
+                        : "mouse-edit-delete-cell"
+                }
+                onClick={handleDelete}
             >
-                Delete
+                {deleteArmed ? 'Confirm Delete' : 'Delete'}
             </td>
 
             <td
