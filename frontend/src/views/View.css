@@ -176,7 +176,7 @@ tbody tr:nth-child(even) {
 
 .accept-row .add-icon,
 .accept-row .add-text-cell {
-  color: darkorange;
+  color: green;
 }
 
 /* =========================
@@ -184,7 +184,7 @@ tbody tr:nth-child(even) {
    ========================= */
 
 .cancel-action {
-  color: darkred;
+  color: #5f7f92;
   font-weight: bold;
   font-style: normal;
 
