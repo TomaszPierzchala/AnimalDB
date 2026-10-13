@@ -106,9 +106,6 @@ tbody tr:nth-child(even) {
 
 .add-text-cell {
   border-left: none;
-  border-right: none;
-
-  color: #666666;
 
   text-align: center;
   font-style: italic;
