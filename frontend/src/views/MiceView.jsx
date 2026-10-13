@@ -1,6 +1,7 @@
 import {useEffect, useState} from 'react';
 
-import AddNewRecordRow from './AddNewRecordRow'
+import AddNewRecordRow from './AddNewRecordRow';
+import EditMouseActionsRow from './EditMouseActionsRow';
 import WorkInProgressBar from "./WorkInProgress";
 import ErrorBanner from '../components/ErrorBanner';
 import useFadingError from "../hooks/fadingError.js";
@@ -565,43 +566,13 @@ function MiceView() {
                 <tbody>
 
                 {isEditingMouse ? (
-
-                    <tr className="mouse-edit-actions-row">
-
-                        <td className="mouse-edit-actions-cell">
-
-                            <button
-                                type="button"
-                                onClick={deleteEditedMouse}
-                            >
-                                Delete
-                            </button>
-
-                            <div className="mouse-edit-main-actions">
-
-                                <button
-                                    type="button"
-                                    disabled={!editedMouseChanged}
-                                    onClick={saveEditedMouse}
-                                >
-                                    Save
-                                </button>
-
-                                <button
-                                    type="button"
-                                    onClick={clearEditedMouse}
-                                >
-                                    Cancel
-                                </button>
-
-                            </div>
-
-                        </td>
-
-                    </tr>
-
+                    <EditMouseActionsRow
+                        canSave={editedMouseChanged}
+                        onSave={saveEditedMouse}
+                        onDelete={deleteEditedMouse}
+                        onCancel={clearEditedMouse}
+                    />
                 ) : (
-
                     <AddNewRecordRow
                         entityName="mouse"
                         onCreate={
@@ -615,8 +586,8 @@ function MiceView() {
                                     <>
                                         Click here to{' '}
                                         <span className="accept-text">
-                                accept
-                            </span>
+                            accept
+                        </span>
                                         {' '}new mouse...
                                     </>
                                 )
@@ -629,9 +600,7 @@ function MiceView() {
                         }
                         colSpan={1}
                     />
-
                 )}
-
                 </tbody>
             </table>
             <div className="pagination">

@@ -509,15 +509,45 @@ button[type="submit"] {
   font-weight: normal;
 }
 
-.mouse-edit-actions-cell {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
+/* =========================
+   MICE EDIT ACTION ROW
+   ========================= */
 
-  padding: 8px;
+.mouse-edit-row td {
+  cursor: pointer;
+  text-align: center;
 }
 
-.mouse-edit-main-actions {
-  display: flex;
-  gap: 12px;
+.mouse-edit-row td:hover {
+  background-color: #dde8ef;
+}
+
+.mouse-edit-delete-cell {
+  width: 160px;
+
+  color: darkred;
+  font-weight: bold;
+}
+
+.mouse-edit-save-cell {
+  color: green;
+  font-weight: bold;
+}
+
+.mouse-edit-cancel-cell {
+  width: 160px;
+
+  color: darkred;
+  font-weight: bold;
+}
+
+.disabled-action {
+  color: #999999;
+
+  cursor: not-allowed !important;
+  opacity: 0.3;
+}
+
+.disabled-action:hover {
+  background-color: transparent !important;
 }
