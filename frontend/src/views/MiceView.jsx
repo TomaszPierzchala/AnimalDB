@@ -196,6 +196,7 @@ function MiceView() {
     async function loadStrainOptions() {
         const strains = await getStrains();
         setStrainOptions(strains);
+        return strains;
     }
 
     async function loadMice() {
@@ -226,14 +227,16 @@ function MiceView() {
 
     async function startAddingMouse() {
         try {
-            const nextAnimalNumber =
-                await getNextAnimalNumber();
+            const nextAnimalNumber = await getNextAnimalNumber();
+            const strains = await loadStrainOptions();
 
-            await loadStrainOptions();
+            const newMouse = createEmptyMouse(nextAnimalNumber);
 
-            setEditedMouse(
-                createEmptyMouse(nextAnimalNumber)
-            );
+            if (strains.length > 0) {
+                newMouse.strainId = strains[0].id;
+            }
+
+            setEditedMouse(newMouse);
 
         } catch (err) {
             showError(
