@@ -448,6 +448,70 @@ class MouseControllerTest {
         ).create(any<MouseRequest>())
     }
 
+    @Test
+    fun `should create mouse with parent animal numbers`() {
+        whenever(mouseService.create(any()))
+            .thenReturn(
+                createResponse(
+                    id = 13L,
+                    sex = Mouse.Sex.F,
+                    animalNumber = 7301,
+                    // and tested
+                    motherAnimalNumber = 26010101,
+                    fatherAnimalNumber = 26010102
+                )
+            )
+
+        mockMvc.perform(
+            post("/api/mice")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(/* request */
+                    """
+                    {
+                      "animalNumber": 7301,
+                      "sex": "F",
+                      "strainId": 1,
+                      "motherAnimalNumber": 26010101,
+                      "fatherAnimalNumber": 26010102
+                    }
+                    """.trimIndent()
+                )
+        )
+            .andExpect(status().isCreated)
+            .andExpect(jsonPath("$.id").value(13))
+            // tested :
+            .andExpect(jsonPath("$.motherAnimalNumber").value(26010101))
+            .andExpect(jsonPath("$.fatherAnimalNumber").value(26010102))
+    }
+
+    @Test
+    fun `should return bad request for invalid parent relation`() {
+        whenever(mouseService.create(any()))
+            .thenThrow(
+                IllegalArgumentException(
+                    "Mother must be female."
+                )
+            )
+
+        mockMvc.perform(
+            post("/api/mice")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(/* request */
+                    """
+                    {
+                      "animalNumber": 7301,
+                      "sex": "F",
+                      "strainId": 1,
+                      "motherAnimalNumber": 26010101,
+                      "fatherAnimalNumber": 26010102
+                    }
+                    """.trimIndent()
+                )
+        )
+            .andExpect(status().isBadRequest)
+
+    }
+
     // -------------------------------------------------
     // Helpers
     // -------------------------------------------------
@@ -455,7 +519,9 @@ class MouseControllerTest {
     private fun createResponse(
         id: Long,
         animalNumber: Int,
-        sex: Mouse.Sex
+        sex: Mouse.Sex,
+        motherAnimalNumber: Int? = null,
+        fatherAnimalNumber: Int? = null
     ): MouseResponse =
         MouseResponse(
             id = id,
@@ -467,9 +533,9 @@ class MouseControllerTest {
             transgenicLineId = null,
             labProcedureId = null,
             motherId = null,
-            motherAnimalNumber = null,
+            motherAnimalNumber = motherAnimalNumber,
             fatherId = null,
-            fatherAnimalNumber = null,
+            fatherAnimalNumber = fatherAnimalNumber,
             birthDate = LocalDate.of(2026, 1, 10),
             deathDate = null,
             room = "A1",
