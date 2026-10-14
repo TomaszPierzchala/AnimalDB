@@ -197,18 +197,18 @@ class MouseRepositoryTest {
         mouseRepository.saveAll(
             listOf(
                 Mouse(
-                    /*animalNumber*/5,
-                    Mouse.Sex.M,
+                    animalNumber = 5,
+                    sex = Sex.M,
                     strain
                 ),
                 Mouse(
-                    /*animalNumber*/ 12,
-                    Mouse.Sex.F,
+                    animalNumber = 12,
+                    sex = Mouse.Sex.F,
                     strain
                 ),
                 Mouse(
-                    /*animalNumber*/ 8,
-                    Mouse.Sex.M,
+                    animalNumber = 8,
+                    sex =Mouse.Sex.M,
                     strain
                 )
             )
@@ -218,5 +218,66 @@ class MouseRepositoryTest {
             mouseRepository.findNextAnimalNumber()
 
         assertThat(result).isEqualTo(13)
+    }
+
+    @Test
+    fun `should find mouse by animal number`() {
+        val strain = strainRepository.save(
+            Strain(
+                "C57BL6",
+                "C57BL/6"
+            )
+        )
+        val saved = mouseRepository.save(
+            Mouse(
+                animalNumber = 26010101,
+                sex = Mouse.Sex.F,
+                strain
+            )
+        )
+
+        mouseRepository.flush()
+        entityManager.clear()
+
+        val result =
+            mouseRepository.findByAnimalNumber(26010101)
+
+        assertThat(requireNotNull(result).id).isEqualTo(saved.id)
+    }
+
+    @Test
+    fun `should return null when animal number does not exist`() {
+        val result =
+            mouseRepository.findByAnimalNumber(99999999)
+
+        assertThat(result).isNull()
+    }
+
+    @Test
+    fun `should reject duplicate animal number`() {
+        val strain = strainRepository.save(
+            Strain(
+                "C57BL6",
+                "C57BL/6"
+            )
+        )
+
+        mouseRepository.saveAndFlush(
+            Mouse(
+                animalNumber = 26010101,
+                sex = Mouse.Sex.F,
+                strain = strain
+            )
+        )
+
+        assertThrows<DataIntegrityViolationException> {
+            mouseRepository.saveAndFlush(
+                Mouse(
+                    animalNumber = 26010101,
+                    sex = Mouse.Sex.M,
+                    strain = strain
+                )
+            )
+        }
     }
 }
