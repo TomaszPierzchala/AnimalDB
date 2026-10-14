@@ -17,8 +17,8 @@ const COLUMNS = [
     { name: 'strainId', label: 'Strain' },
     { name: 'transgenicLineId', label: 'Transgenic line' },
     { name: 'labProcedureId', label: 'Lab procedure' },
-    { name: 'motherId', label: 'Mother' },
-    { name: 'fatherId', label: 'Father' },
+    { name: 'motherAnimalNumber', label: 'Mother Animal Number' },
+    { name: 'fatherAnimalNumber', label: 'Father Animal Number' },
     { name: 'birthDate', label: 'Birth date' },
     { name: 'deathDate', label: 'Death date' },
     { name: 'room', label: 'Room' },
@@ -58,8 +58,8 @@ function createEmptyMouse(animalNumber) {
         strainId: '',
         transgenicLineId: null,
         labProcedureId: null,
-        motherId: null,
-        fatherId: null,
+        motherAnimalNumber: null,
+        fatherAnimalNumber: null,
         birthDate: '',
         deathDate: '',
         room: '',
@@ -385,6 +385,26 @@ function MiceView() {
     }
 
     function renderEditableCell(column) {
+        if (
+            column.name === 'motherAnimalNumber' ||
+            column.name === 'fatherAnimalNumber'
+        ) {
+            return (
+                <input
+                    type="number"
+                    value={editedMouse[column.name] ?? ''}
+                    onClick={event => event.stopPropagation()}
+                    onChange={event =>
+                        changeEditedMouseField(
+                            column.name,
+                            event.target.value === ''
+                                ? null
+                                : Number(event.target.value)
+                        )
+                    }
+                />
+            );
+        }
         if (column.name === 'strainId') {
             return (
                 <select

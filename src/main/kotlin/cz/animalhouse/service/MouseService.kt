@@ -37,6 +37,13 @@ class MouseService(
 
     @Transactional
     fun create(request: MouseRequest): MouseResponse {
+
+        validateParentsAnimalNumbers(
+            animalNumber = request.animalNumber,
+            motherAnimalNumber = request.motherAnimalNumber,
+            fatherAnimalNumber = request.fatherAnimalNumber
+        )
+
         if (mouseRepository.existsByAnimalNumber(request.animalNumber)) {
             throw DuplicateMouseAnimalNumberException(
                 request.animalNumber
@@ -73,13 +80,16 @@ class MouseService(
         //         }
         // }
 
-        val mother = request.motherId?.let {
-            findEntityById(it)
-        }
+        val mother =
+            findParentByAnimalNumber(request.motherAnimalNumber)
 
-        val father = request.fatherId?.let {
-            findEntityById(it)
-        }
+        val father =
+            findParentByAnimalNumber(request.fatherAnimalNumber)
+
+        validateParentsSex(
+            mother = mother,
+            father = father
+        )
 
         val mouse = Mouse(
             animalNumber = request.animalNumber,
@@ -109,6 +119,12 @@ class MouseService(
     ): MouseResponse {
 
         val mouse = findEntityById(id)
+
+        validateParentsAnimalNumbers(
+            animalNumber = request.animalNumber,
+            motherAnimalNumber = request.motherAnimalNumber,
+            fatherAnimalNumber = request.fatherAnimalNumber
+        )
 
         if (mouseRepository.existsByAnimalNumberAndIdNot(
                 request.animalNumber,
@@ -158,6 +174,11 @@ class MouseService(
             findEntityById(it)
         }
 
+        validateParentsSex(
+            mother = mother,
+            father = father
+        )
+
         mouse.animalNumber = request.animalNumber
         mouse.sex = request.sex
         mouse.strain = strain
@@ -189,6 +210,21 @@ class MouseService(
                 "Mouse with id=$id not found"
             )
         }
+
+    private fun findParentByAnimalNumber(
+        animalNumber: Int?
+    ): Mouse? {
+
+        if (animalNumber == null) {
+            return null
+        }
+
+        return mouseRepository
+            .findByAnimalNumber(animalNumber)
+            ?: throw IllegalArgumentException(
+                "Mouse with animal number $animalNumber does not exist."
+            )
+    }
             
     private fun validateDates(
         birthDate: LocalDate?,
@@ -201,6 +237,47 @@ class MouseService(
         ) {
             throw IllegalArgumentException(
                 "Death date cannot be before birth date"
+            )
+        }
+    }
+
+    private fun validateParentsAnimalNumbers(
+        animalNumber: Int,
+        motherAnimalNumber: Int?,
+        fatherAnimalNumber: Int?
+    ) {
+        if (motherAnimalNumber != null && animalNumber == motherAnimalNumber) {
+            throw IllegalArgumentException(
+                "Mouse cannot be its own mother."
+            )
+        }
+
+        if (fatherAnimalNumber != null && animalNumber == fatherAnimalNumber) {
+            throw IllegalArgumentException(
+                "Mouse cannot be its own father."
+            )
+        }
+
+        if (motherAnimalNumber != null && motherAnimalNumber == fatherAnimalNumber) {
+            throw IllegalArgumentException(
+                "Mother and father must be different mice."
+            )
+        }
+    }
+
+        private fun validateParentsSex(
+            mother: Mouse?,
+            father: Mouse?
+        ) {
+        if (mother != null && mother.sex != Mouse.Sex.F) {
+            throw IllegalArgumentException(
+                "Mother must be female."
+            )
+        }
+
+        if (father != null && father.sex != Mouse.Sex.M) {
+            throw IllegalArgumentException(
+                "Father must be male."
             )
         }
     }
@@ -218,7 +295,11 @@ class MouseService(
             transgenicLineId = transgenicLine?.id,
             labProcedureId = labProcedure?.id,
             motherId = mother?.id,
+            motherAnimalNumber = mother?.animalNumber,
+
             fatherId = father?.id,
+            fatherAnimalNumber = father?.animalNumber,
+
             birthDate = birthDate,
             deathDate = deathDate,
             room = room,

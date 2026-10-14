@@ -26,4 +26,7 @@ interface MouseRepository : JpaRepository<Mouse, Long> {
         """
     )
     fun findNextAnimalNumber(): Int
+
+    fun findByAnimalNumber(animalNumber: Int): Mouse?
+
 }

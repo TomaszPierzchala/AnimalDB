@@ -18,6 +18,7 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.Mock
 import org.mockito.junit.jupiter.MockitoExtension
+import org.mockito.kotlin.argThat
 import org.mockito.kotlin.any
 import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
@@ -452,6 +453,283 @@ class MouseServiceTest {
     }
 
     @Test
+    fun `create should assign mother by animal number`() {
+        val mother = createMouse(
+            id = 1L,
+            animalNumber = 26010101,
+            sex = Mouse.Sex.F
+        )
+
+        whenever(
+            mouseRepository.findByAnimalNumber(26010101)
+        ).thenReturn(mother)
+
+        whenever(
+            strainRepository.findById(10L)
+        ).thenReturn(Optional.of(strain))
+
+        whenever(
+            mouseRepository.save(any<Mouse>())
+        ).thenAnswer { val mouse = it.arguments[0] as Mouse
+            ReflectionTestUtils.setField(
+                mouse,
+                "id",
+                13L
+            )
+            mouse
+        }
+
+        val request = createRequest(
+            animalNumber = 76020101,
+            motherAnimalNumber = 26010101
+        )
+
+        mouseService.create(request)
+
+        verify(mouseRepository)
+            .findByAnimalNumber(26010101)
+
+        verify(mouseRepository).save(
+            argThat { mouse ->
+                mouse.mother === mother
+            }
+        )
+    }
+
+    @Test
+    fun `create should throw exception when mother animal number does not exist`() {
+        whenever(
+            mouseRepository.findByAnimalNumber(26010101)
+        ).thenReturn(null)
+
+        whenever(
+            strainRepository.findById(10L)
+        ).thenReturn(Optional.of(strain))
+
+        val request = createRequest(
+            animalNumber = 36020101,
+            motherAnimalNumber = 26010101
+        )
+
+        assertThatThrownBy {
+            mouseService.create(request)
+        }
+            .isInstanceOf(
+                IllegalArgumentException::class.java
+            )
+            .hasMessage(
+                "Mouse with animal number 26010101 does not exist."
+            )
+
+        verify(mouseRepository, never()).save(any())
+    }
+
+    @Test
+    fun `create should not search for mother when mother animal number is null`() {
+        val request = createRequest(
+            animalNumber = 130001,
+            motherAnimalNumber = null
+        )
+
+        whenever(
+            strainRepository.findById(10L)
+        ).thenReturn(Optional.of(strain))
+
+        whenever(
+            mouseRepository.save(any<Mouse>())
+        ).thenAnswer { val mouse = it.arguments[0] as Mouse
+            ReflectionTestUtils.setField(
+                mouse,
+                "id",
+                1L
+            )
+            mouse
+        }
+
+        mouseService.create(request)
+
+        verify(
+            mouseRepository,
+            never()
+        ).findByAnimalNumber(any())
+    }
+
+    @Test
+    fun `create should assign father by animal number`() {
+        val father = createMouse(
+            id = 7L,
+            animalNumber = 26010101,
+            sex = Mouse.Sex.M
+        )
+
+        whenever(
+            mouseRepository.findByAnimalNumber(26010101)
+        ).thenReturn(father)
+
+        whenever(
+            strainRepository.findById(10L)
+        ).thenReturn(Optional.of(strain))
+
+        whenever(
+            mouseRepository.save(any<Mouse>())
+        ).thenAnswer { val mouse = it.arguments[0] as Mouse
+            ReflectionTestUtils.setField(
+                mouse,
+                "id",
+                13L
+            )
+            mouse
+        }
+
+        val request = createRequest(
+            animalNumber = 76020101,
+            fatherAnimalNumber = 26010101
+        )
+
+        mouseService.create(request)
+
+        verify(mouseRepository)
+            .findByAnimalNumber(26010101)
+
+        verify(mouseRepository).save(
+            argThat { mouse ->
+                mouse.father === father
+            }
+        )
+    }
+    @Test
+    fun `create should reject mouse as its own mother`() {
+        // request.animalNumber == motherAnimalNumber
+
+        val request = createRequest(
+            animalNumber = 26010101,
+            motherAnimalNumber = 26010101
+        )
+
+        assertThatThrownBy {
+            mouseService.create(request)
+        }
+            .isInstanceOf(
+                IllegalArgumentException::class.java
+            )
+            .hasMessage(
+                "Mouse cannot be its own mother."
+            )
+
+    }
+    @Test
+    fun `create should reject mouse as its own father`() {
+        // request.animalNumber == fatherAnimalNumber
+
+        val request = createRequest(
+            animalNumber = 91,
+            fatherAnimalNumber = 91
+        )
+
+        assertThatThrownBy {
+            mouseService.create(request)
+        }
+            .isInstanceOf(
+                IllegalArgumentException::class.java
+            )
+            .hasMessage(
+                "Mouse cannot be its own father."
+            )
+
+    }
+    @Test
+    fun `create should reject same mouse as mother and father`() {
+
+        val request = createRequest(
+            animalNumber = 29,
+            motherAnimalNumber = 13,
+            fatherAnimalNumber = 13
+        )
+
+        assertThatThrownBy {
+            mouseService.create(request)
+        }
+            .isInstanceOf(
+                IllegalArgumentException::class.java
+            )
+            .hasMessage(
+                "Mother and father must be different mice."
+            )
+
+        verify(mouseRepository, never())
+            .findByAnimalNumber(13)
+    }
+    @Test
+    fun `create should reject male mouse as mother`() {
+        val male = createMouse(
+            id = 8L,
+            animalNumber = 13,
+            sex = Mouse.Sex.M
+        )
+
+        whenever(
+            mouseRepository.findByAnimalNumber(13)
+        ).thenReturn(male)
+
+        whenever(
+            strainRepository.findById(10L)
+        ).thenReturn(Optional.of(strain))
+
+        val request = createRequest(
+            animalNumber = 29,
+            motherAnimalNumber = 13
+        )
+
+        assertThatThrownBy {
+            mouseService.create(request)
+        }
+            .isInstanceOf(
+                IllegalArgumentException::class.java
+            )
+            .hasMessage(
+                "Mother must be female."
+            )
+
+        verify(mouseRepository)
+            .findByAnimalNumber(13)
+    }
+    @Test
+    fun `create should reject female mouse as father`() {
+        val female = createMouse(
+            id = 1L,
+            animalNumber = 71,
+            sex = Mouse.Sex.F
+        )
+
+        whenever(
+            mouseRepository.findByAnimalNumber(71)
+        ).thenReturn(female)
+
+        whenever(
+            strainRepository.findById(10L)
+        ).thenReturn(Optional.of(strain))
+
+        val request = createRequest(
+            animalNumber = 26010101,
+            fatherAnimalNumber = 71
+        )
+
+        assertThatThrownBy {
+            mouseService.create(request)
+        }
+            .isInstanceOf(
+                IllegalArgumentException::class.java
+            )
+            .hasMessage(
+                "Father must be male."
+            )
+
+        verify(mouseRepository)
+            .findByAnimalNumber(71)
+
+    }
+
+    @Test
     fun shouldUpdateExistingMouse() {
         val id = 13L
 
@@ -720,8 +998,10 @@ class MouseServiceTest {
 
     private fun createRequest(
         animalNumber: Int,
-        birthDate: LocalDate?,
-        deathDate: LocalDate?
+        birthDate: LocalDate? = null,
+        deathDate: LocalDate? = null,
+        motherAnimalNumber: Int? = null,
+        fatherAnimalNumber: Int? = null
     ): MouseRequest =
         MouseRequest(
             animalNumber = animalNumber,
@@ -731,6 +1011,8 @@ class MouseServiceTest {
             labProcedureId = null,
             motherId = null,
             fatherId = null,
+            motherAnimalNumber = motherAnimalNumber,
+            fatherAnimalNumber = fatherAnimalNumber,
             birthDate = birthDate,
             deathDate = deathDate,
             room = "A01",
