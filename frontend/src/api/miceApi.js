@@ -24,6 +24,17 @@ export function getNextAnimalNumber() {
     );
 }
 
+export async function getParentCandidates(prefix, sex) {
+    const params = new URLSearchParams({
+        prefix,
+        sex
+    });
+
+    return apiJson(
+        `${MOUSE_API_URL}/parent-candidates?${params}`
+    );
+}
+
 export function createMouse(mouse) {
     return apiJson(MOUSE_API_URL, {
         method: 'POST',

@@ -4,6 +4,7 @@ import AddNewRecordRow from './AddNewRecordRow';
 import EditMouseActionsRow from './EditMouseActionsRow';
 import WorkInProgressBar from "./WorkInProgress";
 import ErrorBanner from '../components/ErrorBanner';
+import ParentAnimalNumberInput from "../components/ParentAnimalNumberInput";
 import useFadingError from "../hooks/fadingError.js";
 
 import {createMouse, deleteMouse, getMice, getNextAnimalNumber, updateMouse} from '../api/miceApi';
@@ -385,21 +386,30 @@ function MiceView() {
     }
 
     function renderEditableCell(column) {
-        if (
-            column.name === 'motherAnimalNumber' ||
-            column.name === 'fatherAnimalNumber'
-        ) {
+        if (column.name === 'motherAnimalNumber') {
             return (
-                <input
-                    type="number"
-                    value={editedMouse[column.name] ?? ''}
-                    onClick={event => event.stopPropagation()}
-                    onChange={event =>
+                <ParentAnimalNumberInput
+                    value={editedMouse.motherAnimalNumber}
+                    sex="F"
+                    onChange={value =>
                         changeEditedMouseField(
-                            column.name,
-                            event.target.value === ''
-                                ? null
-                                : Number(event.target.value)
+                            'motherAnimalNumber',
+                            value
+                        )
+                    }
+                />
+            );
+        }
+
+        if (column.name === 'fatherAnimalNumber') {
+            return (
+                <ParentAnimalNumberInput
+                    value={editedMouse.fatherAnimalNumber}
+                    sex="M"
+                    onChange={value =>
+                        changeEditedMouseField(
+                            'fatherAnimalNumber',
+                            value
                         )
                     }
                 />
