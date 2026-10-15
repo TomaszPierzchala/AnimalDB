@@ -15,10 +15,7 @@ data class MouseResponse(
     val transgenicLineId: Long?,
     val labProcedureId: Long?,
 
-    val motherId: Long?,
     val motherAnimalNumber: Int?,
-
-    val fatherId: Long?,
     val fatherAnimalNumber: Int?,
 
     val birthDate: LocalDate?,

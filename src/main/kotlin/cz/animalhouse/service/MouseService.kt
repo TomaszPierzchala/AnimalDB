@@ -167,13 +167,11 @@ class MouseService(
         //         }
         // }
 
-        val mother = request.motherId?.let {
-            findEntityById(it)
-        }
+        val mother =
+            findParentByAnimalNumber(request.motherAnimalNumber)
 
-        val father = request.fatherId?.let {
-            findEntityById(it)
-        }
+        val father =
+            findParentByAnimalNumber(request.fatherAnimalNumber)
 
         validateParentsSex(
             mother = mother,
@@ -308,10 +306,8 @@ class MouseService(
 
             transgenicLineId = transgenicLine?.id,
             labProcedureId = labProcedure?.id,
-            motherId = mother?.id,
-            motherAnimalNumber = mother?.animalNumber,
 
-            fatherId = father?.id,
+            motherAnimalNumber = mother?.animalNumber,
             fatherAnimalNumber = father?.animalNumber,
 
             birthDate = birthDate,
