@@ -29,11 +29,20 @@ import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageImpl
 import org.springframework.data.domain.PageRequest
 import org.springframework.test.util.ReflectionTestUtils
+import java.time.Clock
 import java.time.LocalDate
+import java.time.ZoneOffset
 import java.util.Optional
 
 @ExtendWith(MockitoExtension::class)
 class MouseServiceTest {
+
+    private val FIXED_TODAY = LocalDate.of(2026, 10, 15)
+
+    private val clock = Clock.fixed(
+        FIXED_TODAY.atStartOfDay(ZoneOffset.UTC).toInstant(),
+        ZoneOffset.UTC
+    )
 
     @Mock
     private lateinit var mouseRepository: MouseRepository
@@ -62,8 +71,9 @@ class MouseServiceTest {
         mouseService = MouseService(
             mouseRepository,
             strainRepository,
-            transgenicLineRepository//,
-            //labProcedureRepository
+            transgenicLineRepository,
+            //labProcedureRepository,
+            clock
         )
 
         strain = Strain(
@@ -731,6 +741,41 @@ class MouseServiceTest {
     }
 
     @Test
+    fun `create should reject birth date in the future`() {
+        val request = createRequest(
+            animalNumber = 13,
+            birthDate = FIXED_TODAY.plusDays(1)
+        )
+
+        assertThatThrownBy {
+            mouseService.create(request)
+        }
+            .isInstanceOf(
+                IllegalArgumentException::class.java
+            )
+            .hasMessage(
+                "Birth date cannot be in the future."
+            )
+    }
+    @Test
+    fun `create should reject death date in the future`() {
+        val request = createRequest(
+            animalNumber = 13,
+            deathDate = FIXED_TODAY.plusDays(1)
+        )
+
+        assertThatThrownBy {
+            mouseService.create(request)
+        }
+            .isInstanceOf(
+                IllegalArgumentException::class.java
+            )
+            .hasMessage(
+                "Death date cannot be in the future."
+            )
+    }
+
+    @Test
     fun `update should assign mother by animal number`() {
         val UPDATE_ID = 13L
         val MOUSE_ANIMAL_NUMBER = 1017;
@@ -1172,6 +1217,68 @@ class MouseServiceTest {
             )
             .hasMessage(
                 "Father must be male."
+            )
+    }
+
+    @Test
+    fun `update should reject birth date in the future`() {
+        val UPDATE_ID = 13L
+        val MOUSE_ANIMAL_NUMBER = 227
+
+
+        val mouse = createMouse(
+            id = UPDATE_ID,
+            animalNumber = MOUSE_ANIMAL_NUMBER,
+            sex = Mouse.Sex.M
+        )
+        val request = createRequest(
+            animalNumber = 13,
+            birthDate = FIXED_TODAY.plusDays(1)
+        )
+
+        whenever(
+            mouseRepository.findById(UPDATE_ID)
+        ).thenReturn(Optional.of(mouse))
+
+        assertThatThrownBy {
+            mouseService.update(UPDATE_ID, request)
+        }
+            .isInstanceOf(
+                IllegalArgumentException::class.java
+            )
+            .hasMessage(
+                "Birth date cannot be in the future."
+            )
+    }
+
+    @Test
+    fun `update should reject death date in the future`() {
+        val UPDATE_ID = 17L
+        val MOUSE_ANIMAL_NUMBER = 227
+
+
+        val mouse = createMouse(
+            id = UPDATE_ID,
+            animalNumber = MOUSE_ANIMAL_NUMBER,
+            sex = Mouse.Sex.F
+        )
+        val request = createRequest(
+            animalNumber = 19,
+            deathDate = FIXED_TODAY.plusDays(1)
+        )
+
+        whenever(
+            mouseRepository.findById(UPDATE_ID)
+        ).thenReturn(Optional.of(mouse))
+
+        assertThatThrownBy {
+            mouseService.update(UPDATE_ID, request)
+        }
+            .isInstanceOf(
+                IllegalArgumentException::class.java
+            )
+            .hasMessage(
+                "Death date cannot be in the future."
             )
     }
 

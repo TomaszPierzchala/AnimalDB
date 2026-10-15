@@ -13,6 +13,7 @@ import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import java.time.Clock
 import java.time.LocalDate
 
 @Service
@@ -21,6 +22,7 @@ class MouseService(
     private val strainRepository: StrainRepository,
     private val transgenicLineRepository: TransgenicLineRepository,
     // private val labProcedureRepository: LabProcedureRepository
+    private val clock: Clock
 ) {
 
     @Transactional(readOnly = true)
@@ -242,6 +244,20 @@ class MouseService(
         birthDate: LocalDate?,
         deathDate: LocalDate?
     ) {
+        val today = LocalDate.now(clock)
+
+        if (birthDate != null && birthDate > today) {
+            throw IllegalArgumentException(
+                "Birth date cannot be in the future."
+            )
+        }
+
+        if (deathDate != null && deathDate > today) {
+            throw IllegalArgumentException(
+                "Death date cannot be in the future."
+            )
+        }
+
         if (
             birthDate != null &&
             deathDate != null &&
