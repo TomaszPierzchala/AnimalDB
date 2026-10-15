@@ -2,6 +2,7 @@ package cz.animalhouse.service
 
 import cz.animalhouse.dto.MouseRequest
 import cz.animalhouse.dto.MouseResponse
+import cz.animalhouse.dto.ParentCandidateResponse
 import cz.animalhouse.entity.Mouse
 import cz.animalhouse.exception.DuplicateMouseAnimalNumberException
 // import cz.animalhouse.repository.LabProcedureRepository
@@ -225,6 +226,19 @@ class MouseService(
                 "Mouse with animal number $animalNumber does not exist."
             )
     }
+
+    @Transactional(readOnly = true)
+    fun findParentCandidates(
+        prefix: String,
+        sex: String
+    ): List<ParentCandidateResponse> =
+        mouseRepository
+            .findParentCandidates(prefix, sex)
+            .map { mouse ->
+                ParentCandidateResponse(
+                    animalNumber = mouse.animalNumber
+                )
+            }
             
     private fun validateDates(
         birthDate: LocalDate?,

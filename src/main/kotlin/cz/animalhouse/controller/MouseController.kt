@@ -2,6 +2,7 @@ package cz.animalhouse.controller
 
 import cz.animalhouse.dto.MouseRequest
 import cz.animalhouse.dto.MouseResponse
+import cz.animalhouse.dto.ParentCandidateResponse
 import cz.animalhouse.service.MouseService
 import jakarta.validation.Valid
 import org.springframework.data.domain.Page
@@ -32,6 +33,13 @@ class MouseController(
     @GetMapping("/next-animal-number")
     fun getNextAnimalNumber(): Int =
         mouseService.findNextAnimalNumber()
+
+    @GetMapping("/parent-candidates")
+    fun getParentCandidates(
+        @RequestParam prefix: String,
+        @RequestParam sex: String
+    ): List<ParentCandidateResponse> =
+        mouseService.findParentCandidates(prefix, sex)
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)

@@ -965,6 +965,69 @@ class MouseServiceTest {
             .delete(any<Mouse>())
     }
 
+    @Test
+    fun `findParentCandidates should return parent candidates`() {
+        val mouse1 = createMouse(
+            id = 17,
+            animalNumber = 723001,
+            sex = Mouse.Sex.F
+        )
+
+        val mouse2 = createMouse(
+            id = 19,
+            animalNumber = 723002,
+            sex = Mouse.Sex.F
+        )
+
+        whenever(
+            mouseRepository.findParentCandidates(
+                prefix = "723",
+                sex = "F"
+            )
+        ).thenReturn(
+            listOf(mouse1, mouse2)
+        )
+
+        val result =
+            mouseService.findParentCandidates(
+                prefix = "723",
+                sex = "F"
+            )
+
+        assertThat(result).hasSize(2)
+
+        assertThat(result)
+            .extracting<Int> { it.animalNumber }
+            .containsExactly(
+                723001,
+                723002
+            )
+
+        verify(mouseRepository)
+            .findParentCandidates(
+                prefix = "723",
+                sex = "F"
+            )
+    }
+
+    @Test
+    fun `findParentCandidates should return empty list when repository returns no mice`() {
+        whenever(
+            mouseRepository.findParentCandidates(
+                prefix = "999",
+                sex = "F"
+            )
+        ).thenReturn(emptyList())
+
+        val result =
+            mouseService.findParentCandidates(
+                prefix = "999",
+                sex = "F"
+            )
+
+        assertThat(result).isEmpty()
+    }
+
     private fun createMouse(
         id: Long,
         animalNumber: Int,

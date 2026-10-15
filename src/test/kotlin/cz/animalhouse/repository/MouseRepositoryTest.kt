@@ -280,4 +280,102 @@ class MouseRepositoryTest {
             )
         }
     }
+
+    @Test
+    fun `findParentCandidates should find mice by animal number prefix and sex`() {
+        val strain = strainRepository.save(
+            Strain(
+                "C57BL6",
+                "C57BL/6"
+            )
+        )
+        mouseRepository.saveAll(
+            listOf(
+                createMouse(26010101, Mouse.Sex.F, strain = strain),
+                createMouse(26010102, Mouse.Sex.F, strain = strain),
+                createMouse(26010103, Mouse.Sex.M, strain = strain),
+                createMouse(27010101, Mouse.Sex.F, strain = strain)
+            )
+        )
+
+        val result =
+            mouseRepository.findParentCandidates(
+                prefix = "2601",
+                sex = "F"
+            )
+
+        assertThat(result)
+            .extracting<Int> { it.animalNumber }
+            .containsExactly(
+                26010101,
+                26010102
+            )
+    }
+
+    @Test
+    fun `findParentCandidates should return empty list when nothing matches`() {
+        val result =
+            mouseRepository.findParentCandidates(
+                prefix = "999",
+                sex = "F"
+            )
+
+        assertThat(result).isEmpty()
+    }
+
+    @Test
+    fun `findParentCandidates should return at most ten mice`() {
+        val strain = strainRepository.save(
+            Strain(
+                "C57BL6",
+                "C57BL/6"
+            )
+        )
+
+        mouseRepository.saveAll(
+            listOf(
+                createMouse(723001, Mouse.Sex.F, strain = strain),
+                createMouse(723002, Mouse.Sex.F, strain = strain),
+                createMouse(723003, Mouse.Sex.F, strain = strain),
+                createMouse(723004, Mouse.Sex.F, strain = strain),
+                createMouse(723005, Mouse.Sex.F, strain = strain),
+                createMouse(723006, Mouse.Sex.F, strain = strain),
+                createMouse(723007, Mouse.Sex.F, strain = strain),
+                createMouse(723008, Mouse.Sex.F, strain = strain),
+                createMouse(723009, Mouse.Sex.F, strain = strain),
+                createMouse(723010, Mouse.Sex.F, strain = strain),
+                createMouse(723011, Mouse.Sex.F, strain = strain),
+                createMouse(723012, Mouse.Sex.F, strain = strain),
+                createMouse(723013, Mouse.Sex.F, strain = strain),
+                createMouse(723014, Mouse.Sex.F, strain = strain)
+            )
+        )
+
+        val result =
+            mouseRepository.findParentCandidates(
+                prefix = "723",
+                sex = "F"
+            )
+
+        assertThat(result).hasSize(10)
+        assertThat(result)
+            .extracting<Int> { it.animalNumber }
+            .containsExactlyElementsOf(
+                (723001..723010).toList()
+            )
+    }
+
+    private fun createMouse(animalNumber: Int, sex: Mouse.Sex, strain: Strain) : Mouse {
+        return Mouse(
+            animalNumber,
+            sex,
+            strain,
+            birthDate = LocalDate.of(2026, 8, 1),
+            room = "Room 1",
+            rack = "Rack A",
+            cage = "Cage 12",
+            origin = "Prague",
+            note = "Test mouse"
+        )
+    }
 }

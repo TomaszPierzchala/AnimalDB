@@ -6,6 +6,7 @@ import org.springframework.data.domain.Pageable
 import org.springframework.data.jpa.repository.EntityGraph
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.data.jpa.repository.Query
+import org.springframework.data.repository.query.Param
 
 interface MouseRepository : JpaRepository<Mouse, Long> {
 
@@ -29,4 +30,19 @@ interface MouseRepository : JpaRepository<Mouse, Long> {
 
     fun findByAnimalNumber(animalNumber: Int): Mouse?
 
+    @Query(
+        value = """
+        SELECT *
+        FROM mouse
+        WHERE CAST(animal_number AS TEXT) LIKE CONCAT(:prefix, '%')
+          AND sex = :sex
+        ORDER BY animal_number
+        LIMIT 10
+    """,
+        nativeQuery = true
+    )
+    fun findParentCandidates(
+        @Param("prefix") prefix: String,
+        @Param("sex") sex: String
+    ): List<Mouse>
 }

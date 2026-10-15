@@ -2,6 +2,7 @@ package cz.animalhouse.controller
 
 import cz.animalhouse.dto.MouseRequest
 import cz.animalhouse.dto.MouseResponse
+import cz.animalhouse.dto.ParentCandidateResponse
 import cz.animalhouse.entity.Mouse
 import cz.animalhouse.service.MouseService
 import cz.animalhouse.exception.DuplicateMouseAnimalNumberException
@@ -510,6 +511,36 @@ class MouseControllerTest {
         )
             .andExpect(status().isBadRequest)
 
+    }
+
+    @Test
+    fun `should return ParentCandidtes`(){
+        val parent1 = ParentCandidateResponse(
+            animalNumber = 431001
+        )
+
+        val parent2 = ParentCandidateResponse(
+            animalNumber = 431002
+        )
+
+        whenever(mouseService.findParentCandidates(
+            any<String>(),
+            eq("F")))
+            .thenReturn(
+                listOf(parent1, parent2)
+            )
+
+        mockMvc.perform(
+            get("/api/mice/parent-candidates")
+                .param("prefix", "431")
+                .param("sex", "F")
+        )
+            .andExpect(status().isOk)
+            .andExpect(jsonPath("$.length()").value(2))
+            .andExpect(jsonPath("$[0].animalNumber").value(431001))
+            .andExpect(jsonPath("$[1].animalNumber").value(431002))
+
+        verify(mouseService).findParentCandidates(any<String>(), any<String>())
     }
 
     // -------------------------------------------------
