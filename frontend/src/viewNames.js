@@ -3,6 +3,7 @@ export const VIEW_STRAIN = 'strain';
 export const VIEW_TRANSLINE = 'transgenicLine';
 export const VIEW_TRANSLINEGENES = 'transgenicLineGenes';
 export const VIEW_MICE = 'mice';
+export const VIEW_MATING = 'mating'
 
 export const navigationItems = [
   {
@@ -24,5 +25,9 @@ export const navigationItems = [
   {
     id: VIEW_MICE,
     label: 'Mice'
+  },
+  {
+    id: VIEW_MATING,
+    label: 'Mating'
   }
 ];

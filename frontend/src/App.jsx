@@ -7,6 +7,7 @@ import Sidebar from './components/Sidebar';
 import TransgenicLineView from './views/TransgenicLineView';
 import TransgenicLineGenesView from './views/TransgenicLineGenesView';
 import MiceView from './views/MiceView';
+import MatingView from "./views/MatingView";
 
 import { FIRST, SECOND } from './utils/const';
 
@@ -16,6 +17,7 @@ import {
   VIEW_TRANSLINE,
   VIEW_TRANSLINEGENES,
   VIEW_MICE,
+  VIEW_MATING,
   navigationItems
 } from './viewNames';
 
@@ -67,6 +69,9 @@ function App() {
       case VIEW_MICE:
         return renderMiceView();
 
+      case VIEW_MATING:
+        return renderMatingView()
+
       default:
         return renderGeneView();
     }
@@ -112,6 +117,10 @@ function App() {
 
   function renderMiceView(){
     return <MiceView/>;
+  }
+
+  function renderMatingView(){
+    return <MatingView/>;
   }
 
   return (

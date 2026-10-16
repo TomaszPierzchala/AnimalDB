@@ -2,7 +2,7 @@ import {useEffect, useState} from 'react';
 
 import AddNewRecordRow from './AddNewRecordRow';
 import EditRecordActionsRow from './EditRecordActionsRow.jsx';
-import WorkInProgressBar from "./WorkInProgress";
+// import WorkInProgressBar from "./WorkInProgress";
 import ErrorBanner from '../components/ErrorBanner';
 import MouseAnimalNumberInput from "../components/MouseAnimalNumberInput.jsx";
 import useFadingError from "../hooks/fadingError.js";
@@ -672,7 +672,7 @@ function MiceView() {
                 </button>
 
             </div>
-            <WorkInProgressBar/>
+            {/*<WorkInProgressBar/>*/}
         </section>
     );
 }
