@@ -12,6 +12,16 @@ import {getStrains} from "../api/strainApi.js";
 
 import './View.css';
 
+function todayAsInputDate() {
+    const today = new Date();
+
+    const year = today.getFullYear();
+    const month = String(today.getMonth() + 1).padStart(2, '0');
+    const day = String(today.getDate()).padStart(2, '0');
+
+    return `${year}-${month}-${day}`;
+}
+
 const COLUMNS = [
     { name: 'animalNumber', label: 'Animal number' },
     { name: 'sex', label: 'Sex' },
@@ -461,6 +471,7 @@ function MiceView() {
             return (
                 <input
                     type="date"
+                    max={todayAsInputDate()}
                     value={editedMouse[column.name] ?? ''}
                     onClick={event => event.stopPropagation()}
                     onChange={event =>
@@ -476,6 +487,7 @@ function MiceView() {
             return (
                 <input
                     type="number"
+                    min="1"
                     value={editedMouse.animalNumber}
                     onClick={event => event.stopPropagation()}
                     onChange={event =>
