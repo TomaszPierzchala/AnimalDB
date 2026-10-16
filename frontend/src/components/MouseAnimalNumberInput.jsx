@@ -1,7 +1,7 @@
 import {useState} from 'react';
 import {getParentCandidates} from '../api/miceApi';
 
-function ParentAnimalNumberInput({
+function MouseAnimalNumberInput({
                                      value,
                                      sex,
                                      onChange
@@ -54,4 +54,4 @@ function ParentAnimalNumberInput({
     );
 }
 
-export default ParentAnimalNumberInput;
+export default MouseAnimalNumberInput;

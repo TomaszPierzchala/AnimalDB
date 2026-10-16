@@ -1,10 +1,10 @@
 import {useEffect, useState} from 'react';
 
 import AddNewRecordRow from './AddNewRecordRow';
-import EditMouseActionsRow from './EditMouseActionsRow';
+import EditRecordActionsRow from './EditRecordActionsRow.jsx';
 import WorkInProgressBar from "./WorkInProgress";
 import ErrorBanner from '../components/ErrorBanner';
-import ParentAnimalNumberInput from "../components/ParentAnimalNumberInput";
+import MouseAnimalNumberInput from "../components/MouseAnimalNumberInput.jsx";
 import useFadingError from "../hooks/fadingError.js";
 
 import {createMouse, deleteMouse, getMice, getNextAnimalNumber, updateMouse} from '../api/miceApi';
@@ -388,7 +388,7 @@ function MiceView() {
     function renderEditableCell(column) {
         if (column.name === 'motherAnimalNumber') {
             return (
-                <ParentAnimalNumberInput
+                <MouseAnimalNumberInput
                     value={editedMouse.motherAnimalNumber}
                     sex="F"
                     onChange={value =>
@@ -403,7 +403,7 @@ function MiceView() {
 
         if (column.name === 'fatherAnimalNumber') {
             return (
-                <ParentAnimalNumberInput
+                <MouseAnimalNumberInput
                     value={editedMouse.fatherAnimalNumber}
                     sex="M"
                     onChange={value =>
@@ -599,7 +599,7 @@ function MiceView() {
                 <tbody>
 
                 {isEditingMouse ? (
-                    <EditMouseActionsRow
+                    <EditRecordActionsRow
                         canSave={editedMouseChanged}
                         onSave={saveEditedMouse}
                         onDelete={deleteEditedMouse}

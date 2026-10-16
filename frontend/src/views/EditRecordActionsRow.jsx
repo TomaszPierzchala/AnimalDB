@@ -1,6 +1,6 @@
 import {useState} from 'react';
 
-function EditMouseActionsRow({
+function EditRecordActionsRow({
                                  canSave,
                                  onSave,
                                  onDelete,
@@ -53,4 +53,4 @@ function EditMouseActionsRow({
     );
 }
 
-export default EditMouseActionsRow;
+export default EditRecordActionsRow;
