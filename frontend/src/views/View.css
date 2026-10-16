@@ -205,6 +205,23 @@ tbody tr:nth-child(even) {
   opacity: 1;
   transition: opacity 3s ease;
   white-space: pre-line;
+
+  position: fixed;
+
+  top: 22vh;
+  left: 180px;
+
+  width: calc(73.5vw);
+  height: auto;
+  padding: 16px 20px;
+
+  z-index: 100;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  box-sizing: border-box;
 }
 
 .error-fading {
