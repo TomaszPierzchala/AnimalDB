@@ -12,8 +12,8 @@ import {todayAsInputDate} from '../utils/timeUtils'
 import './View.css';
 
 const COLUMNS = [
-    {name: 'femaleAnimalNumber', label: 'Female'},
-    {name: 'maleAnimalNumber', label: 'Male'},
+    {name: 'femaleAnimalNumber', label: 'Female ♀'},
+    {name: 'maleAnimalNumber', label: 'Male ♂'},
     {name: 'matingDate', label: 'Mating date'},
     {name: 'plugDate', label: 'Plug date'},
     {name: 'pregnancyDate', label: 'Pregnancy date'},

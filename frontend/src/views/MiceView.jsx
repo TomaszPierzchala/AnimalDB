@@ -20,8 +20,8 @@ const COLUMNS = [
     { name: 'strainId', label: 'Strain' },
     { name: 'transgenicLineId', label: 'Transgenic line' },
     { name: 'labProcedureId', label: 'Lab procedure' },
-    { name: 'motherAnimalNumber', label: 'Mother Animal Number' },
-    { name: 'fatherAnimalNumber', label: 'Father Animal Number' },
+    { name: 'motherAnimalNumber', label: '♀ Mother Animal Number' },
+    { name: 'fatherAnimalNumber', label: '♂ Father Animal Number' },
     { name: 'birthDate', label: 'Birth date' },
     { name: 'deathDate', label: 'Death date' },
     { name: 'room', label: 'Room' },
@@ -381,6 +381,17 @@ function MiceView() {
         if (columnName === 'strainId') {
             return `${mouse.strainCode} — ${mouse.strainName}`;
         }
+        if (columnName === 'sex') {
+            if (mouse.sex === 'M') {
+                return '♂ M';
+            }
+
+            if (mouse.sex === 'F') {
+                return '♀ F';
+            }
+
+            return '—';
+        }
 
         const value = mouse[columnName];
 
@@ -451,8 +462,8 @@ function MiceView() {
                         changeEditedMouseField('sex', event.target.value)
                     }
                 >
-                    <option value="M">M</option>
-                    <option value="F">F</option>
+                    <option value="M">♂ M</option>
+                    <option value="F">♀ F</option>
                 </select>
             );
         }
