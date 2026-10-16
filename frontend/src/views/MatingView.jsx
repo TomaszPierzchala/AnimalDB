@@ -1,14 +1,13 @@
 import {useEffect, useState} from 'react';
 
 import AddNewRecordRow from './AddNewRecordRow';
-import EditRecordActionsRow from './EditRecordActionsRow.jsx';
+import EditRecordActionsRow from './EditRecordActionsRow';
 import WorkInProgressBar from "./WorkInProgress";
 import ErrorBanner from '../components/ErrorBanner';
-import MouseAnimalNumberInput from "../components/MouseAnimalNumberInput.jsx";
-import useFadingError from "../hooks/fadingError.js";
+import MouseAnimalNumberInput from "../components/MouseAnimalNumberInput";
+import useFadingError from "../hooks/fadingError";
 
-import {createMouse, deleteMouse, getMice, getNextAnimalNumber, updateMouse} from '../api/miceApi';
-import {getStrains} from "../api/strainApi.js";
+// import {createMating, deleteMating, getMatings, updateMating} from '../api/matingApi';
 
 import './View.css';
 
@@ -46,42 +45,40 @@ const EDITABLE_MOUSE_FIELDS = [
 ];
 const PAGE_SIZE = 20;
 
-function createEmptyMouse(animalNumber) {
+function createEmptyMating() {
     return {
         id: null,
-        animalNumber,
-        sex: 'M',
-        strainId: '',
-        transgenicLineId: null,
-        labProcedureId: null,
-        motherAnimalNumber: null,
-        fatherAnimalNumber: null,
+        femaleAnimalNumber: null,
+        maleAnimalNumber: null,
+        matingDate: '',
+        plugDate: '',
+        pregnancyDate: '',
         birthDate: '',
-        deathDate: '',
-        room: '',
-        rack: '',
-        cage: '',
-        origin: '',
+        weaningDate: '',
+
+        bornCount: null,
+        aliveCount: null,
+        femaleCount: null,
+        maleCount: null,
+
         note: ''
     };
 }
 
-function toMouseRequest(mouse) {
+function toMatingRequest(mating) {
     return {
-        animalNumber: mouse.animalNumber,
-        sex: mouse.sex,
-        strainId: mouse.strainId,
-        transgenicLineId: mouse.transgenicLineId,
-        labProcedureId: mouse.labProcedureId,
-        motherAnimalNumber: mouse.motherAnimalNumber,
-        fatherAnimalNumber: mouse.fatherAnimalNumber,
-        birthDate: mouse.birthDate,
-        deathDate: mouse.deathDate,
-        room: mouse.room,
-        rack: mouse.rack,
-        cage: mouse.cage,
-        origin: mouse.origin,
-        note: mouse.note
+        motherAnimalNumber: mating.motherAnimalNumber,
+        fatherAnimalNumber: mating.fatherAnimalNumber,
+        matingDate: mating.matingDate,
+        plugDate: mating.plugDate,
+        pregnancyDate: mating.pregnancyDate,
+        birthDate: mating.birthDate,
+        weaningDate: mating.weaningDate,
+        bornCount: mating.bornCount,
+        aliveCount: mating.aliveCount,
+        femaleCount: mating.femaleCount,
+        maleCount: mating.maleCount,
+        note: mating.note
     };
 }
 
@@ -91,14 +88,13 @@ function MatingView() {
     // STATE
     // =========================
 
-    const [mice, setMice] = useState([]);
-    const [editedMouse, setEditedMouse] = useState(null);
-    const [strainOptions, setStrainOptions] = useState([]);
+    const [matings, setMatings] = useState([]);
+    const [editedMating, setEditedMating] = useState(null);
 
     const [selectedColumns, setSelectedColumns] =
         useState(() => {
             const savedColumns =
-                localStorage.getItem('miceSelectedColumns');
+                localStorage.getItem('matingSelectedColumns');
 
             if (!savedColumns) {
                 return REQUIRED_COLUMNS;
@@ -123,7 +119,7 @@ function MatingView() {
 
             } catch(err) {
                 console.error(
-                    `Could not read saved 'miceSelectedColumns':`,
+                    `Could not read saved 'matingSelectedColumns':`,
                     err.message
                 );
                 return REQUIRED_COLUMNS;
@@ -135,7 +131,7 @@ function MatingView() {
     const [totalElements, setTotalElements] = useState(0);
 
     const [sortBy, setSortBy] =
-        useState('animalNumber');
+        useState('motherAnimalNumber');
 
     const [direction, setDirection] =
         useState('asc');
@@ -151,23 +147,23 @@ function MatingView() {
     // DERIVED VALUES
     // =========================
 
-    const isAddingMouse = editedMouse?.id === null;
-    const isEditingMouse = editedMouse?.id != null;
+    const isAddingMating = editedMating?.id === null;
+    const isEditingMating = editedMating?.id != null;
 
     const visibleColumns =
         COLUMNS.filter(column =>
             selectedColumns.includes(column.name)
         );
 
-    const originalEditedMouse =
-        mice.find(mouse => mouse.id === editedMouse?.id);
+    const originalEditedMating =
+        matings.find(mating => mating.id === editedMating?.id);
 
-    const editedMouseChanged =
-        originalEditedMouse !== undefined &&
+    const editedMatingChanged =
+        originalEditedMating !== undefined &&
         EDITABLE_MOUSE_FIELDS.some(
             fieldName =>
-                editedMouse[fieldName] !==
-                originalEditedMouse[fieldName]
+                editedMating[fieldName] !==
+                originalEditedMating[fieldName]
         );
 
     // =========================
@@ -175,12 +171,12 @@ function MatingView() {
     // =========================
 
     useEffect(() => {
-        loadMice();
+        loadMatings();
     }, [page, sortBy, direction]);
 
     useEffect(() => {
         localStorage.setItem(
-            'miceSelectedColumns',
+            'matingSelectedColumns',
             JSON.stringify(selectedColumns)
         );
     }, [selectedColumns]);
@@ -189,28 +185,23 @@ function MatingView() {
     // =========================
     // DATA LOADING
     // =========================
-    async function loadStrainOptions() {
-        const strains = await getStrains();
-        setStrainOptions(strains);
-        return strains;
-    }
 
-    async function loadMice() {
+    async function loadMatings() {
         try {
-            const data = await getMice({
+            const data = await getMatings({
                 page,
                 size: PAGE_SIZE,
                 sortBy,
                 direction
             });
 
-            setMice(data.content ?? []);
+            setMatings(data.content ?? []);
             setTotalPages(data.page.totalPages ?? 0);
             setTotalElements(data.page.totalElements ?? 0);
 
         } catch (err) {
             showError(
-                `Could not load mice.\n${err.message}`
+                `Could not load matings.\n${err.message}`
             );
         }
     }
@@ -220,37 +211,29 @@ function MatingView() {
     // ADDING
     // =========================
 
-
-    async function startAddingMouse() {
+    async function startAddingMating() {
         try {
-            const nextAnimalNumber = await getNextAnimalNumber();
-            const strains = await loadStrainOptions();
+            const newMating = createEmptyMating();
 
-            const newMouse = createEmptyMouse(nextAnimalNumber);
-
-            if (strains.length > 0) {
-                newMouse.strainId = strains[0].id;
-            }
-
-            setEditedMouse(newMouse);
+            setEditedMating(newMating);
 
         } catch (err) {
             showError(
-                `Could not start adding mouse.\n${err.message}`
+                `Could not start adding mating.\n${err.message}`
             );
         }
     }
 
-    async function acceptNewMouse() {
+    async function acceptNewMating() {
         try {
-            await createMouse(editedMouse);
+            await createMating();
 
-            clearEditedMouse();
-            await loadMice();
+            clearEditedMating();
+            await loadMatings();
 
         } catch (err) {
             showError(
-                `Could not create mouse.\n${err.message}`
+                `Could not create mating.\n${err.message}`
             );
         }
     }
@@ -259,59 +242,57 @@ function MatingView() {
     // EDITING
     // =========================
 
-    async function startEditingMouse(mouse) {
+    async function startEditingMating(mating) {
         try {
-            await loadStrainOptions();
-            setEditedMouse({ ...mouse });
+            setEditedMating({ ...mating });
 
         } catch (err) {
             showError(
-                `Could not start editing mouse.\n${err.message}`
+                `Could not start editing mating.\n${err.message}`
             );
         }
     }
 
-    function changeEditedMouseField(fieldName, value) {
-        setEditedMouse(current => ({
+    function changeEditedMatingField(fieldName, value) {
+        setEditedMating(current => ({
             ...current,
             [fieldName]: value
         }));
     }
 
-    function clearEditedMouse() {
-        setEditedMouse(null);
-        setStrainOptions([]);
+    function clearEditedMating() {
+        setEditedMating(null);
     }
 
-    async function saveEditedMouse() {
+    async function saveEditedMating() {
         try {
-            await updateMouse(
-                editedMouse.id,
-                toMouseRequest(editedMouse)
+            await updateMating(
+                editedMating.id,
+                toMatingRequest(editedMating)
             );
 
-            clearEditedMouse();
+            clearEditedMating();
 
-            await loadMice();
+            await loadMatings();
 
         } catch (err) {
             showError(
-                `Could not update mouse.\n${err.message}`
+                `Could not update mating.\n${err.message}`
             );
         }
     }
 
-    async function deleteEditedMouse() {
+    async function deleteEditedMating() {
         try {
-            await deleteMouse(editedMouse.id);
+            await deleteMating(editedMating.id);
 
-            clearEditedMouse();
+            clearEditedMating();
 
-            await loadMice();
+            await loadMatings();
 
         } catch (err) {
             showError(
-                `Could not delete mouse.\n${err.message}`
+                `Could not delete mating.\n${err.message}`
             );
         }
     }
@@ -370,12 +351,8 @@ function MatingView() {
     // RENDER HELPERS
     // =========================
 
-    function displayValue(mouse, columnName) {
-        if (columnName === 'strainId') {
-            return `${mouse.strainCode} — ${mouse.strainName}`;
-        }
-
-        const value = mouse[columnName];
+    function displayValue(mating, columnName) {
+        const value = mating[columnName];
 
         return value ?? '—';
     }
@@ -384,10 +361,10 @@ function MatingView() {
         if (column.name === 'motherAnimalNumber') {
             return (
                 <MouseAnimalNumberInput
-                    value={editedMouse.motherAnimalNumber}
+                    value={editedMating.motherAnimalNumber}
                     sex="F"
                     onChange={value =>
-                        changeEditedMouseField(
+                        changeEditedMatingField(
                             'motherAnimalNumber',
                             value
                         )
@@ -399,10 +376,10 @@ function MatingView() {
         if (column.name === 'fatherAnimalNumber') {
             return (
                 <MouseAnimalNumberInput
-                    value={editedMouse.fatherAnimalNumber}
+                    value={editedMating.fatherAnimalNumber}
                     sex="M"
                     onChange={value =>
-                        changeEditedMouseField(
+                        changeEditedMatingField(
                             'fatherAnimalNumber',
                             value
                         )
@@ -410,56 +387,20 @@ function MatingView() {
                 />
             );
         }
-        if (column.name === 'strainId') {
-            return (
-                <select
-                    className="mice-select"
-                    value={editedMouse.strainId}
-                    onClick={event => event.stopPropagation()}
-                    onChange={event =>
-                        changeEditedMouseField(
-                            'strainId',
-                            Number(event.target.value)
-                        )
-                    }
-                >
-                    {strainOptions.map(strain => (
-                        <option
-                            key={strain.id}
-                            value={strain.id}
-                        >
-                            {strain.code} — {strain.name}
-                        </option>
-                    ))}
-                </select>
-            );
-        }
-        if (column.name === 'sex') {
-            return (
-                <select
-                    className="mice-select"
-                    value={editedMouse.sex}
-                    onClick={event => event.stopPropagation()}
-                    onChange={event =>
-                        changeEditedMouseField('sex', event.target.value)
-                    }
-                >
-                    <option value="M">M</option>
-                    <option value="F">F</option>
-                </select>
-            );
-        }
         if (
+            column.name === 'matingDate' ||
+            column.name === 'plugDate' ||
+            column.name === 'pregnancyDate' ||
             column.name === 'birthDate' ||
-            column.name === 'deathDate'
+            column.name === 'weaningDate'
         ) {
             return (
                 <input
                     type="date"
-                    value={editedMouse[column.name] ?? ''}
+                    value={editedMating[column.name] ?? ''}
                     onClick={event => event.stopPropagation()}
                     onChange={event =>
-                        changeEditedMouseField(
+                        changeEditedMatingField(
                             column.name,
                             event.target.value
                         )
@@ -467,16 +408,24 @@ function MatingView() {
                 />
             );
         }
-        if (column.name === 'animalNumber') {
+        if (
+            column.name === 'bornCount' ||
+            column.name === 'aliveCount' ||
+            column.name === 'femaleCount' ||
+            column.name === 'maleCount'
+        ) {
             return (
                 <input
                     type="number"
-                    value={editedMouse.animalNumber}
+                    min="0"
+                    value={editedMating[column.name] ?? ''}
                     onClick={event => event.stopPropagation()}
                     onChange={event =>
-                        changeEditedMouseField(
-                            'animalNumber',
-                            Number(event.target.value)
+                        changeEditedMatingField(
+                            column.name,
+                            event.target.value === ''
+                                ? null
+                                : Number(event.target.value)
                         )
                     }
                 />
@@ -485,10 +434,10 @@ function MatingView() {
 
         return (
             <input
-                value={editedMouse[column.name] ?? ''}
+                value={editedMating[column.name] ?? ''}
                 onClick={event => event.stopPropagation()}
                 onChange={event =>
-                    changeEditedMouseField(
+                    changeEditedMatingField(
                         column.name,
                         event.target.value
                     )
@@ -549,29 +498,29 @@ function MatingView() {
                     </thead>
 
                     <tbody>
-                    {mice.map(mouse => (
+                    {matings.map(mating => (
                         <tr
-                            key={mouse.id}
+                            key={mating.id}
                             className="clickable-row"
-                            onClick={() => startEditingMouse(mouse)}
+                            onClick={() => startEditingMating(mating)}
                         >
                             <td className="id-column">
-                                {mouse.id}
+                                {mating.id}
                             </td>
 
                             {visibleColumns.map(column => (
                                 <td key={column.name} className="mice-data-column">
 
-                                    {editedMouse?.id === mouse.id
+                                    {editedMating?.id === mating.id
                                         ? renderEditableCell(column)
-                                        : displayValue(mouse, column.name)
+                                        : displayValue(mating, column.name)
                                     }
 
                                 </td>
                             ))}
                         </tr>
                     ))}
-                    {isAddingMouse && (
+                    {isAddingMating && (
                         <tr className="new-mouse-row">
 
                             <td className="id-column">
@@ -593,37 +542,37 @@ function MatingView() {
             <table className="mice-add-table">
                 <tbody>
 
-                {isEditingMouse ? (
+                {isEditingMating ? (
                     <EditRecordActionsRow
-                        canSave={editedMouseChanged}
-                        onSave={saveEditedMouse}
-                        onDelete={deleteEditedMouse}
-                        onCancel={clearEditedMouse}
+                        canSave={editedMatingChanged}
+                        onSave={saveEditedMating}
+                        onDelete={deleteEditedMating}
+                        onCancel={clearEditedMating}
                     />
                 ) : (
                     <AddNewRecordRow
-                        entityName="mouse"
+                        entityName="mating"
                         onCreate={
-                            isAddingMouse
-                                ? acceptNewMouse
-                                : startAddingMouse
+                            isAddingMating
+                                ? acceptNewMating
+                                : startAddingMating
                         }
                         acceptText={
-                            isAddingMouse
+                            isAddingMating
                                 ? (
                                     <>
                                         Click here to{' '}
                                         <span className="accept-text">
                             accept
                         </span>
-                                        {' '}new mouse...
+                                        {' '}new mating...
                                     </>
                                 )
                                 : null
                         }
                         cancelAction={
-                            isAddingMouse
-                                ? clearEditedMouse
+                            isAddingMating
+                                ? clearEditedMating
                                 : null
                         }
                         colSpan={1}
@@ -649,7 +598,7 @@ function MatingView() {
                     {' '}of{' '}
                     {totalPages}
                     {' — '}
-                    {totalElements} mice
+                    {totalElements} matings
         </span>
 
 
