@@ -13,40 +13,35 @@ import {getStrains} from "../api/strainApi.js";
 import './View.css';
 
 const COLUMNS = [
-    { name: 'animalNumber', label: 'Animal number' },
-    { name: 'sex', label: 'Sex' },
-    { name: 'strainId', label: 'Strain' },
-    { name: 'transgenicLineId', label: 'Transgenic line' },
-    { name: 'labProcedureId', label: 'Lab procedure' },
-    { name: 'motherAnimalNumber', label: 'Mother Animal Number' },
-    { name: 'fatherAnimalNumber', label: 'Father Animal Number' },
-    { name: 'birthDate', label: 'Birth date' },
-    { name: 'deathDate', label: 'Death date' },
-    { name: 'room', label: 'Room' },
-    { name: 'rack', label: 'Rack' },
-    { name: 'cage', label: 'Cage' },
-    { name: 'origin', label: 'Origin' },
-    { name: 'note', label: 'Note' }
+    {name: 'femaleAnimalNumber', label: 'Female'},
+    {name: 'maleAnimalNumber', label: 'Male'},
+    {name: 'matingDate', label: 'Mating date'},
+    {name: 'plugDate', label: 'Plug date'},
+    {name: 'pregnancyDate', label: 'Pregnancy date'},
+    {name: 'birthDate', label: 'Birth date'},
+    {name: 'weaningDate', label: 'Weaning date'},
+    {name: 'bornCount', label: 'Born #'},
+    {name: 'aliveCount', label: 'Alive #'},
+    {name: 'femaleCount', label: 'Females #'},
+    {name: 'maleCount', label: 'Males #'},
+    {name: 'note', label: 'Note'}
 ];
 const REQUIRED_COLUMNS = [
-    'animalNumber',
-    'sex',
-    'strainId'
+    'femaleAnimalNumber',
+    'maleAnimalNumber'
 ];
 const EDITABLE_MOUSE_FIELDS = [
-    'animalNumber',
-    'sex',
-    'strainId',
-    'transgenicLineId',
-    'labProcedureId',
-    'motherAnimalNumber',
-    'fatherAnimalNumber',
+    'femaleAnimalNumber',
+    'maleAnimalNumber',
+    'matingDate',
+    'plugDate',
+    'pregnancyDate',
     'birthDate',
-    'deathDate',
-    'room',
-    'rack',
-    'cage',
-    'origin',
+    'weaningDate',
+    'bornCount',
+    'aliveCount',
+    'femaleCount',
+    'maleCount',
     'note'
 ];
 const PAGE_SIZE = 20;
