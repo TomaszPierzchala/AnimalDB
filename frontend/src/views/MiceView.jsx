@@ -5,7 +5,8 @@ import EditRecordActionsRow from './EditRecordActionsRow.jsx';
 // import WorkInProgressBar from "./WorkInProgress";
 import ErrorBanner from '../components/ErrorBanner';
 import MouseAnimalNumberInput from "../components/MouseAnimalNumberInput.jsx";
-import useFadingError from "../hooks/fadingError.js";
+import useFadingError from "../hooks/fadingError";
+import {useEditKeyDown} from '../hooks/useEditKeyDown'
 
 import {createMouse, deleteMouse, getMice, getNextAnimalNumber, updateMouse} from '../api/miceApi';
 import {getStrains} from "../api/strainApi.js";
@@ -176,6 +177,15 @@ function MiceView() {
                 editedMouse[fieldName] !==
                 originalEditedMouse[fieldName]
         );
+
+    useEditKeyDown({
+        isEditing: isEditingMouse,
+        hasChanges: editedMouseChanged,
+        isAdding: isAddingMouse,
+        onSave: saveEditedMouse,
+        onAccept: acceptNewMouse,
+        onCancel: clearEditedMouse
+    });
 
     // =========================
     // EFFECTS
