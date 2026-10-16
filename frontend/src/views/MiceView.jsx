@@ -9,18 +9,10 @@ import useFadingError from "../hooks/fadingError.js";
 
 import {createMouse, deleteMouse, getMice, getNextAnimalNumber, updateMouse} from '../api/miceApi';
 import {getStrains} from "../api/strainApi.js";
+import {todayAsInputDate} from '../utils/timeUtils'
 
 import './View.css';
 
-function todayAsInputDate() {
-    const today = new Date();
-
-    const year = today.getFullYear();
-    const month = String(today.getMonth() + 1).padStart(2, '0');
-    const day = String(today.getDate()).padStart(2, '0');
-
-    return `${year}-${month}-${day}`;
-}
 
 const COLUMNS = [
     { name: 'animalNumber', label: 'Animal number' },
