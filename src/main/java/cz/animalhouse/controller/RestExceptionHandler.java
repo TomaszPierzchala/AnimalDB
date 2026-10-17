@@ -1,9 +1,6 @@
 package cz.animalhouse.controller;
 
-import cz.animalhouse.exception.DuplicateGeneSymbolException;
-import cz.animalhouse.exception.DuplicateMouseAnimalNumberException;
-import cz.animalhouse.exception.DuplicateStrainCodeException;
-import cz.animalhouse.exception.TransgenicLineGeneNotFoundException;
+import cz.animalhouse.exception.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -14,6 +11,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.NoSuchElementException;
+import java.util.Objects;
 
 @RestControllerAdvice
 public class RestExceptionHandler {
@@ -81,5 +79,16 @@ public class RestExceptionHandler {
         return ResponseEntity
                 .status(HttpStatus.BAD_REQUEST)
                 .body(ex.getMessage());
+    }
+
+    @ExceptionHandler(MouseInUseException.class)
+    @ResponseStatus(HttpStatus.CONFLICT)
+    public Map<String, String> handleMouseInUse(
+            MouseInUseException ex
+    ) {
+        return Map.of(
+                "message",
+                Objects.requireNonNull(ex.getMessage())
+        );
     }
 }

@@ -5,10 +5,12 @@ import cz.animalhouse.dto.MouseResponse
 import cz.animalhouse.dto.ParentCandidateResponse
 import cz.animalhouse.entity.Mouse
 import cz.animalhouse.exception.DuplicateMouseAnimalNumberException
+import cz.animalhouse.exception.MouseDeleteInUseException
 // import cz.animalhouse.repository.LabProcedureRepository
 import cz.animalhouse.repository.MouseRepository
 import cz.animalhouse.repository.StrainRepository
 import cz.animalhouse.repository.TransgenicLineRepository
+import org.springframework.dao.DataIntegrityViolationException
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Service
@@ -201,7 +203,12 @@ class MouseService(
     @Transactional
     fun delete(id: Long) {
         val mouse = findEntityById(id)
-        mouseRepository.delete(mouse)
+        try {
+            mouseRepository.delete(mouse)
+            mouseRepository.flush()
+        } catch (ex: DataIntegrityViolationException) {
+            throw MouseDeleteInUseException(mouse.animalNumber)
+        }
     }
 
     private fun findEntityById(id: Long): Mouse =
