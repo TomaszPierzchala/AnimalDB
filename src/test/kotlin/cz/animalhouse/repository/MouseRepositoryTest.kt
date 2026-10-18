@@ -14,7 +14,7 @@ import org.springframework.boot.testcontainers.service.connection.ServiceConnect
 import org.testcontainers.postgresql.PostgreSQLContainer
 import java.time.LocalDate
 
-import jakarta.persistence.EntityManager;
+import jakarta.persistence.EntityManager
 import org.springframework.test.context.ActiveProfiles
 
 @DataJpaTest
@@ -144,6 +144,56 @@ class MouseRepositoryTest {
                 2001,
                 2002
             )
+    }
+
+    @Test
+    fun `existsByMotherId and existsByFatherId should detect parent references`() {
+        val someStrain = strainRepository.save(
+            Strain(
+                "C57",
+                "C57"
+            )
+        )
+
+        val father = Mouse(
+            31,
+            Sex.M,
+            someStrain,
+        )
+
+        val mother = Mouse(
+            37,
+            Sex.F,
+            someStrain,
+        )
+        mouseRepository.saveAll(
+            listOf(father, mother))
+        mouseRepository.flush()
+
+        val mouse1 = Mouse(
+            137,
+            Sex.F,
+            someStrain,
+            mother = mother
+        )
+        val mouse2 = Mouse(
+            437,
+            Sex.F,
+            someStrain,
+            father = father
+        )
+
+        mouseRepository.saveAll(
+            listOf(mouse1, mouse2))
+        mouseRepository.flush()
+
+        assertThat(mouseRepository.existsByMotherId(mother.id!!)).isTrue
+        assertThat(mouseRepository.existsByFatherId(father.id!!)).isTrue
+
+        assertThat(mouseRepository.existsByMotherId(father.id!!)).isFalse
+        assertThat(mouseRepository.existsByFatherId(mother.id!!)).isFalse
+        assertThat(mouseRepository.existsByMotherId(mouse1.id!!)).isFalse
+        assertThat(mouseRepository.existsByFatherId(mouse2.id!!)).isFalse
     }
 
     @Test

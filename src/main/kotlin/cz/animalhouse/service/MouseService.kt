@@ -6,6 +6,7 @@ import cz.animalhouse.dto.ParentCandidateResponse
 import cz.animalhouse.entity.Mouse
 import cz.animalhouse.exception.DuplicateMouseAnimalNumberException
 import cz.animalhouse.exception.MouseDeleteInUseException
+import cz.animalhouse.exception.MouseSexChangeInUseException
 // import cz.animalhouse.repository.LabProcedureRepository
 import cz.animalhouse.repository.MouseRepository
 import cz.animalhouse.repository.StrainRepository
@@ -117,6 +118,35 @@ class MouseService(
             .toResponse()
     }
 
+    private fun validateSexChange(
+        mouse: Mouse,
+        newSex: Mouse.Sex
+    ) {
+        val id = requireNotNull(mouse.id)
+
+        if (mouse.sex == newSex) {
+            return
+        }
+
+        if (
+            mouse.sex == Mouse.Sex.F &&
+            mouseRepository.existsByMotherId(id)
+        ) {
+            throw MouseSexChangeInUseException(
+                mouse.animalNumber
+            )
+        }
+
+        if (
+            mouse.sex == Mouse.Sex.M &&
+            mouseRepository.existsByFatherId(id)
+        ) {
+            throw MouseSexChangeInUseException(
+                mouse.animalNumber
+            )
+        }
+    }
+
     @Transactional
     fun update(
         id: Long,
@@ -144,6 +174,10 @@ class MouseService(
         validateDates(
             request.birthDate,
             request.deathDate
+        )
+        validateSexChange(
+            mouse,
+            request.sex
         )
 
         val strain = strainRepository.findById(request.strainId)

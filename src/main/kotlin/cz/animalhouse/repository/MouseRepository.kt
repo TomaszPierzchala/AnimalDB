@@ -45,4 +45,8 @@ interface MouseRepository : JpaRepository<Mouse, Long> {
         @Param("prefix") prefix: String,
         @Param("sex") sex: String
     ): List<Mouse>
+
+    fun existsByMotherId(id: Long): Boolean
+
+    fun existsByFatherId(id: Long): Boolean
 }

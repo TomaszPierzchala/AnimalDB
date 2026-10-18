@@ -7,6 +7,7 @@ import cz.animalhouse.entity.Mouse
 import cz.animalhouse.entity.Strain
 import cz.animalhouse.entity.TransgenicLine
 import cz.animalhouse.exception.DuplicateMouseAnimalNumberException
+import cz.animalhouse.exception.MouseSexChangeInUseException
 // import cz.animalhouse.repository.LabProcedureRepository
 import cz.animalhouse.repository.MouseRepository
 import cz.animalhouse.repository.StrainRepository
@@ -778,8 +779,8 @@ class MouseServiceTest {
     @Test
     fun `update should assign mother by animal number`() {
         val UPDATE_ID = 13L
-        val MOUSE_ANIMAL_NUMBER = 1017;
-        val MOTHER_ANIMAL_NUMBER = 137;
+        val MOUSE_ANIMAL_NUMBER = 1017
+        val MOTHER_ANIMAL_NUMBER = 137
 
         val mouse = createMouse(
             id = UPDATE_ID,
@@ -849,9 +850,9 @@ class MouseServiceTest {
 
     @Test
     fun `update should throw exception when mother animal number does not exist`() {
-        val MOTHER_ANIMAL_NUMBER = 137;
+        val MOTHER_ANIMAL_NUMBER = 137
         val UPDATE_ID = 13L
-        val MOUSE_ANIMAL_NUMBER = 1017;
+        val MOUSE_ANIMAL_NUMBER = 1017
 
         val mouse = createMouse(
             id = UPDATE_ID,
@@ -900,9 +901,9 @@ class MouseServiceTest {
 
     @Test
     fun `update should not search for father when its animal number is null`() {
-        val MOTHER_ANIMAL_NUMBER = 137;
+        val MOTHER_ANIMAL_NUMBER = 137
         val UPDATE_ID = 13L
-        val MOUSE_ANIMAL_NUMBER = 1017;
+        val MOUSE_ANIMAL_NUMBER = 1017
         val NULL: Int? = null
 
         val mother = createMouse(
@@ -941,7 +942,7 @@ class MouseServiceTest {
             fatherAnimalNumber = NULL
         )
 
-        val response = mouseService.update(
+        mouseService.update(
             UPDATE_ID,
             request
         )
@@ -959,8 +960,8 @@ class MouseServiceTest {
     @Test
     fun `update should assign father by animal number`() {
         val UPDATE_ID = 13L
-        val MOUSE_ANIMAL_NUMBER = 1017;
-        val FATHER_ANIMAL_NUMBER = 137;
+        val MOUSE_ANIMAL_NUMBER = 1017
+        val FATHER_ANIMAL_NUMBER = 137
 
         val mouse = createMouse(
             id = UPDATE_ID,
@@ -1030,7 +1031,7 @@ class MouseServiceTest {
     @Test
     fun `update should reject when mouse is its own mother`() {
         val UPDATE_ID = 13L
-        val MOUSE_ANIMAL_NUMBER = 1017;
+        val MOUSE_ANIMAL_NUMBER = 1017
 
         val mouse = createMouse(
             id = UPDATE_ID,
@@ -1062,7 +1063,7 @@ class MouseServiceTest {
     @Test
     fun `update should reject when mouse is its own father`() {
         val UPDATE_ID = 13L
-        val FATHER_ANIMAL_NUMBER = 1017;
+        val FATHER_ANIMAL_NUMBER = 1017
 
         val mouse = createMouse(
             id = UPDATE_ID,
@@ -1094,8 +1095,8 @@ class MouseServiceTest {
     @Test
     fun `update should reject same mouse as mother and father`() {
         val UPDATE_ID = 13L
-        val MOUSE_ANIMAL_NUMBER = 227;
-        val FATHER_ANIMAL_NUMBER = 1017;
+        val MOUSE_ANIMAL_NUMBER = 227
+        val FATHER_ANIMAL_NUMBER = 1017
 
         val mouse = createMouse(
             id = UPDATE_ID,
@@ -1172,6 +1173,7 @@ class MouseServiceTest {
                 "Mother must be female."
             )
     }
+
     @Test
     fun `update should reject female mouse as father`() {
         val UPDATE_ID = 13L
@@ -1280,6 +1282,97 @@ class MouseServiceTest {
             .hasMessage(
                 "Death date cannot be in the future."
             )
+    }
+
+    @Test
+    fun `update should reject change sex when mouse is a mother`() {
+        val UPDATE_ID = 13L
+        val MOTHER_ANIMAL_NUMBER = 1017
+
+
+        val mother = createMouse(
+            id = UPDATE_ID,
+            animalNumber = MOTHER_ANIMAL_NUMBER,
+            sex = Mouse.Sex.F
+        )
+
+        whenever(
+            mouseRepository.findById(UPDATE_ID)
+        ).thenReturn(Optional.of(mother))
+
+        whenever(
+            mouseRepository.existsByMotherId(UPDATE_ID)
+        ).thenReturn(true)
+
+
+        val request = createRequest(
+            animalNumber = MOTHER_ANIMAL_NUMBER,
+            sex = Mouse.Sex.M
+        )
+
+        assertThatThrownBy {
+            mouseService.update(
+                UPDATE_ID,
+                request
+            )
+        }
+            .isInstanceOf(
+                MouseSexChangeInUseException::class.java
+            )
+            .hasMessage(
+                "Sex of mouse $MOTHER_ANIMAL_NUMBER cannot be changed because the mouse is used as a parent."
+            )
+
+        verify(mouseRepository)
+            .existsByMotherId(UPDATE_ID)
+
+        verify(mouseRepository, never())
+            .existsByFatherId(any())
+    }
+
+    @Test
+    fun `update should reject change sex when mouse is a father`() {
+        val UPDATE_ID = 13L
+        val FATHER_ANIMAL_NUMBER = 1017
+
+        val father = createMouse(
+            id = UPDATE_ID,
+            animalNumber = FATHER_ANIMAL_NUMBER,
+            sex = Mouse.Sex.M
+        )
+
+        whenever(
+            mouseRepository.findById(UPDATE_ID)
+        ).thenReturn(Optional.of(father))
+
+        whenever(
+            mouseRepository.existsByFatherId(UPDATE_ID)
+        ).thenReturn(true)
+
+
+        val request = createRequest(
+            animalNumber = FATHER_ANIMAL_NUMBER,
+            sex = Mouse.Sex.F
+        )
+
+        assertThatThrownBy {
+            mouseService.update(
+                UPDATE_ID,
+                request
+            )
+        }
+            .isInstanceOf(
+                MouseSexChangeInUseException::class.java
+            )
+            .hasMessage(
+                "Sex of mouse $FATHER_ANIMAL_NUMBER cannot be changed because the mouse is used as a parent."
+            )
+
+        verify(mouseRepository)
+            .existsByFatherId(UPDATE_ID)
+
+        verify(mouseRepository, never())
+            .existsByMotherId(any())
     }
 
     @Test
@@ -1614,6 +1707,7 @@ class MouseServiceTest {
 
     private fun createRequest(
         animalNumber: Int,
+        sex: Mouse.Sex = Mouse.Sex.M,
         birthDate: LocalDate? = null,
         deathDate: LocalDate? = null,
         motherAnimalNumber: Int? = null,
@@ -1621,7 +1715,7 @@ class MouseServiceTest {
     ): MouseRequest =
         MouseRequest(
             animalNumber = animalNumber,
-            sex = Mouse.Sex.M,
+            sex = sex,
             strainId = 10L,
             transgenicLineId = null,
             labProcedureId = null,
