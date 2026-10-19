@@ -47,17 +47,11 @@ class MouseRepositoryTest {
             )
         )
 
-        val mouse = Mouse(
+        val mouse = createMouse(
             1001,
             Sex.M,
             strain,
-            birthDate = LocalDate.of(2026, 8, 1),
-            room = "Room 1",
-            rack = "Rack A",
-            cage = "Cage 12",
-            origin = "Prague",
-            note = "Test mouse"
-        )
+            birthDate = LocalDate.of(2026, 8, 1))
 
         val saved = mouseRepository.save(mouse)
 
@@ -115,7 +109,7 @@ class MouseRepositoryTest {
         )
 
         mouseRepository.save(
-            Mouse(
+            createMouse(
                 2001,
                 Sex.F,
                 strain,
@@ -123,7 +117,7 @@ class MouseRepositoryTest {
         )
 
         mouseRepository.save(
-            Mouse(
+            createMouse(
                 2002,
                 Sex.M,
                 strain,
@@ -155,13 +149,13 @@ class MouseRepositoryTest {
             )
         )
 
-        val father = Mouse(
+        val father = createMouse(
             31,
             Sex.M,
             someStrain,
         )
 
-        val mother = Mouse(
+        val mother = createMouse(
             37,
             Sex.F,
             someStrain,
@@ -170,13 +164,13 @@ class MouseRepositoryTest {
             listOf(father, mother))
         mouseRepository.flush()
 
-        val mouse1 = Mouse(
+        val mouse1 = createMouse(
             137,
             Sex.F,
             someStrain,
             mother = mother
         )
-        val mouse2 = Mouse(
+        val mouse2 = createMouse(
             437,
             Sex.F,
             someStrain,
@@ -205,13 +199,13 @@ class MouseRepositoryTest {
             )
         )
 
-        val first = Mouse(
+        val first = createMouse(
             3001,
             Sex.M,
             strain,
         )
 
-        val second = Mouse(
+        val second = createMouse(
             3001,
             Sex.F,
             strain,
@@ -246,17 +240,17 @@ class MouseRepositoryTest {
 
         mouseRepository.saveAll(
             listOf(
-                Mouse(
+                createMouse(
                     animalNumber = 5,
                     sex = Sex.M,
                     strain
                 ),
-                Mouse(
+                createMouse(
                     animalNumber = 12,
                     sex = Mouse.Sex.F,
                     strain
                 ),
-                Mouse(
+                createMouse(
                     animalNumber = 8,
                     sex =Mouse.Sex.M,
                     strain
@@ -279,7 +273,7 @@ class MouseRepositoryTest {
             )
         )
         val saved = mouseRepository.save(
-            Mouse(
+            createMouse(
                 animalNumber = 26010101,
                 sex = Mouse.Sex.F,
                 strain
@@ -313,7 +307,7 @@ class MouseRepositoryTest {
         )
 
         mouseRepository.saveAndFlush(
-            Mouse(
+            createMouse(
                 animalNumber = 26010101,
                 sex = Mouse.Sex.F,
                 strain = strain
@@ -322,7 +316,7 @@ class MouseRepositoryTest {
 
         assertThrows<DataIntegrityViolationException> {
             mouseRepository.saveAndFlush(
-                Mouse(
+                createMouse(
                     animalNumber = 26010101,
                     sex = Mouse.Sex.M,
                     strain = strain
@@ -415,12 +409,20 @@ class MouseRepositoryTest {
             )
     }
 
-    private fun createMouse(animalNumber: Int, sex: Mouse.Sex, strain: Strain) : Mouse {
+    private fun createMouse(
+        animalNumber: Int,
+        sex: Mouse.Sex,
+        strain: Strain,
+        father: Mouse? = null,
+        mother: Mouse? = null,
+        birthDate: LocalDate? = null) : Mouse {
         return Mouse(
             animalNumber,
             sex,
             strain,
-            birthDate = LocalDate.of(2026, 8, 1),
+            father = father,
+            mother = mother,
+            birthDate = birthDate,
             room = "Room 1",
             rack = "Rack A",
             cage = "Cage 12",
