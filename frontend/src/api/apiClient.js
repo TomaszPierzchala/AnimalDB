@@ -25,6 +25,10 @@ export async function apiJson(url, options = {}) {
         // empty or improper body
       }
 
+      if(response.status === 501){
+        errorMessage = "Server returned error 501 - Not Implemented yet"
+      }
+
       throw new Error(errorMessage);
     }
 

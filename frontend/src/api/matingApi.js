@@ -1,7 +1,7 @@
 import {apiJson} from './apiClient';
 
 const MATING_API_URL =
-    `${import.meta.env.VITE_API_URL}/api/mating`;
+    `${import.meta.env.VITE_API_URL}/api/matings`;
 
 
 export function getMatings({
