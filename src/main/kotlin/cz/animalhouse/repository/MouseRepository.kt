@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.EntityGraph
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.data.jpa.repository.Query
 import org.springframework.data.repository.query.Param
+import java.time.LocalDate
 
 interface MouseRepository : JpaRepository<Mouse, Long> {
 
@@ -34,16 +35,34 @@ interface MouseRepository : JpaRepository<Mouse, Long> {
         value = """
         SELECT *
         FROM mouse
-        WHERE CAST(animal_number AS TEXT) LIKE CONCAT(:prefix, '%')
+        WHERE CAST(animal_number AS TEXT) LIKE CONCAT('%', :infix, '%')
           AND sex = :sex
-        ORDER BY animal_number
+          AND death_date IS NULL
+          AND (
+                birth_date IS NULL
+                OR (
+                    sex = 'F'
+                    AND birth_date < CAST(:currentDate AS DATE)
+                        - (:femaleMinAgeWeeks * 7)
+                )
+                OR (
+                    sex = 'M'
+                    AND birth_date < CAST(:currentDate AS DATE)
+                        - (:maleMinAgeWeeks * 7)
+                )
+              )
+        ORDER BY
+            birth_date DESC NULLS FIRST
         LIMIT 10
     """,
         nativeQuery = true
     )
     fun findParentCandidates(
-        @Param("prefix") prefix: String,
-        @Param("sex") sex: String
+        @Param("infix") infix: String,
+        @Param("sex") sex: String,
+        @Param("currentDate") currentDate: LocalDate,
+        @Param("femaleMinAgeWeeks") femaleMinAgeWeeks: Int,
+        @Param("maleMinAgeWeeks") maleMinAgeWeeks: Int
     ): List<Mouse>
 
     fun existsByMotherId(id: Long): Boolean

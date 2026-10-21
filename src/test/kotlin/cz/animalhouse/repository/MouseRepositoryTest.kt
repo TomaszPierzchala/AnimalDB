@@ -22,6 +22,8 @@ import org.springframework.test.context.ActiveProfiles
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 class MouseRepositoryTest {
 
+    private val FIXED_TODAY = LocalDate.of(2026, 10, 19)
+
     companion object {
         @JvmField
         @ServiceConnection
@@ -326,7 +328,7 @@ class MouseRepositoryTest {
     }
 
     @Test
-    fun `findParentCandidates should find mice by animal number prefix and sex`() {
+    fun `findParentCandidates should find mice by animal number infix and sex`() {
         val strain = strainRepository.save(
             Strain(
                 "C57BL6",
@@ -344,8 +346,11 @@ class MouseRepositoryTest {
 
         val result =
             mouseRepository.findParentCandidates(
-                prefix = "2601",
-                sex = "F"
+                infix = "2601",
+                sex = "F",
+                currentDate = FIXED_TODAY,
+                femaleMinAgeWeeks = 4,
+                maleMinAgeWeeks = 5
             )
 
         assertThat(result)
@@ -360,8 +365,11 @@ class MouseRepositoryTest {
     fun `findParentCandidates should return empty list when nothing matches`() {
         val result =
             mouseRepository.findParentCandidates(
-                prefix = "999",
-                sex = "F"
+                infix = "999",
+                sex = "F",
+                currentDate = FIXED_TODAY,
+                femaleMinAgeWeeks = 4,
+                maleMinAgeWeeks = 5
             )
 
         assertThat(result).isEmpty()
@@ -397,8 +405,11 @@ class MouseRepositoryTest {
 
         val result =
             mouseRepository.findParentCandidates(
-                prefix = "723",
-                sex = "F"
+                infix = "723",
+                sex = "F",
+                currentDate = FIXED_TODAY,
+                femaleMinAgeWeeks = 4,
+                maleMinAgeWeeks = 5
             )
 
         assertThat(result).hasSize(10)
@@ -406,6 +417,171 @@ class MouseRepositoryTest {
             .extracting<Int> { it.animalNumber }
             .containsExactlyElementsOf(
                 (723001..723010).toList()
+            )
+    }
+
+    @Test
+    fun `findParentCandidates should filter females by age and death date`() {
+        val strain = strainRepository.save(
+            Strain(
+                "C57BL6",
+                "C57BL/6"
+            )
+        )
+        
+        val femaleTooYoung = Mouse(
+            animalNumber = 3723001,
+            sex = Mouse.Sex.F,
+            strain = strain,
+            birthDate = FIXED_TODAY.minusWeeks(3)
+        )
+
+        val femaleOldEnough = Mouse(
+            animalNumber = 1723002,
+            sex = Mouse.Sex.F,
+            strain = strain,
+            birthDate = FIXED_TODAY.minusWeeks(5)
+        )
+
+        val femaleOldEnoughButYounger = Mouse(
+            animalNumber = 67230021,
+            sex = Mouse.Sex.F,
+            strain = strain,
+            birthDate = FIXED_TODAY.minusWeeks(5).plusDays(4)
+        )
+        val femaleOldEnoughButOlder = Mouse(
+            animalNumber = 7230023,
+            sex = Mouse.Sex.F,
+            strain = strain,
+            birthDate = FIXED_TODAY.minusWeeks(5).minusDays(3)
+        )
+
+        val femaleNoBirthDate = Mouse(
+            animalNumber = 5723003,
+            sex = Mouse.Sex.F,
+            strain = strain,
+            birthDate = null
+        )
+
+        val deadFemale = Mouse(
+            animalNumber = 2723004,
+            sex = Mouse.Sex.F,
+            strain = strain,
+            birthDate = FIXED_TODAY.minusWeeks(10),
+            deathDate = FIXED_TODAY.minusDays(1)
+        )
+
+        mouseRepository.saveAll(
+            listOf(
+                femaleOldEnoughButOlder,
+                femaleTooYoung,
+                femaleOldEnough,
+                femaleOldEnoughButYounger,
+                femaleNoBirthDate,
+                deadFemale
+            )
+        )
+
+        mouseRepository.flush()
+
+        val result = mouseRepository.findParentCandidates(
+            infix = "723",
+            sex = "F",
+            currentDate = FIXED_TODAY,
+            femaleMinAgeWeeks = 4,
+            maleMinAgeWeeks = 5
+        )
+
+        assertThat(result)
+            .extracting<Int> { it.animalNumber }
+            .containsExactly(
+                5723003,
+                67230021,
+                1723002,
+                7230023
+            )
+        
+    }
+
+    @Test
+    fun `findParentCandidates should filter males by age and death date`() {
+        val strain = strainRepository.save(
+            Strain(
+                "C57BL6",
+                "C57BL/6"
+            )
+        )
+
+        val maleTooYoung = Mouse(
+            animalNumber = 913001,
+            sex = Mouse.Sex.M,
+            strain = strain,
+            birthDate = FIXED_TODAY.minusWeeks(5)
+        )
+
+        val maleOldEnough = Mouse(
+            animalNumber = 913002,
+            sex = Mouse.Sex.M,
+            strain = strain,
+            birthDate = FIXED_TODAY.minusWeeks(6)
+        )
+
+        val maleNoBirthDate = Mouse(
+            animalNumber = 913003,
+            sex = Mouse.Sex.M,
+            strain = strain,
+            birthDate = null
+        )
+
+        val deadMale = Mouse(
+            animalNumber = 913004,
+            sex = Mouse.Sex.M,
+            strain = strain,
+            birthDate = FIXED_TODAY.minusWeeks(10),
+            deathDate = FIXED_TODAY.minusDays(1)
+        )
+
+        val maleOldEnoughButYounger = Mouse(
+            animalNumber = 713007,
+            sex = Mouse.Sex.M,
+            strain = strain,
+            birthDate = FIXED_TODAY.minusWeeks(6).plusDays(3)
+        )
+        val maleOldEnoughButOlder = Mouse(
+            animalNumber = 713009,
+            sex = Mouse.Sex.M,
+            strain = strain,
+            birthDate = FIXED_TODAY.minusWeeks(6).minusDays(4)
+        )
+
+        mouseRepository.saveAll(
+            listOf(
+                maleTooYoung,
+                maleOldEnough,
+                maleNoBirthDate,
+                maleOldEnoughButOlder,
+                deadMale,
+                maleOldEnoughButYounger
+            )
+        )
+
+        mouseRepository.flush()
+
+        val result = mouseRepository.findParentCandidates(
+            infix = "130",
+            sex = "M",
+            currentDate = FIXED_TODAY,
+            femaleMinAgeWeeks = 4,
+            maleMinAgeWeeks = 5
+        )
+
+        assertThat(result)
+            .extracting<Int> { it.animalNumber }
+            .containsExactly(
+                913003,
+                713007,
+                913002,
+                713009
             )
     }
 

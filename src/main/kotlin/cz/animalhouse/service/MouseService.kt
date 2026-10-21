@@ -27,6 +27,10 @@ class MouseService(
     // private val labProcedureRepository: LabProcedureRepository
     private val clock: Clock
 ) {
+    private companion object {
+        const val FEMALE_MIN_BREEDING_AGE_WEEKS = 4
+        const val MALE_MIN_BREEDING_AGE_WEEKS = 5
+    }
 
     @Transactional(readOnly = true)
     fun findAll(pageable: Pageable): Page<MouseResponse> =
@@ -270,16 +274,24 @@ class MouseService(
 
     @Transactional(readOnly = true)
     fun findParentCandidates(
-        prefix: String,
+        infix: String,
         sex: String
-    ): List<ParentCandidateResponse> =
-        mouseRepository
-            .findParentCandidates(prefix, sex)
-            .map { mouse ->
-                ParentCandidateResponse(
-                    animalNumber = mouse.animalNumber
-                )
-            }
+    ): List<ParentCandidateResponse> {
+
+        val currentDate = LocalDate.now(clock)
+
+        return mouseRepository.findParentCandidates(
+        infix = infix,
+        sex = sex,
+        currentDate = currentDate,
+        femaleMinAgeWeeks = FEMALE_MIN_BREEDING_AGE_WEEKS,
+        maleMinAgeWeeks = MALE_MIN_BREEDING_AGE_WEEKS
+        ).map {
+            ParentCandidateResponse(
+                animalNumber = it.animalNumber
+            )
+        }
+    }
             
     private fun validateDates(
         birthDate: LocalDate?,

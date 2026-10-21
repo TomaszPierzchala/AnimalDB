@@ -1627,8 +1627,11 @@ class MouseServiceTest {
 
         whenever(
             mouseRepository.findParentCandidates(
-                prefix = "723",
-                sex = "F"
+                infix = eq("723"),
+                sex = eq("F"),
+                currentDate = any<LocalDate>(),
+                femaleMinAgeWeeks = any<Int>(),
+                maleMinAgeWeeks = any<Int>()
             )
         ).thenReturn(
             listOf(mouse1, mouse2)
@@ -1636,7 +1639,7 @@ class MouseServiceTest {
 
         val result =
             mouseService.findParentCandidates(
-                prefix = "723",
+                infix = "723",
                 sex = "F"
             )
 
@@ -1651,8 +1654,11 @@ class MouseServiceTest {
 
         verify(mouseRepository)
             .findParentCandidates(
-                prefix = "723",
-                sex = "F"
+                infix = eq("723"),
+                sex = eq("F"),
+                currentDate = any<LocalDate>(),
+                femaleMinAgeWeeks = any<Int>(),
+                maleMinAgeWeeks = any<Int>()
             )
     }
 
@@ -1660,18 +1666,30 @@ class MouseServiceTest {
     fun `findParentCandidates should return empty list when repository returns no mice`() {
         whenever(
             mouseRepository.findParentCandidates(
-                prefix = "999",
-                sex = "F"
+                infix = eq("999"),
+                sex = eq("F"),
+                currentDate = any<LocalDate>(),
+                femaleMinAgeWeeks = any<Int>(),
+                maleMinAgeWeeks = any<Int>()
             )
         ).thenReturn(emptyList())
 
         val result =
             mouseService.findParentCandidates(
-                prefix = "999",
+                infix = "999",
                 sex = "F"
             )
 
         assertThat(result).isEmpty()
+
+        verify(mouseRepository)
+            .findParentCandidates(
+                infix = eq("999"),
+                sex = eq("F"),
+                currentDate = any<LocalDate>(),
+                femaleMinAgeWeeks = any<Int>(),
+                maleMinAgeWeeks = any<Int>()
+            )
     }
 
     private fun createMouse(
