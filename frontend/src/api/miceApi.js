@@ -24,9 +24,9 @@ export function getNextAnimalNumber() {
     );
 }
 
-export async function getParentCandidates(prefix, sex) {
+export async function getParentCandidates(infix, sex) {
     const params = new URLSearchParams({
-        prefix,
+        infix,
         sex
     });
 

@@ -36,10 +36,10 @@ class MouseController(
 
     @GetMapping("/parent-candidates")
     fun getParentCandidates(
-        @RequestParam prefix: String,
+        @RequestParam infix: String,
         @RequestParam sex: String
     ): List<ParentCandidateResponse> =
-        mouseService.findParentCandidates(prefix, sex)
+        mouseService.findParentCandidates(infix, sex)
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)

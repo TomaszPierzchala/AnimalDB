@@ -532,7 +532,7 @@ class MouseControllerTest {
 
         mockMvc.perform(
             get("/api/mice/parent-candidates")
-                .param("prefix", "431")
+                .param("infix", "431")
                 .param("sex", "F")
         )
             .andExpect(status().isOk)
