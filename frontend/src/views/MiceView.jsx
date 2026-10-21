@@ -537,7 +537,14 @@ function MiceView() {
 
             <div><h1 className="mice-title">Mice</h1>
 
-                <details className="column-selector">
+                <details
+                    className="column-selector"
+                    onKeyDown={event => {
+                        if (event.key === 'Escape') {
+                            event.currentTarget.open = false;
+                        }
+                    }}
+                >
                     <summary>Displayed columns</summary>
 
                     <div className="column-selector-menu">
