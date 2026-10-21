@@ -6,7 +6,7 @@ import WorkInProgressBar from "./WorkInProgress";
 import ErrorBanner from '../components/ErrorBanner';
 import MouseAnimalNumberInput from "../components/MouseAnimalNumberInput";
 import useFadingError from "../hooks/fadingError";
-// import {createMating, deleteMating, getMatings, updateMating} from '../api/matingApi';
+import {createMating, deleteMating, getMatings, updateMating} from '../api/matingApi';
 import {todayAsInputDate} from '../utils/timeUtils'
 
 import './View.css';

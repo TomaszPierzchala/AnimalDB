@@ -36,8 +36,9 @@ export async function apiJson(url, options = {}) {
   } catch (err) {
     if (err instanceof TypeError) {
       throw new Error(
-		'Cannot connect to backend server. Please start the Spring Boot application.',
-			{ cause: err }
+          'Cannot fetch data from backend.\n' +
+          'The server may be unavailable, or the request may be blocked by CORS.',
+          { cause: err }
 	);
     }
 
