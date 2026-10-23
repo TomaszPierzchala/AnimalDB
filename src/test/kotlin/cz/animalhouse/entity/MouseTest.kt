@@ -3,23 +3,26 @@ package cz.animalhouse.entity
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.Test
+import org.postgresql.util.PSQLException
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.data.jpa.test.autoconfigure.DataJpaTest
 import org.springframework.boot.jdbc.test.autoconfigure.AutoConfigureTestDatabase
 import org.springframework.boot.jpa.test.autoconfigure.TestEntityManager
 import org.springframework.boot.testcontainers.service.connection.ServiceConnection
+import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.util.ReflectionTestUtils
 import org.testcontainers.postgresql.PostgreSQLContainer
 import java.time.LocalDate
+import javax.sql.DataSource
 
 @DataJpaTest
+@ActiveProfiles("test")
 @AutoConfigureTestDatabase(
     replace = AutoConfigureTestDatabase.Replace.NONE
 )
 class MouseTest {
 
     companion object {
-
         @ServiceConnection
         @JvmField
         val postgres =
@@ -28,6 +31,26 @@ class MouseTest {
 
     @Autowired
     lateinit var entityManager: TestEntityManager
+
+    @Autowired
+    lateinit var dataSource: DataSource
+
+    @Test
+    fun `should use test PostgreSQL`() {
+        dataSource.connection.use { connection ->
+            println("JDBC URL: ${connection.metaData.url}")
+            println("Database: ${connection.metaData.databaseProductName}")
+            println("Container running: ${postgres.isRunning}")
+            println("Container ID: ${postgres.containerId}")
+            println("Container JDBC URL: ${postgres.jdbcUrl}")
+
+            assertThat(connection.metaData.databaseProductName)
+                .isEqualTo("PostgreSQL")
+
+            assertThat(connection.metaData.url)
+                .isEqualTo(postgres.jdbcUrl)
+        }
+    }
 
     @Test
     fun `should persist and load mouse`() {
@@ -250,6 +273,9 @@ class MouseTest {
         val strain = entityManager.persistFlushFind(
             Strain("DBA", "DBA/2")
         )
+        val newStrain = entityManager.persistFlushFind(
+            Strain("NEW", "New/13")
+        )
 
         val mouse = entityManager.persistFlushFind(
             Mouse(
@@ -269,6 +295,7 @@ class MouseTest {
         mouse.cage = "Cage 5"
         mouse.deathDate = LocalDate.of(2026, 5, 1)
         mouse.note = "Updated note"
+        mouse.strain = newStrain
 
         entityManager.persistAndFlush(mouse)
         entityManager.clear()
@@ -293,7 +320,13 @@ class MouseTest {
             .isEqualTo(LocalDate.of(2026, 5, 1))
 
         assertThat(saved.note)
-            .isEqualTo("Updated note")
+            .contains("column Cage value changed from Cage 1 to Cage 5")
+            .contains("column Death Date value changed from NULL to 2026-05-01")
+            .contains("column Rack value changed from Rack 1 to Rack 2")
+            .contains("column Room value changed from Room A to Room B")
+            .contains("column Strain value changed from 'DBA — DBA/2' to 'NEW — New/13'")
+            .contains("Updated note")
+            .doesNotContain("Initial note")
     }
 
     @Test
@@ -323,7 +356,7 @@ class MouseTest {
             entityManager.persistAndFlush(duplicate)
         }
             .hasRootCauseInstanceOf(
-                org.postgresql.util.PSQLException::class.java
+                PSQLException::class.java
             )
             .hasMessageContaining(
                 "duplicate key value violates unique constraint"
@@ -352,7 +385,7 @@ class MouseTest {
             entityManager.persistAndFlush(mouse)
         }
             .hasRootCauseInstanceOf(
-                org.postgresql.util.PSQLException::class.java
+                PSQLException::class.java
             )
             .hasMessageContaining(
                 "null value in column \"sex\""
@@ -402,7 +435,7 @@ class MouseTest {
             entityManager.persistAndFlush(mouse)
         }
             .hasRootCauseInstanceOf(
-                org.postgresql.util.PSQLException::class.java
+                PSQLException::class.java
             )
             .hasMessageContaining(
                 "violates check constraint"
