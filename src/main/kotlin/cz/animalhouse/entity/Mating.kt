@@ -30,6 +30,9 @@ class Mating(
     @Column(name = "weaning_date")
     var weaningDate: LocalDate? = null,
 
+    @Column(name = "end_mating_date")
+    var endMatingDate: LocalDate? = null,
+
     @Column(name = "born_count")
     var bornCount: Int? = null,
 

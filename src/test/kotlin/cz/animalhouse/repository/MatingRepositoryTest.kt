@@ -102,6 +102,7 @@ class MatingRepositoryTest {
         assertThat(loaded.pregnancyDate).isNull()
         assertThat(loaded.birthDate).isNull()
         assertThat(loaded.weaningDate).isNull()
+        assertThat(loaded.endMatingDate).isNull()
 
         assertThat(loaded.bornCount).isNull()
         assertThat(loaded.aliveCount).isNull()
@@ -112,4 +113,89 @@ class MatingRepositoryTest {
             .isEqualTo("First, test mating")
     }
 
+    @Test
+    fun `should set endMatingDate on insert when weaningDate is not null`(){
+
+        val strain = strainRepository.save(
+            Strain("C57BL6", "C57BL-6")
+        )
+
+        val mother = Mouse(
+            1001,
+            Sex.F,
+            strain,
+            birthDate = LocalDate.of(2026, 8, 1)
+        )
+
+        val father = Mouse(
+            2001,
+            Sex.M,
+            strain,
+            birthDate = LocalDate.of(2026, 7, 21)
+        )
+
+        mouseRepository.saveAllAndFlush(listOf(mother, father))
+
+        val mating = Mating(
+            female = mother,
+            male = father,
+            weaningDate = FIXED_TODAY
+        )
+
+        val saved = matingRepository.saveAndFlush(mating)
+        val savedId = requireNotNull(saved.id)
+
+        entityManager.clear()
+
+        val loaded = matingRepository.findById(savedId)
+            .orElseThrow()
+
+        assertThat(loaded.weaningDate)
+            .isEqualTo(FIXED_TODAY)
+
+        assertThat(loaded.endMatingDate)
+            .isEqualTo(FIXED_TODAY)
+
+    }
+
+    @Test
+    fun `should set endMatingDate when updated with not NULL weaningDate`(){
+
+        val strain = strainRepository.save(
+            Strain("C57BL6", "C57BL-6")
+        )
+
+        val mother = Mouse(
+            1001,
+            Sex.F,
+            strain,
+            birthDate = LocalDate.of(2026, 8, 1)
+        )
+
+        val father = Mouse(
+            2001,
+            Sex.M,
+            strain,
+            birthDate = LocalDate.of(2026, 7, 21)
+        )
+
+        mouseRepository.saveAllAndFlush(listOf(mother, father))
+
+        val mating = Mating(
+            female = mother,
+            male = father,
+            weaningDate = null
+        )
+
+        val saved = matingRepository.saveAndFlush(mating)
+        entityManager.refresh(saved)
+
+        saved.weaningDate = FIXED_TODAY
+
+        entityManager.flush()   // UPDATE
+        entityManager.refresh(saved) // READ
+
+        assertThat(saved.endMatingDate)
+            .isEqualTo(FIXED_TODAY)
+    }
 }
