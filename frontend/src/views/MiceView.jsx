@@ -512,6 +512,22 @@ function MiceView() {
                 />
             );
         }
+        if (column.name === 'note') {
+            return (
+                <textarea
+                    className="mice-note-editor"
+                    value={editedMouse.note ?? ''}
+                    rows={3}
+                    onClick={event => event.stopPropagation()}
+                    onChange={event =>
+                        changeEditedMouseField(
+                            'note',
+                            event.target.value
+                        )
+                    }
+                />
+            );
+        }
 
         return (
             <input
@@ -601,7 +617,13 @@ function MiceView() {
 
                                     {editedMouse?.id === mouse.id
                                         ? renderEditableCell(column)
-                                        : displayValue(mouse, column.name)
+                                        : column.name === 'note'
+                                            ? (
+                                                <div className="mice-note-scroll">
+                                                    {displayValue(mouse, column.name)}
+                                                </div>
+                                            )
+                                            : displayValue(mouse, column.name)
                                     }
 
                                 </td>
@@ -616,7 +638,13 @@ function MiceView() {
                             </td>
 
                             {visibleColumns.map(column => (
-                                <td key={column.name} className="mice-data-column">
+                                <td key={column.name}
+                                    className={
+                                        column.name === 'note'
+                                            ? 'mice-data-column mice-note-cell'
+                                            : 'mice-data-column'
+                                    }
+                                >
                                     {renderEditableCell(column)}
                                 </td>
                             ))}

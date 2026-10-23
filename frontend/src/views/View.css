@@ -401,6 +401,25 @@ button[type="submit"] {
 .mice-data-column {
   min-width: 180px;
 }
+.mice-note-cell {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+.mice-note-scroll {
+  line-height: 1.4em;
+  max-height: 4.2em;  /* 3 × 1.4em */
+  overflow-y: auto;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+.mice-note-editor {
+  display: block;
+  width: 100%;
+  box-sizing: border-box;
+  min-height: 4.2em;
+  resize: vertical;
+  overflow-y: auto;
+}
 
 .mice-add-table {
   width: 100%;
