@@ -161,6 +161,9 @@ function MiceView() {
 
     const isAddingMouse = editedMouse?.id === null;
     const isEditingMouse = editedMouse?.id != null;
+    const isAnimalNumberValid =
+        Number.isSafeInteger(editedMouse?.animalNumber) &&
+        editedMouse.animalNumber > 0;
 
     const visibleColumns =
         COLUMNS.filter(column =>
@@ -259,6 +262,8 @@ function MiceView() {
     }
 
     async function acceptNewMouse() {
+        if(notValidAnimalNumberError()) return
+
         try {
             await createMouse(editedMouse);
 
@@ -301,6 +306,8 @@ function MiceView() {
     }
 
     async function saveEditedMouse() {
+        if(notValidAnimalNumberError()) return
+
         try {
             await updateMouse(
                 editedMouse.id,
@@ -332,7 +339,16 @@ function MiceView() {
             );
         }
     }
-
+    // =========================
+    // ERROR HELPER
+    // =========================
+    function notValidAnimalNumberError(){
+        if (!isAnimalNumberValid) {
+            showError('Animal number must be a positive integer.');
+            return true
+        }
+        return false
+    }
 
     // =========================
     // COLUMNS / SORTING
@@ -506,7 +522,9 @@ function MiceView() {
                     onChange={event =>
                         changeEditedMouseField(
                             'animalNumber',
-                            Number(event.target.value)
+                            event.target.value === ''
+                                ? ''
+                                : Number(event.target.value)
                         )
                     }
                 />
@@ -660,7 +678,7 @@ function MiceView() {
 
                 {isEditingMouse ? (
                     <EditRecordActionsRow
-                        canSave={editedMouseChanged}
+                        canSave={editedMouseChanged && isAnimalNumberValid}
                         onSave={saveEditedMouse}
                         onDelete={deleteEditedMouse}
                         onCancel={clearEditedMouse}
