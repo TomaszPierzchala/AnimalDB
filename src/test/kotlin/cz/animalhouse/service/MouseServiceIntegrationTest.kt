@@ -6,6 +6,7 @@ import cz.animalhouse.entity.Strain
 import cz.animalhouse.exception.MouseDeleteInUseException
 import cz.animalhouse.repository.MouseRepository
 import cz.animalhouse.repository.StrainRepository
+import cz.animalhouse.testutil.TestClock
 import jakarta.persistence.EntityManager
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
@@ -13,13 +14,41 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.boot.test.context.TestConfiguration
+import org.springframework.boot.testcontainers.service.connection.ServiceConnection
+import org.springframework.context.annotation.Bean
+import org.springframework.context.annotation.Import
+import org.springframework.context.annotation.Primary
+import org.springframework.test.context.ActiveProfiles
 import org.springframework.transaction.annotation.Transactional
-import java.time.LocalDate
+import org.testcontainers.junit.jupiter.Container
+import org.testcontainers.junit.jupiter.Testcontainers
+import org.testcontainers.postgresql.PostgreSQLContainer
+import java.time.Clock
 
 @SpringBootTest
+@ActiveProfiles("test")
 @Transactional
+@Testcontainers
+@Import(MouseServiceIntegrationTest.TestClockConfig::class)
 class MouseServiceIntegrationTest {
-    private val FIXED_TODAY = LocalDate.of(2026, 10, 19)
+
+    companion object {
+        val FIXED_TODAY = TestClock.FIXED_TODAY
+
+        @Container
+        @ServiceConnection
+        @JvmField
+        val postgres = PostgreSQLContainer("postgres:17")
+    }
+
+    @TestConfiguration
+    class TestClockConfig {
+
+        @Bean
+        @Primary
+        fun fixedTestClock(): Clock = TestClock.clock
+    }
 
     @Autowired
     lateinit var mouseService: MouseService
@@ -46,7 +75,7 @@ class MouseServiceIntegrationTest {
     }
 
     @Test
-    fun `delete should throw MouseDeleteInUseException when mouse is used as parent`() {
+    fun `delete should reject deleting a mouse referenced as mother`() {
 
         val mother = mouseRepository.saveAndFlush(
             Mouse(
@@ -136,14 +165,14 @@ class MouseServiceIntegrationTest {
         )
 
         val deadFemale = Mouse(
-            animalNumber = 27230015,
+            animalNumber = 217130015,
             sex = Mouse.Sex.F,
             strain = strain,
             birthDate = FIXED_TODAY.minusWeeks(10),
             deathDate = FIXED_TODAY.minusDays(1)
         )
 
-        mouseRepository.saveAll(
+        mouseRepository.saveAllAndFlush(
             listOf(
                 maleTooYoung,
                 maleOldEnough,
