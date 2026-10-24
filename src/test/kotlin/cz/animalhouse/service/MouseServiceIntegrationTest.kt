@@ -198,4 +198,85 @@ class MouseServiceIntegrationTest {
                 91713004
             )
     }
+
+    @Test
+    fun `update should modify the note`() {
+
+        val savedMouse = mouseRepository.saveAndFlush(
+            Mouse(
+                animalNumber = 1002,
+                sex = Mouse.Sex.M,
+                strain = strain,
+                mother = null
+            )
+        )
+
+        val mother = mouseRepository.saveAndFlush(
+            Mouse(
+                animalNumber = 1001,
+                sex = Mouse.Sex.F,
+                strain = strain
+            )
+        )
+        savedMouse.mother = mother
+        entityManager.flush()
+        entityManager.refresh(savedMouse)
+
+        savedMouse.animalNumber = 1313
+        entityManager.flush()
+        entityManager.refresh(savedMouse)
+
+        savedMouse.sex = Mouse.Sex.F
+        entityManager.flush()
+        entityManager.refresh(savedMouse)
+
+        val newStrain = strainRepository.save(
+            Strain(
+                "NEW",
+                "New strain"
+            )
+        )
+        savedMouse.strain = newStrain
+        entityManager.flush()
+        entityManager.refresh(savedMouse)
+
+        val father = mouseRepository.saveAndFlush(
+            Mouse(
+                animalNumber = 8901,
+                sex = Mouse.Sex.M,
+                strain = newStrain
+            )
+        )
+        savedMouse.father = father
+        entityManager.flush()
+        entityManager.refresh(savedMouse)
+
+        savedMouse.cage = "New Cage"
+        entityManager.flush()
+        entityManager.refresh(savedMouse)
+
+        savedMouse.room = "Some room"
+        entityManager.flush()
+        entityManager.refresh(savedMouse)
+
+        savedMouse.birthDate = FIXED_TODAY.minusDays(6)
+        entityManager.flush()
+        entityManager.refresh(savedMouse)
+        entityManager.clear()
+
+        val loaded = mouseRepository.findByAnimalNumber(savedMouse.animalNumber)
+
+        assertThat(loaded!!.animalNumber).isEqualTo(1313)
+
+        assertThat(loaded.note)
+            .contains("column Mother Animal Number value changed from NULL to 1001")
+            .contains("column Animal Number value changed from 1002 to 1313")
+            .contains("column Sex value changed from M to F")
+            .contains("column Strain value changed from 'TEST — Test strain' to 'NEW — New strain'")
+            .contains("column Father Animal Number value changed from NULL to 8901")
+            .contains("column Cage value changed from NULL to New Cage")
+            .contains("column Room value changed from NULL to Some room")
+            .contains("column Birth Date value changed from NULL to 2026-10-13")
+
+    }
 }
