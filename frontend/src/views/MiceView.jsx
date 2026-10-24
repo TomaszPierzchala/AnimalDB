@@ -1,4 +1,4 @@
-import {useEffect, useState} from 'react';
+import {useEffect, useRef, useState} from 'react';
 
 import AddNewRecordRow from './AddNewRecordRow';
 import EditRecordActionsRow from './EditRecordActionsRow.jsx';
@@ -91,6 +91,28 @@ function toMouseRequest(mouse) {
         origin: mouse.origin,
         note: mouse.note
     };
+}
+
+function NoteCell({value}) {
+    const noteRef = useRef(null);
+
+    const displayedValue = value
+        .split('\n')
+        .filter(line => line.trim() !== '')
+        .join('\n');
+
+    useEffect(() => {
+        if (noteRef.current) {
+            noteRef.current.scrollTop =
+                noteRef.current.scrollHeight;
+        }
+    }, [displayedValue]);
+
+    return (
+        <div ref={noteRef} className="mice-note-scroll">
+            {displayedValue}
+        </div>
+    );
 }
 
 function MiceView() {
@@ -637,9 +659,7 @@ function MiceView() {
                                         ? renderEditableCell(column)
                                         : column.name === 'note'
                                             ? (
-                                                <div className="mice-note-scroll">
-                                                    {displayValue(mouse, column.name)}
-                                                </div>
+                                                <NoteCell value={displayValue(mouse, column.name)} />
                                             )
                                             : displayValue(mouse, column.name)
                                     }
