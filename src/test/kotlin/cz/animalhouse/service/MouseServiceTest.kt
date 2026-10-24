@@ -12,6 +12,7 @@ import cz.animalhouse.exception.MouseSexChangeInUseException
 import cz.animalhouse.repository.MouseRepository
 import cz.animalhouse.repository.StrainRepository
 import cz.animalhouse.repository.TransgenicLineRepository
+import cz.animalhouse.testutil.TestClock
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.BeforeEach
@@ -38,12 +39,8 @@ import java.util.Optional
 @ExtendWith(MockitoExtension::class)
 class MouseServiceTest {
 
-    private val FIXED_TODAY = LocalDate.of(2026, 10, 15)
-
-    private val clock = Clock.fixed(
-        FIXED_TODAY.atStartOfDay(ZoneOffset.UTC).toInstant(),
-        ZoneOffset.UTC
-    )
+    private val FIXED_TODAY = TestClock.FIXED_TODAY
+    private val clock = TestClock.clock
 
     @Mock
     private lateinit var mouseRepository: MouseRepository
