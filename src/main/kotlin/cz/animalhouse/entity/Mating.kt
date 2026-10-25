@@ -53,4 +53,23 @@ class Mating(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     var id: Long? = null
+        protected set
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) {
+            return true
+        }
+
+        if (other !is Mating) {
+            return false
+        }
+
+        return id != null && id == other.id
+    }
+
+    override fun hashCode(): Int =
+        javaClass.hashCode()
+
+    override fun toString(): String =
+        "Mating [(id=$id), (female=$female), (male=$male), note=$note)]"
 }
