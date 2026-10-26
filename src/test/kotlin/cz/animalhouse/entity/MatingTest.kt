@@ -906,4 +906,173 @@ class MatingTest {
             )
     }
 
+    @Test
+    fun `should reject nonexistent female_id`() {
+        val strain = entityManager.persistFlushFind(
+            Strain("NOD", "Non-obese diabetic")
+        )
+
+        val male = entityManager.persistFlushFind(
+            Mouse(
+                animalNumber = 301,
+                sex = Mouse.Sex.M,
+                strain = strain
+            )
+        )
+
+        val nonexistentFemale = entityManager.entityManager.getReference(
+            Mouse::class.java,
+            999999L
+        )
+
+        val mating = Mating(
+            female = nonexistentFemale,
+            male = male
+        )
+
+        assertThatThrownBy {
+            entityManager.persistAndFlush(mating)
+        }
+            .hasRootCauseInstanceOf(PSQLException::class.java)
+            .hasMessageContaining("violates foreign key constraint")
+    }
+
+    @Test
+    fun `should reject nonexistent male_id`() {
+        val strain = entityManager.persistFlushFind(
+            Strain("NOD", "Non-obese diabetic")
+        )
+
+        val female = entityManager.persistFlushFind(
+            Mouse(
+                animalNumber = 1301,
+                sex = Mouse.Sex.F,
+                strain = strain
+            )
+        )
+
+        val nonexistentMale = entityManager.entityManager.getReference(
+            Mouse::class.java,
+            999999L
+        )
+
+        val mating = Mating(
+            female = female,
+            male = nonexistentMale
+        )
+
+        assertThatThrownBy {
+            entityManager.persistAndFlush(mating)
+        }
+            .hasRootCauseInstanceOf(PSQLException::class.java)
+            .hasMessageContaining("violates foreign key constraint")
+    }
+
+    @Test
+    fun `should allow missing intermediate dates`() {
+        val strain = entityManager.persistFlushFind(
+            Strain("NOD", "Non-obese diabetic")
+        )
+
+        val female = entityManager.persistFlushFind(
+            Mouse(
+                animalNumber = 1301,
+                sex = Mouse.Sex.F,
+                strain = strain
+            )
+        )
+
+        val male = entityManager.persistFlushFind(
+            Mouse(
+                animalNumber = 301,
+                sex = Mouse.Sex.M,
+                strain = strain
+            )
+        )
+
+        val mating = Mating(
+            female = female,
+            male = male,
+            matingDate = LocalDate.of(2026, 5, 1),
+            plugDate = null,
+            pregnancyDate = null,
+            birthDate = LocalDate.of(2026, 6, 1),
+            weaningDate = LocalDate.of(2026, 6, 22)
+        )
+
+        entityManager.persistAndFlush(mating)
+        entityManager.clear()
+
+        val saved = requireNotNull(
+            entityManager.find(
+                Mating::class.java,
+                requireNotNull(mating.id)
+            )
+        )
+
+        assertThat(saved.matingDate)
+            .isEqualTo(LocalDate.of(2026, 5, 1))
+
+        assertThat(saved.plugDate).isNull()
+        assertThat(saved.pregnancyDate).isNull()
+
+        assertThat(saved.birthDate)
+            .isEqualTo(LocalDate.of(2026, 6, 1))
+
+        assertThat(saved.weaningDate)
+            .isEqualTo(LocalDate.of(2026, 6, 22))
+
+        assertThat(saved.endMatingDate)
+            .isEqualTo(LocalDate.of(2026, 6, 22))
+    }
+
+    @Test
+    fun `should delete mating without deleting mice`() {
+        val strain = entityManager.persistFlushFind(
+            Strain("NOD", "Non-obese diabetic")
+        )
+
+        val female = entityManager.persistFlushFind(
+            Mouse(
+                animalNumber = 1301,
+                sex = Mouse.Sex.F,
+                strain = strain
+            )
+        )
+
+        val male = entityManager.persistFlushFind(
+            Mouse(
+                animalNumber = 301,
+                sex = Mouse.Sex.M,
+                strain = strain
+            )
+        )
+
+        val mating = entityManager.persistFlushFind(
+            Mating(
+                female = female,
+                male = male
+            )
+        )
+
+        val matingId = requireNotNull(mating.id)
+        val femaleId = requireNotNull(female.id)
+        val maleId = requireNotNull(male.id)
+
+        entityManager.remove(mating)
+        entityManager.flush()
+        entityManager.clear()
+
+        assertThat(
+            entityManager.find(Mating::class.java, matingId)
+        ).isNull()
+
+        assertThat(
+            entityManager.find(Mouse::class.java, femaleId)
+        ).isNotNull()
+
+        assertThat(
+            entityManager.find(Mouse::class.java, maleId)
+        ).isNotNull()
+    }
  }
