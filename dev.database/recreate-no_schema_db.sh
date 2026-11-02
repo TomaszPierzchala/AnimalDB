@@ -1,4 +1,5 @@
 #!/bin/bash
+. ./.secret
 
 set -e
 
@@ -8,7 +9,7 @@ if [ -z "$ANIMALDB_PASSWORD" ]; then
 fi
 
 echo "Dropping database..."
-psql -d postgres -f cancel-connection-and-drop-db.sql
+psql -d postgres -f cancel-connection-and-drop-animaldb.sql
 
 echo "Creating database..."
 psql -d postgres \
