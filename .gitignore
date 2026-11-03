@@ -46,6 +46,10 @@ build/
 .local/
 *Test_Local.java
 OPIS.md
-animaldb_*.sql
+NEXT.md
+
 ### temporary sql files ####
+animaldb_*.sql
 *.sql_*
+*.dump
+*.old
