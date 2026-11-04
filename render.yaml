@@ -1,0 +1,50 @@
+# started with export from Render on 2026-10-26T12:34:48Z
+version: "1"
+projects:
+- name: AnimalDB
+  environments:
+  - name: Demo
+    databases:
+    - name: animaldb-postgres
+      databaseName: animaldbdev
+      user: dbadmin
+      plan: free
+      region: frankfurt
+      ipAllowList:
+      - source: 0.0.0.0/0
+        description: everywhere
+      postgresMajorVersion: "18"
+
+    services:
+      - type: web
+        name: animaldb-backend
+        runtime: docker
+        repo: https://github.com/TomaszPierzchala/AnimalDB
+        plan: free
+        envVars:
+          - key: DATABASE_URL
+            fromDatabase:
+              name: animaldb-postgres
+              property: connectionString
+
+          - key: DB_USERNAME
+            fromDatabase:
+              name: animaldb-postgres
+              property: user
+
+          - key: DB_PASSWORD
+            fromDatabase:
+              name: animaldb-postgres
+              property: password
+
+          - key: FRONTEND_URL
+            fromService:
+              name: animaldb-frontend
+              type: web
+              envVarKey: RENDER_EXTERNAL_URL
+
+        region: frankfurt
+        healthCheckPath: /actuator/health
+        dockerContext: .
+        dockerfilePath: ./Dockerfile
+        autoDeployTrigger: commit
