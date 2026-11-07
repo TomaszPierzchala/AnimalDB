@@ -314,15 +314,20 @@ COMMENT ON COLUMN mating.end_mating_date IS
 CREATE OR REPLACE FUNCTION set_end_mating_date_on_weaning()
 RETURNS TRIGGER AS $$
 BEGIN
-    IF NEW.weaning_date IS NOT NULL
-       AND (
-           TG_OP = 'INSERT'
-           OR NEW.weaning_date IS DISTINCT FROM OLD.weaning_date
-       ) THEN
+    IF TG_OP = 'INSERT' THEN
+        IF NEW.weaning_date IS NOT NULL
+           AND NEW.end_mating_date IS NULL THEN
+            NEW.end_mating_date := NEW.weaning_date;
+        END IF;
 
-        NEW.end_mating_date := NEW.weaning_date;
-
-END IF;
+    ELSIF TG_OP = 'UPDATE' THEN
+        IF NEW.weaning_date IS NOT NULL
+           AND OLD.end_mating_date IS NULL
+           AND NEW.end_mating_date IS NULL
+           AND NEW.weaning_date IS DISTINCT FROM OLD.weaning_date THEN
+            NEW.end_mating_date := NEW.weaning_date;
+        END IF;
+    END IF;
 
 RETURN NEW;
 END;
