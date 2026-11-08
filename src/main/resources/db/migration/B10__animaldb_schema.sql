@@ -102,11 +102,19 @@ CREATE TABLE mating (
                         pregnancy_date DATE,
                         birth_date DATE,
                         weaning_date DATE,
-                        CHECK (mating_date IS NULL OR plug_date IS NULL OR mating_date < plug_date),
-                        CHECK (plug_date IS NULL OR pregnancy_date IS NULL OR plug_date < pregnancy_date),
-                        CHECK (pregnancy_date IS NULL OR birth_date IS NULL OR pregnancy_date < birth_date),
-                        CHECK (birth_date IS NULL OR weaning_date IS NULL OR birth_date < weaning_date),
-
+                        CONSTRAINT chk_mating_dates_order
+                            CHECK (
+                                (mating_date IS NULL OR plug_date IS NULL OR mating_date < plug_date)
+                                    AND (mating_date IS NULL OR pregnancy_date IS NULL OR mating_date < pregnancy_date)
+                                    AND (mating_date IS NULL OR birth_date IS NULL OR mating_date < birth_date)
+                                    AND (mating_date IS NULL OR weaning_date IS NULL OR mating_date < weaning_date)
+                                    AND (plug_date IS NULL OR pregnancy_date IS NULL OR plug_date < pregnancy_date)
+                                    AND (plug_date IS NULL OR birth_date IS NULL OR plug_date < birth_date)
+                                    AND (plug_date IS NULL OR weaning_date IS NULL OR plug_date < weaning_date)
+                                    AND (pregnancy_date IS NULL OR birth_date IS NULL OR pregnancy_date < birth_date)
+                                    AND (pregnancy_date IS NULL OR weaning_date IS NULL OR pregnancy_date < weaning_date)
+                                    AND (birth_date IS NULL OR weaning_date IS NULL OR birth_date < weaning_date)
+                                ),
                         born_count INTEGER CHECK (born_count >= 0),
                         alive_count INTEGER CHECK (alive_count >= 0),
                         female_count INTEGER CHECK (female_count >= 0),
