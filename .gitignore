@@ -44,6 +44,7 @@ build/
 .secret
 .env.docker
 .local/
+migrations-without-baseline/
 *Test_Local.java
 OPIS.md
 NEXT.md

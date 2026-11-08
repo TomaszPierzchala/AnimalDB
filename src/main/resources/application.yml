@@ -10,7 +10,7 @@ spring:
   flyway:
     enabled: true
     locations:
-      - classpath:db/migration
+      - classpath:db/migrations
       - classpath:db/data
 
   jpa:
