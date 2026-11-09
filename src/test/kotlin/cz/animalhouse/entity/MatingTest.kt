@@ -3,6 +3,8 @@ package cz.animalhouse.entity
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.CsvSource
 import org.postgresql.util.PSQLException
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.data.jpa.test.autoconfigure.DataJpaTest
@@ -477,7 +479,7 @@ class MatingTest {
 
             plugDate = LocalDate.of(2026, 4, 30),
             pregnancyDate = LocalDate.of(2026, 4, 27)
-            )
+        )
 
         assertThatThrownBy {
             entityManager.persistAndFlush(mating)
@@ -517,7 +519,7 @@ class MatingTest {
 
             pregnancyDate = LocalDate.of(2026, 4, 27),
             birthDate = LocalDate.of(2026, 4, 23)
-            )
+        )
 
         assertThatThrownBy {
             entityManager.persistAndFlush(mating)
@@ -557,7 +559,7 @@ class MatingTest {
 
             birthDate = LocalDate.of(2026, 4, 23),
             weaningDate = LocalDate.of(2026, 4, 2)
-            )
+        )
 
         assertThatThrownBy {
             entityManager.persistAndFlush(mating)
@@ -608,7 +610,7 @@ class MatingTest {
                 PSQLException::class.java
             )
             .hasMessageContaining(
-                "ERROR: new row for relation \"mating\" violates check constraint \"mating_born_count_check\""
+                "ERROR: new row for relation \"mating\" violates check constraint \"chk_mating_counts\""
             )
     }
 
@@ -650,7 +652,7 @@ class MatingTest {
                 PSQLException::class.java
             )
             .hasMessageContaining(
-                "ERROR: new row for relation \"mating\" violates check constraint \"mating_alive_count_check\""
+                "ERROR: new row for relation \"mating\" violates check constraint \"chk_mating_counts\""
             )
     }
 
@@ -692,7 +694,7 @@ class MatingTest {
                 PSQLException::class.java
             )
             .hasMessageContaining(
-                "ERROR: new row for relation \"mating\" violates check constraint \"mating_female_count_check\""
+                "ERROR: new row for relation \"mating\" violates check constraint \"chk_mating_counts\""
             )
     }
 
@@ -734,7 +736,7 @@ class MatingTest {
                 PSQLException::class.java
             )
             .hasMessageContaining(
-                "ERROR: new row for relation \"mating\" violates check constraint \"mating_male_count_check\""
+                "ERROR: new row for relation \"mating\" violates check constraint \"chk_mating_counts\""
             )
     }
 
@@ -906,6 +908,94 @@ class MatingTest {
             )
     }
 
+    // Cases added for chk_mating_counts: constraints against born_count,
+    // including cases where alive_count is unknown (NULL).
+    @ParameterizedTest(name = "reject counts: born={0}, alive={1}, female={2}, male={3}")
+    @CsvSource(
+        value = [
+            "10, NULL, 11, NULL", // female_count > born_count
+            "10, NULL, NULL, 11", // male_count > born_count
+            "10, NULL, 6, 5"     // female_count + male_count > born_count
+        ],
+        nullValues = ["NULL"]
+    )
+    fun `should reject counts exceeding born_count`(
+        born: Int?, alive: Int?, femaleCount: Int?, maleCount: Int?
+    ) {
+        val strain = entityManager.persistFlushFind(
+            Strain("NOD", "Non-obese diabetic")
+        )
+        val female = entityManager.persistFlushFind(
+            Mouse(animalNumber = 1301, sex = Mouse.Sex.F, strain = strain)
+        )
+        val male = entityManager.persistFlushFind(
+            Mouse(animalNumber = 301, sex = Mouse.Sex.M, strain = strain)
+        )
+
+        val mating = Mating(
+            female = female,
+            male = male,
+            bornCount = born,
+            aliveCount = alive,
+            femaleCount = femaleCount,
+            maleCount = maleCount
+        )
+
+        assertThatThrownBy {
+            entityManager.persistAndFlush(mating)
+        }
+            .hasRootCauseInstanceOf(PSQLException::class.java)
+            .hasMessageContaining("violates check constraint \"chk_mating_counts\"")
+    }
+
+    // Boundary and nullable cases that must remain valid.
+    @ParameterizedTest(name = "accept counts: born={0}, alive={1}, female={2}, male={3}")
+    @CsvSource(
+        value = [
+            "10, NULL, 4, 5",    // missing alive_count, sum <= born_count
+            "10, NULL, 10, NULL", // female_count == born_count
+            "10, NULL, NULL, 10", // male_count == born_count
+            "10, NULL, 6, 4",    // female_count + male_count == born_count
+            "10, 8, 3, 5",       // female_count + male_count == alive_count
+            "0, 0, 0, 0",        // zeros are valid
+            "NULL, NULL, 4, 5"  // unknown totals are allowed
+        ],
+        nullValues = ["NULL"]
+    )
+    fun `should allow consistent counts at boundaries`(
+        born: Int?, alive: Int?, femaleCount: Int?, maleCount: Int?
+    ) {
+        val strain = entityManager.persistFlushFind(
+            Strain("NOD", "Non-obese diabetic")
+        )
+        val female = entityManager.persistFlushFind(
+            Mouse(animalNumber = 1301, sex = Mouse.Sex.F, strain = strain)
+        )
+        val male = entityManager.persistFlushFind(
+            Mouse(animalNumber = 301, sex = Mouse.Sex.M, strain = strain)
+        )
+
+        val mating = Mating(
+            female = female,
+            male = male,
+            bornCount = born,
+            aliveCount = alive,
+            femaleCount = femaleCount,
+            maleCount = maleCount
+        )
+
+        entityManager.persistAndFlush(mating)
+        entityManager.clear()
+
+        val saved = requireNotNull(
+            entityManager.find(Mating::class.java, requireNotNull(mating.id))
+        )
+        assertThat(saved.bornCount).isEqualTo(born)
+        assertThat(saved.aliveCount).isEqualTo(alive)
+        assertThat(saved.femaleCount).isEqualTo(femaleCount)
+        assertThat(saved.maleCount).isEqualTo(maleCount)
+    }
+
     @Test
     fun `should reject nonexistent female_id`() {
         val strain = entityManager.persistFlushFind(
@@ -1075,4 +1165,4 @@ class MatingTest {
             entityManager.find(Mouse::class.java, maleId)
         ).isNotNull()
     }
- }
+}

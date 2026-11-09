@@ -115,18 +115,38 @@ CREATE TABLE mating (
                                     AND (pregnancy_date IS NULL OR weaning_date IS NULL OR pregnancy_date < weaning_date)
                                     AND (birth_date IS NULL OR weaning_date IS NULL OR birth_date < weaning_date)
                                 ),
-                        born_count INTEGER CHECK (born_count >= 0),
-                        alive_count INTEGER CHECK (alive_count >= 0),
-                        female_count INTEGER CHECK (female_count >= 0),
-                        male_count INTEGER CHECK (male_count >= 0),
-                        CHECK (alive_count IS NULL OR born_count IS NULL OR alive_count <= born_count),
-                        CHECK (female_count IS NULL OR alive_count IS NULL OR female_count <= alive_count),
-                        CHECK (male_count IS NULL OR alive_count IS NULL OR male_count <= alive_count),
-                        CHECK (
-                            female_count IS NULL
-                                OR male_count IS NULL
+                        born_count INTEGER,
+                        alive_count INTEGER,
+                        female_count INTEGER,
+                        male_count INTEGER,
+                        CONSTRAINT chk_mating_counts CHECK (
+                            -- Non-negative counts
+                            (born_count IS NULL OR born_count >= 0)
+                                AND (alive_count IS NULL OR alive_count >= 0)
+                                AND (female_count IS NULL OR female_count >= 0)
+                                AND (male_count IS NULL OR male_count >= 0)
+
+                                -- Alive cannot exceed born
+                                AND (alive_count IS NULL OR born_count IS NULL
+                                OR alive_count <= born_count)
+
+                                -- Female and male counts cannot exceed alive
+                                AND (female_count IS NULL OR alive_count IS NULL
+                                OR female_count <= alive_count)
+                                AND (male_count IS NULL OR alive_count IS NULL
+                                OR male_count <= alive_count)
+                                AND (female_count IS NULL OR male_count IS NULL
                                 OR alive_count IS NULL
-                                OR female_count + male_count <= alive_count
+                                OR female_count + male_count <= alive_count)
+
+                                -- Female and male counts cannot exceed born
+                                AND (female_count IS NULL OR born_count IS NULL
+                                OR female_count <= born_count)
+                                AND (male_count IS NULL OR born_count IS NULL
+                                OR male_count <= born_count)
+                                AND (female_count IS NULL OR male_count IS NULL
+                                OR born_count IS NULL
+                                OR female_count + male_count <= born_count)
                             ),
 
                         note TEXT,

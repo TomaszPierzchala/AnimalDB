@@ -99,24 +99,10 @@ CREATE TABLE mating (
     pregnancy_date DATE,
     birth_date DATE,
     weaning_date DATE,
-    CHECK (mating_date IS NULL OR plug_date IS NULL OR mating_date < plug_date),
-    CHECK (plug_date IS NULL OR pregnancy_date IS NULL OR plug_date < pregnancy_date),
-    CHECK (pregnancy_date IS NULL OR birth_date IS NULL OR pregnancy_date < birth_date),
-    CHECK (birth_date IS NULL OR weaning_date IS NULL OR birth_date < weaning_date),
-
-    born_count INTEGER CHECK (born_count >= 0),
-    alive_count INTEGER CHECK (alive_count >= 0),
-    female_count INTEGER CHECK (female_count >= 0),
-    male_count INTEGER CHECK (male_count >= 0),
-    CHECK (alive_count IS NULL OR born_count IS NULL OR alive_count <= born_count),
-    CHECK (female_count IS NULL OR alive_count IS NULL OR female_count <= alive_count),
-    CHECK (male_count IS NULL OR alive_count IS NULL OR male_count <= alive_count),
-    CHECK (
-           female_count IS NULL
-           OR male_count IS NULL
-           OR alive_count IS NULL
-           OR female_count + male_count <= alive_count
-    ),
+    born_count INTEGER,
+    alive_count INTEGER,
+    female_count INTEGER,
+    male_count INTEGER,
 
     note TEXT
 );
