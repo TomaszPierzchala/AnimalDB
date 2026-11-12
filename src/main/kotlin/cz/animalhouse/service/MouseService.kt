@@ -91,10 +91,10 @@ class MouseService(
         // }
 
         val mother =
-            findParentByAnimalNumber(request.motherAnimalNumber)
+            findMouseByAnimalNumber(request.motherAnimalNumber)
 
         val father =
-            findParentByAnimalNumber(request.fatherAnimalNumber)
+            findMouseByAnimalNumber(request.fatherAnimalNumber)
 
         validateParentsSex(
             mother = mother,
@@ -210,10 +210,10 @@ class MouseService(
         // }
 
         val mother =
-            findParentByAnimalNumber(request.motherAnimalNumber)
+            findMouseByAnimalNumber(request.motherAnimalNumber)
 
         val father =
-            findParentByAnimalNumber(request.fatherAnimalNumber)
+            findMouseByAnimalNumber(request.fatherAnimalNumber)
 
         validateParentsSex(
             mother = mother,
@@ -257,7 +257,7 @@ class MouseService(
             )
         }
 
-    private fun findParentByAnimalNumber(
+    fun findMouseByAnimalNumber(
         animalNumber: Int?
     ): Mouse? {
 
