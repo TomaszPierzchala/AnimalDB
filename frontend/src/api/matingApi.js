@@ -19,23 +19,23 @@ export function getMatings({
   return apiJson(`${MATING_API_URL}?${params}`);
 }
 
-export function createMating(mouse) {
+export function createMating(mating) {
     return apiJson(MATING_API_URL, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
         },
-        body: JSON.stringify(mouse)
+        body: JSON.stringify(mating)
     });
 }
 
-export function updateMating(id, mouse) {
+export function updateMating(id, mating) {
     return apiJson(`${MATING_API_URL}/${id}`, {
         method: 'PUT',
         headers: {
             'Content-Type': 'application/json'
         },
-        body: JSON.stringify(mouse)
+        body: JSON.stringify(mating)
     });
 }
 
