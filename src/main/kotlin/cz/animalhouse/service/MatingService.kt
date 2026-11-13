@@ -154,8 +154,11 @@ class MatingService(
         )
 
         counts.forEach { (name, count) ->
-            require(count == null || count >= 0) {
-                "$name must not be negative"
+            require(count == null || count >= 0 ){
+                "$name cannot be negative"
+            }
+            require(count == null || count < 100 ){
+                "Biology limits $name to values below 100"
             }
         }
 

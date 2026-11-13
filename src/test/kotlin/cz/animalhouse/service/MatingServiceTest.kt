@@ -11,6 +11,7 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.CsvSource
+import org.junit.jupiter.params.provider.ValueSource
 import org.mockito.kotlin.any
 import org.mockito.kotlin.isNull
 import org.mockito.kotlin.mock
@@ -139,6 +140,53 @@ class MatingServiceTest {
         verify(matingRepository).save(any<Mating>())
     }
 
+    @ParameterizedTest
+    @ValueSource(strings = [
+        "bornCount",
+        "aliveCount",
+        "femaleCount",
+        "maleCount"
+    ])
+    fun `create rejects negative counts`(field: String) {
+        val request = validRequest().withCount(field, -1)
+
+        val exception = assertThrows<IllegalArgumentException> {
+            matingService.create(request)
+        }
+
+        assertEquals(
+            "$field cannot be negative",
+            exception.message
+        )
+
+        verifyNoInteractions(matingRepository, mouseService)
+    }
+
+    @ParameterizedTest
+    @ValueSource(ints = [100, Int.MAX_VALUE])
+    fun `create rejects counts exceeding biological limit`(count: Int) {
+        listOf(
+            "bornCount",
+            "aliveCount",
+            "femaleCount",
+            "maleCount"
+        ).forEach { field ->
+
+            val request = validRequest().withCount(field, count)
+
+            val exception = assertThrows<IllegalArgumentException> {
+                matingService.create(request)
+            }
+
+            assertEquals(
+                "Biology limits $field to values below 100",
+                exception.message
+            )
+        }
+
+        verifyNoInteractions(matingRepository, mouseService)
+    }
+
     private fun validRequest() = MatingRequest(
         femaleAnimalNumber = 1001,
         maleAnimalNumber = 1002,
@@ -154,4 +202,15 @@ class MatingServiceTest {
         note = null,
         endMatingDate = null
     )
+
+    private fun MatingRequest.withCount(
+        field: String,
+        value: Int
+    ): MatingRequest = when (field) {
+        "bornCount" -> copy(bornCount = value)
+        "aliveCount" -> copy(aliveCount = value)
+        "femaleCount" -> copy(femaleCount = value)
+        "maleCount" -> copy(maleCount = value)
+        else -> error("Unknown count field: $field")
+    }
 }
