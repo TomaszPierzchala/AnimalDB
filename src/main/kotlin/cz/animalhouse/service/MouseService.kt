@@ -267,7 +267,7 @@ class MouseService(
 
         return mouseRepository
             .findByAnimalNumber(animalNumber)
-            ?: throw IllegalArgumentException(
+            ?: throw NoSuchElementException(
                 "Mouse with animal number $animalNumber does not exist."
             )
     }

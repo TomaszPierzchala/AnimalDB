@@ -525,7 +525,7 @@ class MouseServiceTest {
             mouseService.create(request)
         }
             .isInstanceOf(
-                IllegalArgumentException::class.java
+                NoSuchElementException::class.java
             )
             .hasMessage(
                 "Mouse with animal number 26010101 does not exist."
@@ -889,7 +889,7 @@ class MouseServiceTest {
             )
         }
             .isInstanceOf(
-                IllegalArgumentException::class.java
+                NoSuchElementException::class.java
             )
             .hasMessage(
                 "Mouse with animal number $MOTHER_ANIMAL_NUMBER does not exist."
