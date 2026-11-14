@@ -214,7 +214,7 @@ class MatingServiceTest {
             .thenReturn(Optional.of(mating))
 
         val request = validRequest().copy(
-            bornCount = 100
+            bornCount = 21
         )
 
         val exception = assertThrows<IllegalArgumentException> {
@@ -222,7 +222,7 @@ class MatingServiceTest {
         }
 
         assertEquals(
-            "Biology limits bornCount to values below 100",
+            "Biology limits bornCount to values no more then 20",
             exception.message
         )
 
@@ -345,7 +345,7 @@ class MatingServiceTest {
     }
 
     @ParameterizedTest
-    @ValueSource(ints = [100, Int.MAX_VALUE])
+    @ValueSource(ints = [21, Int.MAX_VALUE])
     fun `create rejects counts exceeding biological limit`(count: Int) {
         listOf(
             "bornCount",
@@ -361,7 +361,7 @@ class MatingServiceTest {
             }
 
             assertEquals(
-                "Biology limits $field to values below 100",
+                "Biology limits $field to values no more then 20",
                 exception.message
             )
         }

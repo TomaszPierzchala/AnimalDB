@@ -166,8 +166,8 @@ class MatingService(
             require(count == null || count >= 0 ){
                 "$name cannot be negative"
             }
-            require(count == null || count < 100 ){
-                "Biology limits $name to values below 100"
+            require(count == null || count <= 20 ){
+                "Biology limits $name to values no more then 20"
             }
         }
 
