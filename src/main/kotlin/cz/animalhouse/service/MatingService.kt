@@ -75,10 +75,7 @@ class MatingService(
                 "Mouse animal number must not be null"
             }
 
-            return mouseService.findMouseByAnimalNumber(animalNumber)
-                ?: throw NoSuchElementException(
-                "Mouse with animalNumber=$animalNumber not found"
-                )
+            return mouseService.findMouseByAnimalNumber(animalNumber)!!
     }
 
     private fun findEntityById(id: Long): Mating =
