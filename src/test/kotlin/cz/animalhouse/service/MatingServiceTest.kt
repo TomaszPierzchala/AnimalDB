@@ -113,7 +113,32 @@ class MatingServiceTest {
             exception.message
         )
 
-        verifyNoInteractions(matingRepository, entityManager)
+        verify(matingRepository, never()).saveAndFlush(any<Mating>())
+        verifyNoInteractions(entityManager)
+    }
+
+    @Test
+    fun `create rejects nonexistent male mouse`() {
+        mockMice()
+
+        whenever(mouseService.findMouseByAnimalNumber(1002))
+            .thenThrow(
+                NoSuchElementException(
+                    "Mouse with animal number 1002 does not exist."
+                )
+            )
+
+        val exception = assertThrows<NoSuchElementException> {
+            matingService.create(validRequest())
+        }
+
+        assertEquals(
+            "Mouse with animal number 1002 does not exist.",
+            exception.message
+        )
+
+        verify(matingRepository, never()).saveAndFlush(any<Mating>())
+        verifyNoInteractions(entityManager)
     }
 
     @Test
@@ -365,6 +390,105 @@ class MatingServiceTest {
                 exception.message
             )
         }
+
+        verifyNoInteractions(matingRepository, mouseService)
+    }
+
+
+    @ParameterizedTest
+    @CsvSource(
+        "5, 6, 2, 2, aliveCount must not exceed bornCount",
+        "5, 4, 5, 0, femaleCount must not exceed aliveCount",
+        "5, 4, 0, 5, maleCount must not exceed aliveCount",
+        "5, 4, 3, 2, femaleCount + maleCount must not exceed aliveCount"
+    )
+    fun `create rejects inconsistent counts`(
+        born: Int,
+        alive: Int,
+        female: Int,
+        male: Int,
+        expectedMessage: String
+    ) {
+        val request = validRequest().copy(
+            bornCount = born,
+            aliveCount = alive,
+            femaleCount = female,
+            maleCount = male
+        )
+
+        val exception = assertThrows<IllegalArgumentException> {
+            matingService.create(request)
+        }
+
+        assertEquals(expectedMessage, exception.message)
+        verifyNoInteractions(matingRepository, mouseService, entityManager)
+    }
+
+
+    @Test
+    fun `create rejects same female and male`() {
+        val request = validRequest().copy(
+            femaleAnimalNumber = 1001,
+            maleAnimalNumber = 1001
+        )
+
+        val exception = assertThrows<IllegalArgumentException> {
+            matingService.create(request)
+        }
+
+        assertEquals(
+            "Female and male must be different mice",
+            exception.message
+        )
+
+        verifyNoInteractions(
+            matingRepository,
+            mouseService,
+            entityManager
+        )
+    }
+
+    @ParameterizedTest
+    @CsvSource(
+        "matingDate, plugDate",
+        "plugDate, pregnancyDate",
+        "pregnancyDate, birthDate",
+        "birthDate, weaningDate"
+    )
+    fun `create rejects equal consecutive dates`(
+        firstField: String,
+        secondField: String
+    ) {
+        val date = LocalDate.of(2026, 10, 10)
+
+        val request = when (firstField) {
+            "matingDate" -> validRequest().copy(
+                matingDate = date,
+                plugDate = date
+            )
+            "plugDate" -> validRequest().copy(
+                plugDate = date,
+                pregnancyDate = date
+            )
+            "pregnancyDate" -> validRequest().copy(
+                pregnancyDate = date,
+                birthDate = date
+            )
+            "birthDate" -> validRequest().copy(
+                birthDate = date,
+                weaningDate = date
+            )
+            else -> error("Unknown field: $firstField")
+        }
+
+        val exception = assertThrows<IllegalArgumentException> {
+            matingService.create(request)
+        }
+
+        assertEquals(
+            "$firstField must be before $secondField",
+            exception.message
+        )
 
         verifyNoInteractions(matingRepository, mouseService)
     }
