@@ -17,6 +17,5 @@ data class MatingRequest(
     val femaleCount: Int? = null,
     val maleCount: Int? = null,
 
-    val note: String? = null,
-    val endMatingDate: LocalDate? = null
+    val note: String? = null
 )

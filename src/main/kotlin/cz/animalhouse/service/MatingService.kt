@@ -108,7 +108,6 @@ class MatingService(
         mating.maleCount = request.maleCount
 
         mating.note = request.note
-        mating.endMatingDate = request.endMatingDate
     }
 
     private fun validate(request: MatingRequest) {

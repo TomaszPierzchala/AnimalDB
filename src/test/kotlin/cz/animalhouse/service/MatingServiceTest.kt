@@ -13,6 +13,8 @@ import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.CsvSource
 import org.junit.jupiter.params.provider.ValueSource
 import org.mockito.kotlin.*
+import org.springframework.data.domain.PageImpl
+import org.springframework.data.domain.PageRequest
 import org.springframework.test.util.ReflectionTestUtils
 import java.time.LocalDate
 import java.util.Optional
@@ -342,6 +344,28 @@ class MatingServiceTest {
         verify(entityManager).refresh(any<Mating>())
     }
 
+    @ParameterizedTest
+    @ValueSource(ints = [0, 20])
+    fun `create accepts boundary counts`(count: Int) {
+        mockMice()
+        mockSave()
+
+        val request = validRequest().copy(
+            bornCount = count,
+            aliveCount = count,
+            femaleCount = count,
+            maleCount = 0
+        )
+
+        val response = matingService.create(request)
+
+        assertEquals(count, response.bornCount)
+        assertEquals(count, response.aliveCount)
+        assertEquals(count, response.femaleCount)
+        assertEquals(0, response.maleCount)
+
+        verify(matingRepository).saveAndFlush(any<Mating>())
+    }
 
     @ParameterizedTest
     @ValueSource(strings = [
@@ -564,6 +588,29 @@ class MatingServiceTest {
         )
     }
 
+    @Test
+    fun `findAll returns mapped page`() {
+        mockMice()
+
+        val pageable = PageRequest.of(0, 10)
+
+        val mating = Mating(female = female, male = male)
+        ReflectionTestUtils.setField(mating, "id", 10L)
+
+        whenever(matingRepository.findAll(pageable))
+            .thenReturn(PageImpl(listOf(mating), pageable, 1))
+
+        val result = matingService.findAll(pageable)
+
+        assertEquals(1, result.totalElements)
+        assertEquals(1, result.content.size)
+        assertEquals(10L, result.content[0].id)
+        assertEquals(1001, result.content[0].femaleAnimalNumber)
+        assertEquals(1002, result.content[0].maleAnimalNumber)
+
+        verify(matingRepository).findAll(pageable)
+    }
+
     private fun validRequest() = MatingRequest(
         femaleAnimalNumber = 1001,
         maleAnimalNumber = 1002,
@@ -576,8 +623,7 @@ class MatingServiceTest {
         aliveCount = null,
         femaleCount = null,
         maleCount = null,
-        note = null,
-        endMatingDate = null
+        note = null
     )
 
     private fun MatingRequest.withCount(
