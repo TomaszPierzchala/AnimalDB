@@ -5,7 +5,6 @@ import cz.animalhouse.dto.MatingRequest
 import cz.animalhouse.entity.Mating
 import cz.animalhouse.entity.Mouse
 import cz.animalhouse.repository.MatingRepository
-import cz.animalhouse.repository.MouseRepository
 import jakarta.persistence.EntityManager
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
@@ -21,13 +20,11 @@ import java.util.Optional
 class MatingServiceTest {
 
     private val matingRepository = mock<MatingRepository>()
-    private val mouseRepository = mock<MouseRepository>()
     private val mouseService = mock<MouseService>()
     private val entityManager = mock<EntityManager>()
 
     private val matingService = MatingService(
         matingRepository,
-        mouseRepository,
         mouseService,
         entityManager
     )
@@ -277,7 +274,6 @@ class MatingServiceTest {
 
         verifyNoInteractions(
             matingRepository,
-            mouseRepository,
             mouseService
         )
     }

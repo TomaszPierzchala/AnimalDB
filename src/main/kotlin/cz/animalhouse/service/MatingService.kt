@@ -2,11 +2,9 @@ package cz.animalhouse.service
 
 import cz.animalhouse.dto.MatingRequest
 import cz.animalhouse.dto.MatingResponse
-import cz.animalhouse.dto.MouseResponse
 import cz.animalhouse.entity.Mating
 import cz.animalhouse.entity.Mouse
 import cz.animalhouse.repository.MatingRepository
-import cz.animalhouse.repository.MouseRepository
 import jakarta.persistence.EntityManager
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
@@ -18,7 +16,6 @@ import kotlin.Long
 @Transactional(readOnly = true)
 class MatingService(
     private val matingRepository: MatingRepository,
-    private val mouseRepository: MouseRepository,
     private val mouseService: MouseService,
     private val entityManager: EntityManager
 ) {
@@ -93,12 +90,6 @@ class MatingService(
                 NoSuchElementException(
                     "Mating with id=$id not found"
                 )
-            }
-
-    private fun findMouse(id: Long): Mouse =
-        mouseRepository.findById(id)
-            .orElseThrow {
-                NoSuchElementException("Mouse not found: $id")
             }
 
     private fun applyRequest(
