@@ -521,6 +521,49 @@ class MatingServiceTest {
     }
 
 
+    @Test
+    fun `findById returns mating response`() {
+        mockMice()
+
+        val mating = Mating(female = female, male = male).apply {
+            matingDate = LocalDate.of(2026, 10, 1)
+            bornCount = 5
+            aliveCount = 4
+            note = "Test mating"
+        }
+        ReflectionTestUtils.setField(mating, "id", 10L)
+
+        whenever(matingRepository.findById(10L))
+            .thenReturn(Optional.of(mating))
+
+        val response = matingService.findById(10L)
+
+        assertEquals(10L, response.id)
+        assertEquals(1001, response.femaleAnimalNumber)
+        assertEquals(1002, response.maleAnimalNumber)
+        assertEquals(mating.matingDate, response.matingDate)
+        assertEquals(5, response.bornCount)
+        assertEquals(4, response.aliveCount)
+        assertEquals("Test mating", response.note)
+
+        verify(matingRepository).findById(10L)
+    }
+
+    @Test
+    fun `findById throws when mating does not exist`() {
+        whenever(matingRepository.findById(998L))
+            .thenReturn(Optional.empty())
+
+        val exception = assertThrows<NoSuchElementException> {
+            matingService.findById(998L)
+        }
+
+        assertEquals(
+            "Mating with id=998 not found",
+            exception.message
+        )
+    }
+
     private fun validRequest() = MatingRequest(
         femaleAnimalNumber = 1001,
         maleAnimalNumber = 1002,
