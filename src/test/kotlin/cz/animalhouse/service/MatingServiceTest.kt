@@ -493,6 +493,38 @@ class MatingServiceTest {
         verifyNoInteractions(matingRepository, mouseService)
     }
 
+    @Test
+    fun `delete removes existing mating`() {
+        val mating = Mating(female = female, male = male)
+
+        whenever(matingRepository.findById(10L))
+            .thenReturn(Optional.of(mating))
+
+        matingService.delete(10L)
+
+        verify(matingRepository).findById(10L)
+        verify(matingRepository).delete(mating)
+        verifyNoInteractions(entityManager, mouseService)
+    }
+
+    @Test
+    fun `delete throws when mating does not exist`() {
+        whenever(matingRepository.findById(999L))
+            .thenReturn(Optional.empty())
+
+        val exception = assertThrows<NoSuchElementException> {
+            matingService.delete(999L)
+        }
+
+        assertEquals(
+            "Mating with id=999 not found",
+            exception.message
+        )
+
+        verify(matingRepository, never()).delete(any<Mating>())
+    }
+
+
     private fun validRequest() = MatingRequest(
         femaleAnimalNumber = 1001,
         maleAnimalNumber = 1002,
