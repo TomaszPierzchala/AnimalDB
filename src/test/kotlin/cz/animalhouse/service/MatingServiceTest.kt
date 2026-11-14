@@ -6,32 +6,230 @@ import cz.animalhouse.entity.Mating
 import cz.animalhouse.entity.Mouse
 import cz.animalhouse.repository.MatingRepository
 import cz.animalhouse.repository.MouseRepository
-import org.junit.jupiter.api.Assertions.assertEquals
+import jakarta.persistence.EntityManager
+import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.CsvSource
 import org.junit.jupiter.params.provider.ValueSource
-import org.mockito.kotlin.any
-import org.mockito.kotlin.isNull
-import org.mockito.kotlin.mock
-import org.mockito.kotlin.never
-import org.mockito.kotlin.verify
-import org.mockito.kotlin.verifyNoInteractions
-import org.mockito.kotlin.whenever
+import org.mockito.kotlin.*
+import org.springframework.test.util.ReflectionTestUtils
 import java.time.LocalDate
+import java.util.Optional
 
 class MatingServiceTest {
 
     private val matingRepository = mock<MatingRepository>()
     private val mouseRepository = mock<MouseRepository>()
     private val mouseService = mock<MouseService>()
+    private val entityManager = mock<EntityManager>()
 
     private val matingService = MatingService(
         matingRepository,
         mouseRepository,
-        mouseService
+        mouseService,
+        entityManager
     )
+
+    private val female = mock<Mouse>()
+    private val male = mock<Mouse>()
+
+    private fun mockMice() {
+        whenever(female.sex).thenReturn(Mouse.Sex.F)
+        whenever(male.sex).thenReturn(Mouse.Sex.M)
+
+        whenever(female.animalNumber).thenReturn(1001)
+        whenever(male.animalNumber).thenReturn(1002)
+
+        whenever(mouseService.findMouseByAnimalNumber(1001))
+            .thenReturn(female)
+        whenever(mouseService.findMouseByAnimalNumber(1002))
+            .thenReturn(male)
+    }
+
+    private fun mockSave(id: Long = 1L) {
+        whenever(matingRepository.saveAndFlush(any<Mating>()))
+            .thenAnswer { invocation ->
+                invocation.getArgument<Mating>(0).apply {
+                    ReflectionTestUtils.setField(this, "id", id)
+                }
+            }
+    }
+
+    @Test
+    fun `create saves mating and refreshes entity`() {
+        mockMice()
+        mockSave()
+
+        val request = validRequest().copy(
+            matingDate = LocalDate.of(2026, 10, 1),
+            plugDate = LocalDate.of(2026, 10, 2),
+            bornCount = 5,
+            aliveCount = 4,
+            femaleCount = 2,
+            maleCount = 2,
+            note = "First mating"
+        )
+
+        val response = matingService.create(request)
+
+        assertEquals(1L, response.id)
+        assertEquals(1001, response.femaleAnimalNumber)
+        assertEquals(1002, response.maleAnimalNumber)
+        assertEquals(request.matingDate, response.matingDate)
+        assertEquals(request.plugDate, response.plugDate)
+        assertEquals(5, response.bornCount)
+        assertEquals(4, response.aliveCount)
+        assertEquals(2, response.femaleCount)
+        assertEquals(2, response.maleCount)
+        assertEquals("First mating", response.note)
+
+        val captor = argumentCaptor<Mating>()
+        verify(matingRepository).saveAndFlush(captor.capture())
+
+        val saved = captor.firstValue
+        assertSame(female, saved.female)
+        assertSame(male, saved.male)
+
+        verify(entityManager).refresh(saved)
+    }
+
+    @Test
+    fun `create rejects nonexistent female mouse`() {
+        whenever(mouseService.findMouseByAnimalNumber(1001))
+            .thenThrow(
+                NoSuchElementException(
+                    "Mouse with animal number 1001 does not exist."
+                )
+            )
+
+        val exception = assertThrows<NoSuchElementException> {
+            matingService.create(validRequest())
+        }
+
+        assertEquals(
+            "Mouse with animal number 1001 does not exist.",
+            exception.message
+        )
+
+        verifyNoInteractions(matingRepository, entityManager)
+    }
+
+    @Test
+    fun `update modifies existing mating and refreshes entity`() {
+        mockMice()
+        mockSave(id = 10L)
+
+        val mating = Mating(female = female, male = male)
+        ReflectionTestUtils.setField(mating, "id", 10L)
+
+        whenever(matingRepository.findById(10L))
+            .thenReturn(Optional.of(mating))
+
+        val request = validRequest().copy(
+            matingDate = LocalDate.of(2026, 10, 1),
+            birthDate = LocalDate.of(2026, 10, 22),
+            bornCount = 6,
+            aliveCount = 5,
+            femaleCount = 3,
+            maleCount = 2,
+            note = "Updated mating"
+        )
+
+        val response = matingService.update(10L, request)
+
+        assertEquals(10L, response.id)
+        assertEquals(1001, response.femaleAnimalNumber)
+        assertEquals(1002, response.maleAnimalNumber)
+        assertEquals(request.matingDate, response.matingDate)
+        assertEquals(request.birthDate, response.birthDate)
+        assertEquals(6, response.bornCount)
+        assertEquals(5, response.aliveCount)
+        assertEquals(3, response.femaleCount)
+        assertEquals(2, response.maleCount)
+        assertEquals("Updated mating", response.note)
+
+        verify(matingRepository).findById(10L)
+        verify(matingRepository).saveAndFlush(mating)
+        verify(entityManager).refresh(mating)
+    }
+
+    @Test
+    fun `update throws when mating does not exist`() {
+        whenever(matingRepository.findById(999L))
+            .thenReturn(Optional.empty())
+
+        val exception = assertThrows<NoSuchElementException> {
+            matingService.update(999L, validRequest())
+        }
+
+        assertEquals(
+            "Mating with id=999 not found",
+            exception.message
+        )
+
+        verify(matingRepository).findById(999L)
+        verify(matingRepository, never())
+            .saveAndFlush(any<Mating>())
+        verifyNoInteractions(mouseService, entityManager)
+    }
+
+    @Test
+    fun `update rejects invalid dates without changing entity`() {
+        val mating = Mating(female = female, male = male)
+        ReflectionTestUtils.setField(mating, "id", 10L)
+
+        whenever(matingRepository.findById(10L))
+            .thenReturn(Optional.of(mating))
+
+        val request = validRequest().copy(
+            matingDate = LocalDate.of(2026, 10, 10),
+            pregnancyDate = LocalDate.of(2026, 10, 5)
+        )
+
+        val exception = assertThrows<IllegalArgumentException> {
+            matingService.update(10L, request)
+        }
+
+        assertEquals(
+            "matingDate must be before pregnancyDate",
+            exception.message
+        )
+
+        assertNull(mating.matingDate)
+        assertNull(mating.pregnancyDate)
+
+        verify(matingRepository, never())
+            .saveAndFlush(any<Mating>())
+        verifyNoInteractions(mouseService, entityManager)
+    }
+
+    @Test
+    fun `update rejects biologically impossible counts`() {
+        val mating = Mating(female = female, male = male)
+        ReflectionTestUtils.setField(mating, "id", 10L)
+
+        whenever(matingRepository.findById(10L))
+            .thenReturn(Optional.of(mating))
+
+        val request = validRequest().copy(
+            bornCount = 100
+        )
+
+        val exception = assertThrows<IllegalArgumentException> {
+            matingService.update(10L, request)
+        }
+
+        assertEquals(
+            "Biology limits bornCount to values below 100",
+            exception.message
+        )
+
+        verify(matingRepository, never())
+            .saveAndFlush(any<Mating>())
+        verifyNoInteractions(mouseService, entityManager)
+    }
 
     @Test
     fun `create rejects dates in wrong order when intermediate dates are null`() {
@@ -110,26 +308,8 @@ class MatingServiceTest {
 
     @Test
     fun `create accepts correct mouse sexes`() {
-        val female = mock<Mouse>()
-        val male = mock<Mouse>()
-
-        whenever(female.sex).thenReturn(Mouse.Sex.F)
-        whenever(male.sex).thenReturn(Mouse.Sex.M)
-        whenever(female.animalNumber).thenReturn(1001)
-        whenever(male.animalNumber).thenReturn(1002)
-
-        whenever(mouseService.findMouseByAnimalNumber(1001))
-            .thenReturn(female)
-        whenever(mouseService.findMouseByAnimalNumber(1002))
-            .thenReturn(male)
-
-        val mating = mock<Mating>()
-        whenever(mating.id).thenReturn(1L)
-        whenever(mating.female).thenReturn(female)
-        whenever(mating.male).thenReturn(male)
-
-        whenever(matingRepository.save(any<Mating>()))
-            .thenReturn(mating)
+        mockMice()
+        mockSave()
 
         val response = matingService.create(validRequest())
 
@@ -137,8 +317,10 @@ class MatingServiceTest {
         assertEquals(1001, response.femaleAnimalNumber)
         assertEquals(1002, response.maleAnimalNumber)
 
-        verify(matingRepository).save(any<Mating>())
+        verify(matingRepository).saveAndFlush(any<Mating>())
+        verify(entityManager).refresh(any<Mating>())
     }
+
 
     @ParameterizedTest
     @ValueSource(strings = [

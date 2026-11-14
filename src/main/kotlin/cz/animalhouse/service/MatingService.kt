@@ -5,15 +5,13 @@ import cz.animalhouse.dto.MatingResponse
 import cz.animalhouse.dto.MouseResponse
 import cz.animalhouse.entity.Mating
 import cz.animalhouse.entity.Mouse
-import cz.animalhouse.exception.MouseDeleteInUseException
 import cz.animalhouse.repository.MatingRepository
 import cz.animalhouse.repository.MouseRepository
-import org.springframework.dao.DataIntegrityViolationException
+import jakarta.persistence.EntityManager
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
-import java.time.LocalDate
 import kotlin.Long
 
 @Service
@@ -21,7 +19,8 @@ import kotlin.Long
 class MatingService(
     private val matingRepository: MatingRepository,
     private val mouseRepository: MouseRepository,
-    private val mouseService: MouseService
+    private val mouseService: MouseService,
+    private val entityManager: EntityManager
 ) {
 
     fun findAll(pageable: Pageable): Page<MatingResponse> =
@@ -46,8 +45,10 @@ class MatingService(
 
         applyRequest(mating, request)
 
-        return matingRepository.save(mating)
-            .toResponse()
+        val saved = matingRepository.saveAndFlush(mating)
+        entityManager.refresh(saved)
+
+        return saved.toResponse()
     }
 
     @Transactional
@@ -56,12 +57,20 @@ class MatingService(
 
         validate(request)
 
-        mating.female = findMouseByAnimalNumber(request.femaleAnimalNumber)
-        mating.male = findMouseByAnimalNumber(request.maleAnimalNumber)
+        val female = findMouseByAnimalNumber(request.femaleAnimalNumber)
+        val male = findMouseByAnimalNumber(request.maleAnimalNumber)
+
+        validateSex(female, male)
+
+        mating.female = female
+        mating.male = male
 
         applyRequest(mating, request)
 
-        return matingRepository.save(mating).toResponse()
+        val saved = matingRepository.saveAndFlush(mating)
+        entityManager.refresh(saved)
+
+        return saved.toResponse()
     }
 
     @Transactional
