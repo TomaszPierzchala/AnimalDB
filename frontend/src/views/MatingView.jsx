@@ -6,6 +6,7 @@ import WorkInProgressBar from "./WorkInProgress";
 import ErrorBanner from '../components/ErrorBanner';
 import MouseAnimalNumberInput from "../components/MouseAnimalNumberInput";
 import useFadingError from "../hooks/fadingError";
+import {useEditKeyDown} from '../hooks/useEditKeyDown'
 import {createMating, deleteMating, getMatings, updateMating} from '../api/matingApi';
 import {todayAsInputDate} from '../utils/timeUtils'
 
@@ -165,6 +166,15 @@ function MatingView() {
                 editedMating[fieldName] !==
                 originalEditedMating[fieldName]
         );
+
+    useEditKeyDown({
+        isEditing: isEditingMating,
+        hasChanges: editedMatingChanged,
+        isAdding: isAddingMating,
+        onSave: saveEditedMating,
+        onAccept: acceptNewMating,
+        onCancel: clearEditedMating
+    });
 
     // =========================
     // EFFECTS
