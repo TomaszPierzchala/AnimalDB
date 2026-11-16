@@ -67,8 +67,8 @@ function createEmptyMating() {
 
 function toMatingRequest(mating) {
     return {
-        motherAnimalNumber: mating.motherAnimalNumber,
-        fatherAnimalNumber: mating.fatherAnimalNumber,
+        femaleAnimalNumber: mating.femaleAnimalNumber,
+        maleAnimalNumber: mating.maleAnimalNumber,
         matingDate: mating.matingDate,
         plugDate: mating.plugDate,
         pregnancyDate: mating.pregnancyDate,
@@ -131,7 +131,7 @@ function MatingView() {
     const [totalElements, setTotalElements] = useState(0);
 
     const [sortBy, setSortBy] =
-        useState('motherAnimalNumber');
+        useState('femaleAnimalNumber');
 
     const [direction, setDirection] =
         useState('asc');
@@ -358,14 +358,14 @@ function MatingView() {
     }
 
     function renderEditableCell(column) {
-        if (column.name === 'motherAnimalNumber') {
+        if (column.name === 'femaleAnimalNumber') {
             return (
                 <MouseAnimalNumberInput
-                    value={editedMating.motherAnimalNumber}
+                    value={editedMating.femaleAnimalNumber}
                     sex="F"
                     onChange={value =>
                         changeEditedMatingField(
-                            'motherAnimalNumber',
+                            'femaleAnimalNumber',
                             value
                         )
                     }
@@ -373,14 +373,14 @@ function MatingView() {
             );
         }
 
-        if (column.name === 'fatherAnimalNumber') {
+        if (column.name === 'maleAnimalNumber') {
             return (
                 <MouseAnimalNumberInput
-                    value={editedMating.fatherAnimalNumber}
+                    value={editedMating.maleAnimalNumber}
                     sex="M"
                     onChange={value =>
                         changeEditedMatingField(
-                            'fatherAnimalNumber',
+                            'maleAnimalNumber',
                             value
                         )
                     }
