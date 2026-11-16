@@ -226,7 +226,7 @@ function MatingView() {
 
     async function acceptNewMating() {
         try {
-            await createMating();
+            await createMating(editedMating);
 
             clearEditedMating();
             await loadMatings();
