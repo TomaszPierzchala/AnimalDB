@@ -2,9 +2,9 @@ package cz.animalhouse.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import cz.animalhouse.entity.TransgenicLine;
+import cz.animalhouse.entity.StrainTransgenicLine;
 
-public interface TransgenicLineRepository extends JpaRepository<TransgenicLine, Long> {
+public interface StrainTransgenicLineRepository extends JpaRepository<StrainTransgenicLine, Long> {
 
 	boolean existsByName(String name);
 

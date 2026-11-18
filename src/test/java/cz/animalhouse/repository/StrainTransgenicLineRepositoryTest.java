@@ -13,7 +13,7 @@ import org.springframework.test.context.ActiveProfiles;
 import org.testcontainers.postgresql.PostgreSQLContainer;
 
 import cz.animalhouse.entity.Strain;
-import cz.animalhouse.entity.TransgenicLine;
+import cz.animalhouse.entity.StrainTransgenicLine;
 import jakarta.persistence.EntityManager;
 
 @DataJpaTest
@@ -21,7 +21,7 @@ import jakarta.persistence.EntityManager;
 @AutoConfigureTestDatabase(
         replace = AutoConfigureTestDatabase.Replace.NONE
 )
-class TransgenicLineRepositoryTest {
+class StrainTransgenicLineRepositoryTest {
 
     @ServiceConnection
     static PostgreSQLContainer postgres =
@@ -31,7 +31,7 @@ class TransgenicLineRepositoryTest {
     private StrainRepository strainRepository;
 
     @Autowired
-    private TransgenicLineRepository transgenicLineRepository;
+    private StrainTransgenicLineRepository transgenicLineRepository;
 
     @Autowired
     private EntityManager entityManager;
@@ -45,11 +45,11 @@ class TransgenicLineRepositoryTest {
 
         strainRepository.save(strain);
 
-        TransgenicLine line1 = new TransgenicLine(
+        StrainTransgenicLine line1 = new StrainTransgenicLine(
                 strain,
                 "OT-I");
 
-        TransgenicLine line2 = new TransgenicLine(
+        StrainTransgenicLine line2 = new StrainTransgenicLine(
                 strain,
                 "GFP");
 
@@ -59,13 +59,13 @@ class TransgenicLineRepositoryTest {
         transgenicLineRepository.flush();
         entityManager.clear();
 
-        List<TransgenicLine> lines =
+        List<StrainTransgenicLine> lines =
                 transgenicLineRepository.findAll();
 
         assertThat(lines).hasSize(2);
 
         assertThat(lines)
-                .extracting(TransgenicLine::getName)
+                .extracting(StrainTransgenicLine::getName)
                 .containsExactlyInAnyOrder(
                         "OT-I",
                         "GFP");
@@ -91,9 +91,9 @@ class TransgenicLineRepositoryTest {
                         "BALBC",
                         "BALB/c"));
 
-        TransgenicLine line =
+        StrainTransgenicLine line =
                 transgenicLineRepository.save(
-                        new TransgenicLine(
+                        new StrainTransgenicLine(
                                 firstStrain,
                                 "OT-I"));
 
@@ -103,7 +103,7 @@ class TransgenicLineRepositoryTest {
         transgenicLineRepository.flush();
         entityManager.clear();
 
-        TransgenicLine saved =
+        StrainTransgenicLine saved =
                 transgenicLineRepository.findById(line.getId())
                         .orElseThrow();
 
@@ -125,14 +125,14 @@ class TransgenicLineRepositoryTest {
                         "C57BL6",
                         "C57BL/6"));
 
-        TransgenicLine line1 =
+        StrainTransgenicLine line1 =
                 transgenicLineRepository.save(
-                        new TransgenicLine(
+                        new StrainTransgenicLine(
                                 strain,
                                 "OT-I"));
 
         transgenicLineRepository.save(
-                new TransgenicLine(
+                new StrainTransgenicLine(
                         strain,
                         "OT-II"));
 
@@ -144,7 +144,7 @@ class TransgenicLineRepositoryTest {
         transgenicLineRepository.flush();
         entityManager.clear();
 
-        List<TransgenicLine> lines =
+        List<StrainTransgenicLine> lines =
                 transgenicLineRepository.findAll();
 
         assertThat(lines).hasSize(1);
@@ -162,7 +162,7 @@ class TransgenicLineRepositoryTest {
                         "C57BL/6"));
 
         transgenicLineRepository.save(
-                new TransgenicLine(
+                new StrainTransgenicLine(
                         strain,
                         "OT-I"));
 
@@ -186,15 +186,15 @@ class TransgenicLineRepositoryTest {
                         "C57BL6",
                         "C57BL/6"));
 
-        TransgenicLine line1 =
+        StrainTransgenicLine line1 =
                 transgenicLineRepository.save(
-                        new TransgenicLine(
+                        new StrainTransgenicLine(
                                 strain,
                                 "OT-I"));
 
-        TransgenicLine line2 =
+        StrainTransgenicLine line2 =
                 transgenicLineRepository.save(
-                        new TransgenicLine(
+                        new StrainTransgenicLine(
                                 strain,
                                 "OT-II"));
 
