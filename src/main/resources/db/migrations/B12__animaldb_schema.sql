@@ -391,6 +391,7 @@ ORDER BY key
 
     column_label := CASE col_name
     WHEN 'strain_id' THEN 'Strain'
+    WHEN 'strain_transgenic_line_id' THEN 'StrainTransgenicLine'
     WHEN 'mother_id' THEN 'Mother Animal Number'
     WHEN 'father_id' THEN 'Father Animal Number'
     ELSE INITCAP(REPLACE(col_name, '_', ' '))
@@ -408,6 +409,17 @@ SELECT quote_literal(code || ' — ' || name)
 INTO new_value
 FROM strain
 WHERE id = NEW.strain_id;
+
+WHEN 'strain_transgenic_line_id' THEN
+SELECT quote_literal(s.code || ' — ' || s.name || ':' || stl.name)
+  INTO old_value
+  FROM strain AS s JOIN strain_transgenic_line AS stl ON stl.strain_id = s.id
+ WHERE stl.id = OLD.strain_transgenic_line_id;
+
+SELECT quote_literal(s.code || ' — ' || s.name || ':' || stl.name)
+  INTO new_value
+  FROM strain AS s JOIN strain_transgenic_line AS stl ON stl.strain_id = s.id
+ WHERE stl.id = NEW.strain_transgenic_line_id;
 
 WHEN 'mother_id' THEN
 SELECT animal_number::TEXT
