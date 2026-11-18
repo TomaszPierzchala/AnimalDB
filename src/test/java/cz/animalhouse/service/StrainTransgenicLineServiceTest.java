@@ -16,29 +16,29 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import cz.animalhouse.dto.TransgenicLineRequest;
-import cz.animalhouse.dto.TransgenicLineResponse;
+import cz.animalhouse.dto.StrainTransgenicLineRequest;
+import cz.animalhouse.dto.StrainTransgenicLineResponse;
 import cz.animalhouse.entity.Strain;
-import cz.animalhouse.entity.TransgenicLine;
-import cz.animalhouse.exception.DuplicateTransgenicLineNameException;
+import cz.animalhouse.entity.StrainTransgenicLine;
+import cz.animalhouse.exception.DuplicateStrainTransgenicLineNameException;
 import cz.animalhouse.exception.StrainNotFoundException;
 import cz.animalhouse.repository.StrainRepository;
-import cz.animalhouse.repository.TransgenicLineRepository;
+import cz.animalhouse.repository.StrainTransgenicLineRepository;
 
 @ExtendWith(MockitoExtension.class)
-class TransgenicLineServiceTest {
+class StrainTransgenicLineServiceTest {
 
     @Mock
-    private TransgenicLineRepository transgenicLineRepository;
+    private StrainTransgenicLineRepository transgenicLineRepository;
 
     @Mock
     private StrainRepository strainRepository;
 
-    private TransgenicLineService transgenicLineService;
+    private StrainTransgenicLineService transgenicLineService;
 
     @BeforeEach
     void setUp() {
-        transgenicLineService = new TransgenicLineService(
+        transgenicLineService = new StrainTransgenicLineService(
                 transgenicLineRepository,
                 strainRepository);
     }
@@ -50,22 +50,22 @@ class TransgenicLineServiceTest {
                 "C57BL6",
                 "C57BL/6");
 
-        TransgenicLine line1 =
-                new TransgenicLine(strain, "OT-I");
+        StrainTransgenicLine line1 =
+                new StrainTransgenicLine(strain, "OT-I");
 
-        TransgenicLine line2 =
-                new TransgenicLine(strain, "OT-II");
+        StrainTransgenicLine line2 =
+                new StrainTransgenicLine(strain, "OT-II");
 
         when(transgenicLineRepository.findAll())
                 .thenReturn(List.of(line1, line2));
 
-        List<TransgenicLineResponse> result =
+        List<StrainTransgenicLineResponse> result =
                 transgenicLineService.findAll();
 
         assertThat(result).hasSize(2);
 
         assertThat(result)
-                .extracting(TransgenicLineResponse::name)
+                .extracting(StrainTransgenicLineResponse::name)
                 .containsExactly("OT-I", "OT-II");
     }
 
@@ -78,8 +78,8 @@ class TransgenicLineServiceTest {
                 "C57BL6",
                 "C57BL/6");
 
-        TransgenicLineRequest request =
-                new TransgenicLineRequest(
+        StrainTransgenicLineRequest request =
+                new StrainTransgenicLineRequest(
                         strainId,
                         "OT-I");
 
@@ -91,11 +91,11 @@ class TransgenicLineServiceTest {
 
         when(transgenicLineRepository.save(
                 org.mockito.ArgumentMatchers.any(
-                        TransgenicLine.class)))
+                        StrainTransgenicLine.class)))
                 .thenAnswer(invocation ->
                         invocation.getArgument(0));
 
-        TransgenicLineResponse result =
+        StrainTransgenicLineResponse result =
                 transgenicLineService.create(request);
 
         assertThat(result.name()).isEqualTo("OT-I");
@@ -103,14 +103,14 @@ class TransgenicLineServiceTest {
 
         verify(transgenicLineRepository)
                 .save(org.mockito.ArgumentMatchers.any(
-                        TransgenicLine.class));
+                        StrainTransgenicLine.class));
     }
 
     @Test
     void shouldRejectDuplicateNameDuringCreate() {
 
-        TransgenicLineRequest request =
-                new TransgenicLineRequest(
+        StrainTransgenicLineRequest request =
+                new StrainTransgenicLineRequest(
                         1L,
                         "OT-I");
 
@@ -119,8 +119,8 @@ class TransgenicLineServiceTest {
 
         assertThatThrownBy(() ->
                 transgenicLineService.create(request))
-                .isInstanceOf(DuplicateTransgenicLineNameException.class)
-                .hasMessageContaining("Transgenic line with name 'OT-I' already exists");
+                .isInstanceOf(DuplicateStrainTransgenicLineNameException.class)
+                .hasMessageContaining("Strain/transgenic line with name 'OT-I' already exists");
 
         verify(strainRepository, never())
                 .findById(1L);
@@ -133,8 +133,8 @@ class TransgenicLineServiceTest {
     void shouldThrowExceptionWhenCreatingTransgenicLineForMissingStrain() {
         final Long strainId = 999L;
 
-        TransgenicLineRequest request =
-                new TransgenicLineRequest(
+        StrainTransgenicLineRequest request =
+                new StrainTransgenicLineRequest(
                         strainId,
                         "OT-I"
                 );
@@ -157,7 +157,7 @@ class TransgenicLineServiceTest {
                 .findById(strainId);
 
         verify(transgenicLineRepository, never())
-                .save(any(TransgenicLine.class));
+                .save(any(StrainTransgenicLine.class));
     }
 
     @Test
@@ -175,13 +175,13 @@ class TransgenicLineServiceTest {
                 "BALB/c"
         );
 
-        TransgenicLine transgenicLine = new TransgenicLine(
+        StrainTransgenicLine transgenicLine = new StrainTransgenicLine(
                 oldStrain,
                 "OT-I"
         );
 
-        TransgenicLineRequest request =
-                new TransgenicLineRequest(
+        StrainTransgenicLineRequest request =
+                new StrainTransgenicLineRequest(
                         newStrainId,
                         "OT-II"
                 );
@@ -197,13 +197,13 @@ class TransgenicLineServiceTest {
                 .thenReturn(Optional.of(newStrain));
 
 
-        Optional<TransgenicLineResponse> result =
+        Optional<StrainTransgenicLineResponse> result =
                 transgenicLineService.update(id, request);
 
 
         assertThat(result).isPresent();
 
-        TransgenicLineResponse response = result.orElseThrow();
+        StrainTransgenicLineResponse response = result.orElseThrow();
 
         assertThat(response.name()).isEqualTo("OT-II");
         assertThat(response.strainCode()).isEqualTo("BALBC");
@@ -226,15 +226,15 @@ class TransgenicLineServiceTest {
         final Long id = 10L;
         final Long strainId = 1L;
 
-        TransgenicLineRequest request =
-                new TransgenicLineRequest(
+        StrainTransgenicLineRequest request =
+                new StrainTransgenicLineRequest(
                         strainId,
                         "OT-I");
 
         when(transgenicLineRepository.findById(id))
                 .thenReturn(Optional.empty());
 
-        Optional<TransgenicLineResponse> result =
+        Optional<StrainTransgenicLineResponse> result =
                 transgenicLineService.update(id, request);
 
         assertThat(result).isEmpty();
@@ -253,13 +253,13 @@ class TransgenicLineServiceTest {
                 "C57BL/6"
         );
 
-        TransgenicLine transgenicLine = new TransgenicLine(
+        StrainTransgenicLine transgenicLine = new StrainTransgenicLine(
                 oldStrain,
                 "OT-I"
         );
 
-        TransgenicLineRequest request =
-                new TransgenicLineRequest(
+        StrainTransgenicLineRequest request =
+                new StrainTransgenicLineRequest(
                         newStrainId,
                         "OT-II"
                 );
@@ -274,7 +274,7 @@ class TransgenicLineServiceTest {
         assertThatThrownBy(() ->
                 transgenicLineService.update(id, request))
                 .isInstanceOf(
-                        DuplicateTransgenicLineNameException.class)
+                        DuplicateStrainTransgenicLineNameException.class)
                 .hasMessageContaining("OT-II");
 
         assertThat(transgenicLine.getName()).isEqualTo("OT-I");

@@ -6,23 +6,23 @@ import java.util.Optional;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import cz.animalhouse.dto.TransgenicLineRequest;
-import cz.animalhouse.dto.TransgenicLineResponse;
+import cz.animalhouse.dto.StrainTransgenicLineRequest;
+import cz.animalhouse.dto.StrainTransgenicLineResponse;
 import cz.animalhouse.entity.Strain;
-import cz.animalhouse.entity.TransgenicLine;
-import cz.animalhouse.exception.DuplicateTransgenicLineNameException;
+import cz.animalhouse.entity.StrainTransgenicLine;
+import cz.animalhouse.exception.DuplicateStrainTransgenicLineNameException;
 import cz.animalhouse.exception.StrainNotFoundException;
 import cz.animalhouse.repository.StrainRepository;
-import cz.animalhouse.repository.TransgenicLineRepository;
+import cz.animalhouse.repository.StrainTransgenicLineRepository;
 
 @Service
-public class TransgenicLineService {
+public class StrainTransgenicLineService {
 
-    private final TransgenicLineRepository transgenicLineRepository;
+    private final StrainTransgenicLineRepository transgenicLineRepository;
     private final StrainRepository strainRepository;
 
-    public TransgenicLineService(
-            TransgenicLineRepository transgenicLineRepository,
+    public StrainTransgenicLineService(
+            StrainTransgenicLineRepository transgenicLineRepository,
             StrainRepository strainRepository) {
 
         this.transgenicLineRepository = transgenicLineRepository;
@@ -30,51 +30,51 @@ public class TransgenicLineService {
     }
 
     @Transactional(readOnly = true)
-    public List<TransgenicLineResponse> findAll() {
+    public List<StrainTransgenicLineResponse> findAll() {
         return transgenicLineRepository.findAll()
                 .stream()
-                .map(TransgenicLineResponse::fromEntity)
+                .map(StrainTransgenicLineResponse::fromEntity)
                 .toList();
     }
 
     @Transactional(readOnly = true)
-    public Optional<TransgenicLineResponse> findById(Long id) {
+    public Optional<StrainTransgenicLineResponse> findById(Long id) {
         return transgenicLineRepository.findById(id)
-                .map(TransgenicLineResponse::fromEntity);
+                .map(StrainTransgenicLineResponse::fromEntity);
     }
 
     @Transactional
-    public TransgenicLineResponse create(
-            TransgenicLineRequest request) {
+    public StrainTransgenicLineResponse create(
+            StrainTransgenicLineRequest request) {
 
         if (transgenicLineRepository.existsByName(request.name())) {
-            throw new DuplicateTransgenicLineNameException(
+            throw new DuplicateStrainTransgenicLineNameException(
                     request.name()
             );
         }
 
         Strain strain = findStrain(request.strainId());
 
-        TransgenicLine transgenicLine = new TransgenicLine(
+        StrainTransgenicLine transgenicLine = new StrainTransgenicLine(
                 strain,
                 request.name()
         );
 
-        TransgenicLine saved =
+        StrainTransgenicLine saved =
                 transgenicLineRepository.save(transgenicLine);
 
-        return TransgenicLineResponse.fromEntity(saved);
+        return StrainTransgenicLineResponse.fromEntity(saved);
     }
 
     @Transactional
-    public Optional<TransgenicLineResponse> update(
+    public Optional<StrainTransgenicLineResponse> update(
             Long id,
-            TransgenicLineRequest request) {
+            StrainTransgenicLineRequest request) {
 
-        Optional<TransgenicLine> optionalTransgenicLine =
+        Optional<StrainTransgenicLine> optionalStrainTransgenicLine =
                 transgenicLineRepository.findById(id);
 
-        if (optionalTransgenicLine.isEmpty()) {
+        if (optionalStrainTransgenicLine.isEmpty()) {
             return Optional.empty();
         }
 
@@ -82,21 +82,21 @@ public class TransgenicLineService {
                 request.name(),
                 id)) {
 
-            throw new DuplicateTransgenicLineNameException(
+            throw new DuplicateStrainTransgenicLineNameException(
                     request.name()
             );
         }
 
         Strain strain = findStrain(request.strainId());
 
-        TransgenicLine transgenicLine =
-                optionalTransgenicLine.get();
+        StrainTransgenicLine transgenicLine =
+                optionalStrainTransgenicLine.get();
 
         transgenicLine.setStrain(strain);
         transgenicLine.setName(request.name());
 
         return Optional.of(
-                TransgenicLineResponse.fromEntity(transgenicLine)
+                StrainTransgenicLineResponse.fromEntity(transgenicLine)
         );
     }
 

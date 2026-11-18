@@ -1,8 +1,8 @@
 package cz.animalhouse.dto;
 
-import cz.animalhouse.entity.TransgenicLine;
+import cz.animalhouse.entity.StrainTransgenicLine;
 
-public record TransgenicLineResponse(
+public record StrainTransgenicLineResponse(
         Long id,
         Long strainId,
         String strainCode,
@@ -10,10 +10,10 @@ public record TransgenicLineResponse(
         String name
 ) {
 
-    public static TransgenicLineResponse fromEntity(
-            TransgenicLine transgenicLine) {
+    public static StrainTransgenicLineResponse fromEntity(
+            StrainTransgenicLine transgenicLine) {
 
-        return new TransgenicLineResponse(
+        return new StrainTransgenicLineResponse(
                 transgenicLine.getId(),
                 transgenicLine.getStrain().getId(),
                 transgenicLine.getStrain().getCode(),

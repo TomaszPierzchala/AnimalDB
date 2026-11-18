@@ -4,7 +4,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 
-public record TransgenicLineRequest(
+public record StrainTransgenicLineRequest(
 
         @NotNull(message = "Strain ID is required")
         Long strainId,
