@@ -18,7 +18,7 @@ public class TransgenicLineGene {
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @MapsId("transgenicLineId")
     @JoinColumn(name = "transgenic_line_id", nullable = false)
-    private TransgenicLine transgenicLine;
+    private StrainTransgenicLine transgenicLine;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @MapsId("geneId")
@@ -28,7 +28,7 @@ public class TransgenicLineGene {
     protected TransgenicLineGene() {
     }
 
-	public TransgenicLineGene(TransgenicLine transgenicLine, Gene gene) {
+	public TransgenicLineGene(StrainTransgenicLine transgenicLine, Gene gene) {
 		this.transgenicLine = transgenicLine;
 		this.gene = gene;
 	}
@@ -37,7 +37,7 @@ public class TransgenicLineGene {
 		return id;
 	}
 
-	public TransgenicLine getTransgenicLine() {
+	public StrainTransgenicLine getTransgenicLine() {
 		return transgenicLine;
 	}
 
@@ -45,7 +45,7 @@ public class TransgenicLineGene {
 		return gene;
 	}
 
-	public void setTransgenicLine(TransgenicLine transgenicLine) {
+	public void setTransgenicLine(StrainTransgenicLine transgenicLine) {
 		this.transgenicLine = transgenicLine;
 	}
 

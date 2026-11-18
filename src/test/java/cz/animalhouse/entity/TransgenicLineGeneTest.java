@@ -29,8 +29,8 @@ class TransgenicLineGeneTest {
         Strain strain = entityManager.persistFlushFind(
                 new Strain("C57BL/6J", "Black 6"));
 
-        TransgenicLine transgenicLine = entityManager.persistFlushFind(
-                new TransgenicLine(strain, "OT-I"));
+        StrainTransgenicLine transgenicLine = entityManager.persistFlushFind(
+                new StrainTransgenicLine(strain, "OT-I"));
 
         Gene gene = entityManager.persistFlushFind(
                 new Gene("OT1", "Ovalbumin-specific T-cell receptor"));
@@ -85,8 +85,8 @@ class TransgenicLineGeneTest {
         Strain strain = entityManager.persistFlushFind(
                 new Strain("C57BL/6J", "Black 6"));
 
-        TransgenicLine transgenicLine = entityManager.persistFlushFind(
-                new TransgenicLine(strain, "OT-I"));
+        StrainTransgenicLine transgenicLine = entityManager.persistFlushFind(
+                new StrainTransgenicLine(strain, "OT-I"));
 
         TransgenicLineGene transgenicLineGene =
                 new TransgenicLineGene(transgenicLine, null);
@@ -102,8 +102,8 @@ class TransgenicLineGeneTest {
         Strain strain = entityManager.persistFlushFind(
                 new Strain("C57BL/6J", "Black 6"));
 
-        TransgenicLine transgenicLine = entityManager.persistFlushFind(
-                new TransgenicLine(strain, "OT-I"));
+        StrainTransgenicLine transgenicLine = entityManager.persistFlushFind(
+                new StrainTransgenicLine(strain, "OT-I"));
 
         Gene gene = entityManager.persistFlushFind(
                 new Gene("OT1", "Ovalbumin-specific T-cell receptor"));
