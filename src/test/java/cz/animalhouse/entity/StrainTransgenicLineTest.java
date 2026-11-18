@@ -15,7 +15,7 @@ import org.testcontainers.postgresql.PostgreSQLContainer;
 @DataJpaTest
 @ActiveProfiles("test")
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
-class TransgenicLineTest {
+class StrainTransgenicLineTest {
 
     @ServiceConnection
     static PostgreSQLContainer postgres =
@@ -32,14 +32,14 @@ class TransgenicLineTest {
 
         entityManager.persist(strain);
 
-        TransgenicLine line =
-                new TransgenicLine(strain, "OT-I");
+        StrainTransgenicLine line =
+                new StrainTransgenicLine(strain, "OT-I");
 
         entityManager.persistAndFlush(line);
         entityManager.clear();
 
-        TransgenicLine saved =
-                entityManager.find(TransgenicLine.class, line.getId());
+        StrainTransgenicLine saved =
+                entityManager.find(StrainTransgenicLine.class, line.getId());
 
         assertThat(saved).isNotNull();
 
@@ -54,8 +54,9 @@ class TransgenicLineTest {
                 .isEqualTo(line.hashCode());
 
         assertThat(saved.toString())
-                .contains("TransgenicLine [id=")
-                .contains("OT-I");
+                .contains("StrainTransgenicLine [id=")
+                .contains("OT-I")
+                .contains("strain=Strain [id=").contains("code=C57BL/6J, name=Black 6");
     }
 
     @Test
@@ -66,8 +67,8 @@ class TransgenicLineTest {
 
         entityManager.persist(strain);
 
-        TransgenicLine line =
-                new TransgenicLine(strain, "Old name");
+        StrainTransgenicLine line =
+                new StrainTransgenicLine(strain, "Old name");
 
         entityManager.persistAndFlush(line);
 
@@ -76,8 +77,8 @@ class TransgenicLineTest {
         entityManager.persistAndFlush(line);
         entityManager.clear();
 
-        TransgenicLine saved =
-                entityManager.find(TransgenicLine.class, line.getId());
+        StrainTransgenicLine saved =
+                entityManager.find(StrainTransgenicLine.class, line.getId());
 
         assert saved != null;
         assertThat(saved.getName())
@@ -87,8 +88,8 @@ class TransgenicLineTest {
     @Test
     void shouldRejectNullStrain() {
 
-        TransgenicLine line =
-                new TransgenicLine(null, "OT-I");
+        StrainTransgenicLine line =
+                new StrainTransgenicLine(null, "OT-I");
 
         assertThatThrownBy(() -> entityManager.persistAndFlush(line))
                 .hasRootCauseInstanceOf(org.postgresql.util.PSQLException.class)
@@ -102,10 +103,10 @@ class TransgenicLineTest {
                 entityManager.persistFlushFind(new Strain("C57BL/6J", "Black 6"));
 
         entityManager.persistAndFlush(
-                new TransgenicLine(strain, "OT-I"));
+                new StrainTransgenicLine(strain, "OT-I"));
 
-        TransgenicLine duplicate =
-                new TransgenicLine(strain, "OT-I");
+        StrainTransgenicLine duplicate =
+                new StrainTransgenicLine(strain, "OT-I");
 
         assertThatThrownBy(() -> entityManager.persistAndFlush(duplicate))
                 .hasRootCauseInstanceOf(org.postgresql.util.PSQLException.class)
@@ -113,16 +114,18 @@ class TransgenicLineTest {
     }
     
     @Test
-    void shouldRejectNullName() {
+    void shouldAllowNullName() {
 
         Strain strain =
                 entityManager.persistFlushFind(new Strain("BALB", "BALB/c"));
 
-        TransgenicLine line =
-                new TransgenicLine(strain, null);
+        StrainTransgenicLine line =
+                new StrainTransgenicLine(strain, null);
 
-        assertThatThrownBy(() -> entityManager.persistAndFlush(line))
-                .hasRootCauseInstanceOf(org.postgresql.util.PSQLException.class)
-                .hasMessageContaining("ERROR: null value in column \"name\"");
+        StrainTransgenicLine saved =
+                entityManager.persistFlushFind(line);
+
+        assertThat(saved.getId()).isNotNull();
+        assertThat(saved.getName()).isNull();
     }
 }

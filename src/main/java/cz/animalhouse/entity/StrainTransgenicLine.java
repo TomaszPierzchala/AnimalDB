@@ -14,8 +14,8 @@ import jakarta.persistence.Table;
  * JPA entity representing a transgenic mouse line.
  */
 @Entity
-@Table(name = "transgenic_line")
-public class TransgenicLine {
+@Table(name = "strain_transgenic_line")
+public class StrainTransgenicLine {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -25,13 +25,13 @@ public class TransgenicLine {
 	@JoinColumn(name = "strain_id", nullable = false)
 	private Strain strain;
 
-	@Column(nullable = false, unique = true, length = 100)
+	@Column(nullable = true, unique = true, length = 100)
 	private String name;
 
-	protected TransgenicLine() {
+	protected StrainTransgenicLine() {
 	}
 
-	public TransgenicLine(Strain strain, String name) {
+	public StrainTransgenicLine(Strain strain, String name) {
 		this.strain = strain;
 		this.name = name;
 	}
@@ -66,9 +66,9 @@ public class TransgenicLine {
 			return false;
 		}
 
-		TransgenicLine transgenicLine = (TransgenicLine) o;
+		StrainTransgenicLine strainTransgenicLine = (StrainTransgenicLine) o;
 
-		return id != null && id.equals(transgenicLine.id);
+		return id != null && id.equals(strainTransgenicLine.id);
 	}
 
 	@Override
@@ -78,7 +78,7 @@ public class TransgenicLine {
 
 	@Override
 	public String toString() {
-		return "TransgenicLine [id=" + id + ", name=" + name + "]";
+		return "StrainTransgenicLine [id=" + id + "strain=" + strain + ", name=" + name + "]";
 	}
 
 }
