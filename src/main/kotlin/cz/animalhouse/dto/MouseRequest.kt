@@ -9,7 +9,7 @@ data class MouseRequest(
     val animalNumber: Int,
     val sex: Sex,
     val strainId: Long,
-    val transgenicLineId: Long? = null,
+    val strainTransgenicLineId: Long,
     val labProcedureId: Long? = null,
     val motherAnimalNumber: Int? = null,
     val fatherAnimalNumber: Int? = null,

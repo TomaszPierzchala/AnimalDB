@@ -10,7 +10,7 @@ import cz.animalhouse.exception.MouseSexChangeInUseException
 // import cz.animalhouse.repository.LabProcedureRepository
 import cz.animalhouse.repository.MouseRepository
 import cz.animalhouse.repository.StrainRepository
-import cz.animalhouse.repository.TransgenicLineRepository
+import cz.animalhouse.repository.StrainTransgenicLineRepository
 import org.springframework.dao.DataIntegrityViolationException
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
@@ -23,7 +23,7 @@ import java.time.LocalDate
 class MouseService(
     private val mouseRepository: MouseRepository,
     private val strainRepository: StrainRepository,
-    private val transgenicLineRepository: TransgenicLineRepository,
+    private val transgenicLineRepository: StrainTransgenicLineRepository,
     // private val labProcedureRepository: LabProcedureRepository
     private val clock: Clock
 ) {
@@ -72,7 +72,7 @@ class MouseService(
                 )
             }
 
-        val transgenicLine = request.transgenicLineId?.let { id ->
+        val transgenicLine = request.strainTransgenicLineId.let { id ->
             transgenicLineRepository.findById(id)
                 .orElseThrow {
                     NoSuchElementException(
@@ -105,7 +105,7 @@ class MouseService(
             animalNumber = request.animalNumber,
             sex = request.sex,
             strain = strain,
-            transgenicLine = transgenicLine,
+            strainTransgenicLine = transgenicLine,
             // labProcedure = labProcedure,
             mother = mother,
             father = father,
@@ -191,14 +191,12 @@ class MouseService(
                 )
             }
 
-        val transgenicLine = request.transgenicLineId?.let { lineId ->
-            transgenicLineRepository.findById(lineId)
-                .orElseThrow {
-                    NoSuchElementException(
-                        "Transgenic line with id=$lineId not found"
-                    )
-                }
-        }
+        val transgenicLine = transgenicLineRepository.findById(request.strainTransgenicLineId)
+            .orElseThrow {
+                NoSuchElementException(
+                    "Transgenic line with id=${request.strainTransgenicLineId} not found"
+                )
+            }
 
         // val labProcedure = request.labProcedureId?.let { procedureId ->
         //     labProcedureRepository.findById(procedureId)
@@ -223,7 +221,7 @@ class MouseService(
         mouse.animalNumber = request.animalNumber
         mouse.sex = request.sex
         mouse.strain = strain
-        mouse.transgenicLine = transgenicLine
+        mouse.strainTransgenicLine = transgenicLine
         // mouse.labProcedure = labProcedure
         mouse.mother = mother
         mouse.father = father
@@ -373,7 +371,7 @@ class MouseService(
             strainCode = requireNotNull(strain.code),
             strainName = requireNotNull(strain.name),
 
-            transgenicLineId = transgenicLine?.id,
+            strainTransgenicLineId = strainTransgenicLine.id,
             labProcedureId = labProcedure?.id,
 
             motherAnimalNumber = mother?.animalNumber,

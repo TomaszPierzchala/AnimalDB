@@ -12,7 +12,7 @@ data class MouseResponse(
     val strainCode: String,
     val strainName: String,
 
-    val transgenicLineId: Long?,
+    val strainTransgenicLineId: Long,
     val labProcedureId: Long?,
 
     val motherAnimalNumber: Int?,

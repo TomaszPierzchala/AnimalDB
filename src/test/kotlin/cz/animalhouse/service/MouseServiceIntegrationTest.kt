@@ -3,9 +3,11 @@ package cz.animalhouse.service
 import cz.animalhouse.dto.ParentCandidateResponse
 import cz.animalhouse.entity.Mouse
 import cz.animalhouse.entity.Strain
+import cz.animalhouse.entity.StrainTransgenicLine
 import cz.animalhouse.exception.MouseDeleteInUseException
 import cz.animalhouse.repository.MouseRepository
 import cz.animalhouse.repository.StrainRepository
+import cz.animalhouse.repository.StrainTransgenicLineRepository
 import cz.animalhouse.testutil.TestClock
 import jakarta.persistence.EntityManager
 import org.assertj.core.api.Assertions.assertThat
@@ -60,9 +62,13 @@ class MouseServiceIntegrationTest {
     lateinit var strainRepository: StrainRepository
 
     @Autowired
+    lateinit var strainTransgenicLineRepository: StrainTransgenicLineRepository
+
+    @Autowired
     lateinit var entityManager: EntityManager
 
-    lateinit var strain: Strain
+    private lateinit var strain: Strain
+    private lateinit var strainTransgenicLine: StrainTransgenicLine
 
     @BeforeEach
     fun setUp() {
@@ -71,6 +77,9 @@ class MouseServiceIntegrationTest {
                 "TEST",
                 "Test strain"
             )
+        )
+        strainTransgenicLine = strainTransgenicLineRepository.save(
+            StrainTransgenicLine(strain, "ABCD")
         )
     }
 
@@ -81,7 +90,8 @@ class MouseServiceIntegrationTest {
             Mouse(
                 animalNumber = 1001,
                 sex = Mouse.Sex.F,
-                strain = strain
+                strain = strain,
+                strainTransgenicLine = strainTransgenicLine
             )
         )
 
@@ -90,6 +100,7 @@ class MouseServiceIntegrationTest {
                 animalNumber = 1002,
                 sex = Mouse.Sex.M,
                 strain = strain,
+                strainTransgenicLine = strainTransgenicLine,
                 mother = mother
             )
         )
@@ -115,12 +126,14 @@ class MouseServiceIntegrationTest {
             animalNumber = 81713011,
             sex = Mouse.Sex.F,
             strain = strain,
+            strainTransgenicLine = strainTransgenicLine,
             birthDate = FIXED_TODAY.minusWeeks(3)
         )
         val maleTooYoung = Mouse(
             animalNumber = 91713012,
             sex = Mouse.Sex.M,
             strain = strain,
+            strainTransgenicLine = strainTransgenicLine,
             birthDate = FIXED_TODAY.minusWeeks(2)
         )
 
@@ -128,6 +141,7 @@ class MouseServiceIntegrationTest {
             animalNumber = 1713003,
             sex = Mouse.Sex.F,
             strain = strain,
+            strainTransgenicLine = strainTransgenicLine,
             birthDate = FIXED_TODAY.minusWeeks(5)
         )
 
@@ -135,6 +149,7 @@ class MouseServiceIntegrationTest {
             animalNumber = 17130013,
             sex = Mouse.Sex.M,
             strain = strain,
+            strainTransgenicLine = strainTransgenicLine,
             birthDate = FIXED_TODAY.minusWeeks(5)
         )
 
@@ -142,12 +157,14 @@ class MouseServiceIntegrationTest {
             animalNumber = 61713002,
             sex = Mouse.Sex.F,
             strain = strain,
+            strainTransgenicLine = strainTransgenicLine,
             birthDate = FIXED_TODAY.minusWeeks(5).plusDays(4)
         )
         val femaleOldEnoughButOlder = Mouse(
             animalNumber = 91713004,
             sex = Mouse.Sex.F,
             strain = strain,
+            strainTransgenicLine = strainTransgenicLine,
             birthDate = FIXED_TODAY.minusWeeks(5).minusDays(3)
         )
 
@@ -155,12 +172,14 @@ class MouseServiceIntegrationTest {
             animalNumber = 51713001,
             sex = Mouse.Sex.F,
             strain = strain,
+            strainTransgenicLine = strainTransgenicLine,
             birthDate = null
         )
         val maleNoBirthDate = Mouse(
             animalNumber = 517130014,
             sex = Mouse.Sex.M,
             strain = strain,
+            strainTransgenicLine = strainTransgenicLine,
             birthDate = null
         )
 
@@ -168,6 +187,7 @@ class MouseServiceIntegrationTest {
             animalNumber = 217130015,
             sex = Mouse.Sex.F,
             strain = strain,
+            strainTransgenicLine = strainTransgenicLine,
             birthDate = FIXED_TODAY.minusWeeks(10),
             deathDate = FIXED_TODAY.minusDays(1)
         )
@@ -207,6 +227,7 @@ class MouseServiceIntegrationTest {
                 animalNumber = 1002,
                 sex = Mouse.Sex.M,
                 strain = strain,
+                strainTransgenicLine = strainTransgenicLine,
                 mother = null
             )
         )
@@ -215,7 +236,8 @@ class MouseServiceIntegrationTest {
             Mouse(
                 animalNumber = 1001,
                 sex = Mouse.Sex.F,
-                strain = strain
+                strain = strain,
+                strainTransgenicLine = strainTransgenicLine
             )
         )
         savedMouse.mother = mother
@@ -240,11 +262,19 @@ class MouseServiceIntegrationTest {
         entityManager.flush()
         entityManager.refresh(savedMouse)
 
+        val newStrainTransgenicLine = strainTransgenicLineRepository.save(
+            StrainTransgenicLine(newStrain, "4:36")
+        )
+        savedMouse.strainTransgenicLine = newStrainTransgenicLine
+        entityManager.flush()
+        entityManager.refresh(savedMouse)
+
         val father = mouseRepository.saveAndFlush(
             Mouse(
                 animalNumber = 8901,
                 sex = Mouse.Sex.M,
-                strain = newStrain
+                strain = newStrain,
+                strainTransgenicLine = strainTransgenicLine
             )
         )
         savedMouse.father = father
@@ -273,6 +303,7 @@ class MouseServiceIntegrationTest {
             .contains("column Animal Number value changed from 1002 to 1313")
             .contains("column Sex value changed from M to F")
             .contains("column Strain value changed from 'TEST — Test strain' to 'NEW — New strain'")
+            .contains("column StrainTransgenicLine value changed from 'TEST — Test strain:ABCD' to 'NEW — New strain:4:36'")
             .contains("column Father Animal Number value changed from NULL to 8901")
             .contains("column Cage value changed from NULL to New Cage")
             .contains("column Room value changed from NULL to Some room")

@@ -5,13 +5,13 @@ import cz.animalhouse.dto.MouseResponse
 import cz.animalhouse.entity.LabProcedure
 import cz.animalhouse.entity.Mouse
 import cz.animalhouse.entity.Strain
-import cz.animalhouse.entity.TransgenicLine
+import cz.animalhouse.entity.StrainTransgenicLine
 import cz.animalhouse.exception.DuplicateMouseAnimalNumberException
 import cz.animalhouse.exception.MouseSexChangeInUseException
 // import cz.animalhouse.repository.LabProcedureRepository
 import cz.animalhouse.repository.MouseRepository
 import cz.animalhouse.repository.StrainRepository
-import cz.animalhouse.repository.TransgenicLineRepository
+import cz.animalhouse.repository.StrainTransgenicLineRepository
 import cz.animalhouse.testutil.TestClock
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatThrownBy
@@ -31,9 +31,7 @@ import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageImpl
 import org.springframework.data.domain.PageRequest
 import org.springframework.test.util.ReflectionTestUtils
-import java.time.Clock
 import java.time.LocalDate
-import java.time.ZoneOffset
 import java.util.Optional
 
 @ExtendWith(MockitoExtension::class)
@@ -49,20 +47,20 @@ class MouseServiceTest {
     private lateinit var strainRepository: StrainRepository
 
     @Mock
-    private lateinit var transgenicLineRepository: TransgenicLineRepository
+    private lateinit var transgenicLineRepository: StrainTransgenicLineRepository
 
 //     @Mock
 //     private lateinit var labProcedureRepository: LabProcedureRepository
 
     private lateinit var strain: Strain
-
-    @Mock
-    private lateinit var transgenicLine: TransgenicLine
+    private lateinit var strainTransgenicLine: StrainTransgenicLine
 
     @Mock
     private lateinit var labProcedure: LabProcedure
 
     private lateinit var mouseService: MouseService
+
+    val STAIN_TRTANSGENIC_LINE_ID: Long = 23L
 
     @BeforeEach
     fun setUp() {
@@ -78,11 +76,17 @@ class MouseServiceTest {
             "Strain Code",
             "A Name of the Strain"
         )
-
         ReflectionTestUtils.setField(
             strain,
             "id",
             10L
+        )
+
+        strainTransgenicLine = StrainTransgenicLine(strain, "ABCD")
+        ReflectionTestUtils.setField(
+            strainTransgenicLine,
+            "id",
+            STAIN_TRTANSGENIC_LINE_ID
         )
     }
 
@@ -202,7 +206,7 @@ class MouseServiceTest {
             animalNumber = 1001,
             sex = Mouse.Sex.M,
             strainId = 10L,
-            transgenicLineId = null,
+            strainTransgenicLineId = strainTransgenicLine.id,
             labProcedureId = null,
             motherAnimalNumber = null,
             fatherAnimalNumber = null,
@@ -222,6 +226,9 @@ class MouseServiceTest {
         whenever(
             strainRepository.findById(10L)
         ).thenReturn(Optional.of(strain))
+        whenever(
+            transgenicLineRepository.findById(STAIN_TRTANSGENIC_LINE_ID)
+        ).thenReturn(Optional.of(strainTransgenicLine))
 
         whenever(
             mouseRepository.save(any<Mouse>())
@@ -357,6 +364,9 @@ class MouseServiceTest {
         whenever(
             strainRepository.findById(10L)
         ).thenReturn(Optional.of(strain))
+        whenever(
+            transgenicLineRepository.findById(STAIN_TRTANSGENIC_LINE_ID)
+        ).thenReturn(Optional.of(strainTransgenicLine))
 
         whenever(
             mouseRepository.save(any<Mouse>())
@@ -392,7 +402,7 @@ class MouseServiceTest {
             animalNumber = 1001,
             sex = Mouse.Sex.F,
             strainId = 10L,
-            transgenicLineId = 20L,
+            strainTransgenicLineId = STAIN_TRTANSGENIC_LINE_ID,
         //     labProcedureId = 30L,
             motherAnimalNumber = null,
             fatherAnimalNumber = null,
@@ -412,21 +422,15 @@ class MouseServiceTest {
         whenever(
             strainRepository.findById(10L)
         ).thenReturn(Optional.of(strain))
-
         whenever(
-            transgenicLineRepository.findById(20L)
-        ).thenReturn(
-            Optional.of(transgenicLine)
-        )
+            transgenicLineRepository.findById(STAIN_TRTANSGENIC_LINE_ID)
+        ).thenReturn(Optional.of(strainTransgenicLine))
 
         // whenever(
         //     labProcedureRepository.findById(30L)
         // ).thenReturn(
         //     Optional.of(labProcedure)
         // )
-
-        whenever(transgenicLine.id)
-            .thenReturn(20L)
 
         // whenever(labProcedure.id)
         //     .thenReturn(30L)
@@ -449,14 +453,14 @@ class MouseServiceTest {
         val result =
             mouseService.create(request)
 
-        assertThat(result.transgenicLineId)
-            .isEqualTo(20L)
+        assertThat(result.strainTransgenicLineId)
+            .isEqualTo(STAIN_TRTANSGENIC_LINE_ID)
+
+        verify(transgenicLineRepository)
+            .findById(STAIN_TRTANSGENIC_LINE_ID)
 
         // assertThat(result.labProcedureId)
         //     .isEqualTo(30L)
-
-        verify(transgenicLineRepository)
-            .findById(20L)
 
         // verify(labProcedureRepository)
         //     .findById(30L)
@@ -477,6 +481,9 @@ class MouseServiceTest {
         whenever(
             strainRepository.findById(10L)
         ).thenReturn(Optional.of(strain))
+        whenever(
+            transgenicLineRepository.findById(STAIN_TRTANSGENIC_LINE_ID)
+        ).thenReturn(Optional.of(strainTransgenicLine))
 
         whenever(
             mouseRepository.save(any<Mouse>())
@@ -515,6 +522,9 @@ class MouseServiceTest {
         whenever(
             strainRepository.findById(10L)
         ).thenReturn(Optional.of(strain))
+        whenever(
+            transgenicLineRepository.findById(STAIN_TRTANSGENIC_LINE_ID)
+        ).thenReturn(Optional.of(strainTransgenicLine))
 
         val request = createRequest(
             animalNumber = 36020101,
@@ -544,6 +554,9 @@ class MouseServiceTest {
         whenever(
             strainRepository.findById(10L)
         ).thenReturn(Optional.of(strain))
+        whenever(
+            transgenicLineRepository.findById(STAIN_TRTANSGENIC_LINE_ID)
+        ).thenReturn(Optional.of(strainTransgenicLine))
 
         whenever(
             mouseRepository.save(any<Mouse>())
@@ -579,6 +592,9 @@ class MouseServiceTest {
         whenever(
             strainRepository.findById(10L)
         ).thenReturn(Optional.of(strain))
+        whenever(
+            transgenicLineRepository.findById(STAIN_TRTANSGENIC_LINE_ID)
+        ).thenReturn(Optional.of(strainTransgenicLine))
 
         whenever(
             mouseRepository.save(any<Mouse>())
@@ -683,6 +699,9 @@ class MouseServiceTest {
         whenever(
             strainRepository.findById(10L)
         ).thenReturn(Optional.of(strain))
+        whenever(
+            transgenicLineRepository.findById(STAIN_TRTANSGENIC_LINE_ID)
+        ).thenReturn(Optional.of(strainTransgenicLine))
 
         val request = createRequest(
             animalNumber = 29,
@@ -717,6 +736,9 @@ class MouseServiceTest {
         whenever(
             strainRepository.findById(10L)
         ).thenReturn(Optional.of(strain))
+        whenever(
+            transgenicLineRepository.findById(STAIN_TRTANSGENIC_LINE_ID)
+        ).thenReturn(Optional.of(strainTransgenicLine))
 
         val request = createRequest(
             animalNumber = 26010101,
@@ -794,7 +816,7 @@ class MouseServiceTest {
             animalNumber = MOUSE_ANIMAL_NUMBER,
             sex = Mouse.Sex.F,
             strainId = 10L,
-
+            strainTransgenicLineId = STAIN_TRTANSGENIC_LINE_ID,
             motherAnimalNumber = MOTHER_ANIMAL_NUMBER
         )
 
@@ -816,6 +838,9 @@ class MouseServiceTest {
         whenever(
             strainRepository.findById(10L)
         ).thenReturn(Optional.of(strain))
+        whenever(
+            transgenicLineRepository.findById(STAIN_TRTANSGENIC_LINE_ID)
+        ).thenReturn(Optional.of(strainTransgenicLine))
 
         val result =
             mouseService.update(
@@ -875,6 +900,9 @@ class MouseServiceTest {
         whenever(
             strainRepository.findById(10L)
         ).thenReturn(Optional.of(strain))
+        whenever(
+            transgenicLineRepository.findById(STAIN_TRTANSGENIC_LINE_ID)
+        ).thenReturn(Optional.of(strainTransgenicLine))
 
 
         val request = createRequest(
@@ -931,6 +959,9 @@ class MouseServiceTest {
         whenever(
             strainRepository.findById(10L)
         ).thenReturn(Optional.of(strain))
+        whenever(
+            transgenicLineRepository.findById(STAIN_TRTANSGENIC_LINE_ID)
+        ).thenReturn(Optional.of(strainTransgenicLine))
 
 
         val request = createRequest(
@@ -975,7 +1006,7 @@ class MouseServiceTest {
             animalNumber = MOUSE_ANIMAL_NUMBER,
             sex = Mouse.Sex.F,
             strainId = 10L,
-
+            strainTransgenicLineId = STAIN_TRTANSGENIC_LINE_ID,
             fatherAnimalNumber = FATHER_ANIMAL_NUMBER
         )
 
@@ -997,6 +1028,9 @@ class MouseServiceTest {
         whenever(
             strainRepository.findById(10L)
         ).thenReturn(Optional.of(strain))
+        whenever(
+            transgenicLineRepository.findById(STAIN_TRTANSGENIC_LINE_ID)
+        ).thenReturn(Optional.of(strainTransgenicLine))
 
         val result =
             mouseService.update(
@@ -1155,6 +1189,9 @@ class MouseServiceTest {
         whenever(
             strainRepository.findById(10L)
         ).thenReturn(Optional.of(strain))
+        whenever(
+            transgenicLineRepository.findById(STAIN_TRTANSGENIC_LINE_ID)
+        ).thenReturn(Optional.of(strainTransgenicLine))
 
 
         assertThatThrownBy {
@@ -1203,6 +1240,9 @@ class MouseServiceTest {
         whenever(
             strainRepository.findById(10L)
         ).thenReturn(Optional.of(strain))
+        whenever(
+            transgenicLineRepository.findById(STAIN_TRTANSGENIC_LINE_ID)
+        ).thenReturn(Optional.of(strainTransgenicLine))
 
 
         assertThatThrownBy {
@@ -1386,7 +1426,7 @@ class MouseServiceTest {
             animalNumber = 2001,
             sex = Mouse.Sex.F,
             strainId = 10L,
-            transgenicLineId = null,
+            strainTransgenicLineId = STAIN_TRTANSGENIC_LINE_ID,
             labProcedureId = null,
             motherAnimalNumber = null,
             fatherAnimalNumber = null,
@@ -1413,6 +1453,9 @@ class MouseServiceTest {
         whenever(
             strainRepository.findById(10L)
         ).thenReturn(Optional.of(strain))
+        whenever(
+            transgenicLineRepository.findById(STAIN_TRTANSGENIC_LINE_ID)
+        ).thenReturn(Optional.of(strainTransgenicLine))
 
         val result =
             mouseService.update(
@@ -1698,7 +1741,7 @@ class MouseServiceTest {
             animalNumber = animalNumber,
             sex = sex,
             strain = strain,
-            transgenicLine = null,
+            strainTransgenicLine = strainTransgenicLine,
             labProcedure = null,
             mother = null,
             father = null,
@@ -1732,7 +1775,7 @@ class MouseServiceTest {
             animalNumber = animalNumber,
             sex = sex,
             strainId = 10L,
-            transgenicLineId = null,
+            strainTransgenicLineId = STAIN_TRTANSGENIC_LINE_ID,
             labProcedureId = null,
             motherAnimalNumber = motherAnimalNumber,
             fatherAnimalNumber = fatherAnimalNumber,
