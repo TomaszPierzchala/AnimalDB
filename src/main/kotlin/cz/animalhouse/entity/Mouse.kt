@@ -44,9 +44,9 @@ class Mouse(
     )
     var strain: Strain,
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "transgenic_line_id")
-    var transgenicLine: TransgenicLine? = null,
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "strain_transgenic_line_id", nullable = false)
+    var strainTransgenicLine: StrainTransgenicLine,
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "lab_procedure_id")
@@ -104,7 +104,7 @@ class Mouse(
         javaClass.hashCode()
 
     override fun toString(): String =
-        "Mouse [(id=$id), animalNumber=$animalNumber, sex=$sex]"
+        "Mouse [(id=$id), animalNumber=$animalNumber, sex=$sex, strainTransgenicLine=$strainTransgenicLine]"
 
     enum class Sex {
         M,

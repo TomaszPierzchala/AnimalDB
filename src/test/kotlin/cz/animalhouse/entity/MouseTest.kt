@@ -57,6 +57,9 @@ class MouseTest {
         val strain = entityManager.persistFlushFind(
             Strain("C57BL/6J", "Black 6")
         )
+        val strainTransgenicLine = entityManager.persistFlushFind(
+             StrainTransgenicLine(strain, "ABCD")
+        )
 
         val director = entityManager.persistFlushFind(
             Person(
@@ -76,19 +79,11 @@ class MouseTest {
             )
         )
 
-        val transgenicLine =
-            entityManager.persistFlushFind(
-                TransgenicLine(
-                    strain,
-                    "OT-I"
-                )
-            )
-
         val mouse = Mouse(
             animalNumber = 1001,
             sex = Mouse.Sex.M,
             strain = strain,
-            transgenicLine = transgenicLine,
+            strainTransgenicLine = strainTransgenicLine,
             labProcedure = procedure,
             birthDate = LocalDate.of(2026, 1, 10),
             room = "Room A",
@@ -120,8 +115,8 @@ class MouseTest {
         assertThat(saved.strain.id)
             .isEqualTo(strain.id)
 
-        assertThat(saved.transgenicLine?.id)
-            .isEqualTo(transgenicLine.id)
+        assertThat(saved.strainTransgenicLine.id)
+            .isEqualTo(strainTransgenicLine.id)
 
         assertThat(saved.labProcedure?.id)
             .isEqualTo(procedure.id)
@@ -164,12 +159,16 @@ class MouseTest {
         val strain = entityManager.persistFlushFind(
             Strain("BALB", "BALB/c")
         )
+        val strainTransgenicLine = entityManager.persistFlushFind(
+            StrainTransgenicLine(strain, "ABCD")
+        )
 
         val mother = entityManager.persistFlushFind(
             Mouse(
                 animalNumber = 2001,
                 sex = Mouse.Sex.F,
                 strain = strain,
+                strainTransgenicLine = strainTransgenicLine,
                 birthDate = LocalDate.of(2025, 1, 1),
                 room = "Room A",
                 rack = "Rack 1",
@@ -183,6 +182,7 @@ class MouseTest {
                 animalNumber = 2002,
                 sex = Mouse.Sex.M,
                 strain = strain,
+                strainTransgenicLine = strainTransgenicLine,
                 birthDate = LocalDate.of(2025, 1, 2),
                 room = "Room A",
                 rack = "Rack 1",
@@ -195,6 +195,7 @@ class MouseTest {
             animalNumber = 2003,
             sex = Mouse.Sex.F,
             strain = strain,
+            strainTransgenicLine = strainTransgenicLine,
             mother = mother,
             father = father,
             birthDate = LocalDate.of(2026, 1, 10),
@@ -234,11 +235,15 @@ class MouseTest {
         val strain = entityManager.persistFlushFind(
             Strain("FVB", "Friend Virus B")
         )
+        val strainTransgenicLine = entityManager.persistFlushFind(
+            StrainTransgenicLine(strain, "ABCD")
+        )
 
         val mouse = Mouse(
             animalNumber = 3001,
             sex = Mouse.Sex.F,
-            strain = strain
+            strain = strain,
+            strainTransgenicLine = strainTransgenicLine
         )
 
         entityManager.persistAndFlush(mouse)
@@ -253,7 +258,7 @@ class MouseTest {
 
         assertThat(saved).isNotNull()
 
-        assertThat(saved.transgenicLine).isNull()
+        assertThat(saved.strainTransgenicLine).isNotNull
         assertThat(saved.labProcedure).isNull()
         assertThat(saved.mother).isNull()
         assertThat(saved.father).isNull()
@@ -276,12 +281,19 @@ class MouseTest {
         val newStrain = entityManager.persistFlushFind(
             Strain("NEW", "New/13")
         )
+        val strainTransgenicLine = entityManager.persistFlushFind(
+            StrainTransgenicLine(strain, "ABCD")
+        )
+        val newStrainTransgenicLine = entityManager.persistFlushFind(
+            StrainTransgenicLine(strain, "XYZ")
+        )
 
         val mouse = entityManager.persistFlushFind(
             Mouse(
                 animalNumber = 4001,
                 sex = Mouse.Sex.M,
                 strain = strain,
+                strainTransgenicLine = strainTransgenicLine,
                 birthDate = LocalDate.of(2026, 1, 1),
                 room = "Room A",
                 rack = "Rack 1",
@@ -296,6 +308,7 @@ class MouseTest {
         mouse.deathDate = LocalDate.of(2026, 5, 1)
         mouse.note = "Updated note"
         mouse.strain = newStrain
+        mouse.strainTransgenicLine = newStrainTransgenicLine
 
         entityManager.persistAndFlush(mouse)
         entityManager.clear()
@@ -325,6 +338,7 @@ class MouseTest {
             .contains("column Rack value changed from Rack 1 to Rack 2")
             .contains("column Room value changed from Room A to Room B")
             .contains("column Strain value changed from 'DBA — DBA/2' to 'NEW — New/13'")
+            .contains("column StrainTransgenicLine value changed from 'DBA — DBA/2:ABCD' to 'DBA — DBA/2:XYZ'")
             .contains("Updated note")
             .doesNotContain("Initial note")
     }
@@ -337,19 +351,24 @@ class MouseTest {
                 "Non-obese diabetic"
             )
         )
+        val strainTransgenicLine = entityManager.persistFlushFind(
+            StrainTransgenicLine(strain, "ABCD")
+        )
 
         entityManager.persistAndFlush(
             Mouse(
                 animalNumber = 5001,
                 sex = Mouse.Sex.F,
-                strain = strain
+                strain = strain,
+                strainTransgenicLine = strainTransgenicLine
             )
         )
 
         val duplicate = Mouse(
             animalNumber = 5001,
             sex = Mouse.Sex.M,
-            strain = strain
+            strain = strain,
+            strainTransgenicLine = strainTransgenicLine
         )
 
         assertThatThrownBy {
@@ -368,11 +387,15 @@ class MouseTest {
         val strain = entityManager.persistFlushFind(
             Strain("129S", "129S strain")
         )
+        val strainTransgenicLine = entityManager.persistFlushFind(
+            StrainTransgenicLine(strain, "ABCD")
+        )
 
         val mouse = Mouse(
             animalNumber = 6001,
             sex = Mouse.Sex.M,
-            strain = strain
+            strain = strain,
+            strainTransgenicLine = strainTransgenicLine
         )
 
         ReflectionTestUtils.setField(
@@ -397,11 +420,15 @@ class MouseTest {
         val strain = entityManager.persistFlushFind(
             Strain("TEMP", "Temporary strain")
         )
+        val strainTransgenicLine = entityManager.persistFlushFind(
+            StrainTransgenicLine(strain, "ABCD")
+        )
 
         val mouse = Mouse(
             animalNumber = 7001,
             sex = Mouse.Sex.F,
-            strain = strain
+            strain = strain,
+            strainTransgenicLine = strainTransgenicLine
         )
 
         ReflectionTestUtils.setField(
@@ -418,15 +445,85 @@ class MouseTest {
     }
 
     @Test
+    fun `should reject null strainTransgenicLine association at database level`() {
+        val strain = entityManager.persistFlushFind(
+            Strain("TEMP", "Temporary strain")
+        )
+        val strainTransgenicLine = entityManager.persistFlushFind(
+            StrainTransgenicLine(strain, "ABCD")
+        )
+
+        val mouse = Mouse(
+            animalNumber = 7001,
+            sex = Mouse.Sex.F,
+            strain = strain,
+            strainTransgenicLine = strainTransgenicLine
+        )
+
+        ReflectionTestUtils.setField(
+            mouse,
+            "strainTransgenicLine",
+            null
+        )
+
+        assertThatThrownBy {
+            entityManager.persistAndFlush(mouse)
+        }
+            .isInstanceOf(org.hibernate.exception.ConstraintViolationException::class.java)
+            .hasMessageContaining("ERROR: null value in column \"strain_transgenic_line_id\"")
+    }
+
+
+    @Test
+    fun `should allow inconsistent strain and transgenic line`() {
+        val strain1 = entityManager.persistFlushFind(
+            Strain("BALB", "BALB/c")
+        )
+        val strain2 = entityManager.persistFlushFind(
+            Strain("C57BL", "C57BL/6")
+        )
+
+        val line = entityManager.persistFlushFind(
+            StrainTransgenicLine(strain1, "ABCD")
+        )
+
+        val mouse = entityManager.persistFlushFind(
+            Mouse(
+                animalNumber = 9004,
+                sex = Mouse.Sex.F,
+                strain = strain2,
+                strainTransgenicLine = line
+            )
+        )
+
+        entityManager.clear()
+
+        val saved = requireNotNull(
+            entityManager.find(Mouse::class.java, requireNotNull(mouse.id))
+        )
+
+        assertThat(saved.strain.id).isEqualTo(strain2.id)
+        assertThat(saved.strainTransgenicLine.strain.id)
+            .isEqualTo(strain1.id)
+
+        assertThat(saved.strain.id)
+            .isNotEqualTo(saved.strainTransgenicLine.strain.id)
+    }
+
+    @Test
     fun `should reject death date before birth date`() {
         val strain = entityManager.persistFlushFind(
             Strain("SJL", "SJL/J")
+        )
+        val strainTransgenicLine = entityManager.persistFlushFind(
+            StrainTransgenicLine(strain, "ABCD")
         )
 
         val mouse = Mouse(
             animalNumber = 8001,
             sex = Mouse.Sex.M,
             strain = strain,
+            strainTransgenicLine = strainTransgenicLine,
             birthDate = LocalDate.of(2026, 5, 1),
             deathDate = LocalDate.of(2026, 4, 1)
         )
