@@ -59,11 +59,15 @@ class MatingTest {
         val strain = entityManager.persistFlushFind(
             Strain("C57BL/6J", "Black 6")
         )
+        val strainTransgenicLine = entityManager.persistFlushFind(
+            StrainTransgenicLine(strain, "XYZ")
+        )
 
         val father = Mouse(
             animalNumber = 1001,
             sex = Mouse.Sex.M,
             strain = strain,
+            strainTransgenicLine = strainTransgenicLine,
             birthDate = LocalDate.of(2026, 1, 10),
             room = "Room A",
             rack = "Rack 1",
@@ -77,6 +81,7 @@ class MatingTest {
             animalNumber = 3013,
             sex = Mouse.Sex.F,
             strain = strain,
+            strainTransgenicLine = strainTransgenicLine,
             birthDate = LocalDate.of(2026, 2, 20),
             room = "Room A",
             rack = "Rack 2",
@@ -120,6 +125,7 @@ class MatingTest {
 
         assertThat(saved.male.sex)
             .isEqualTo(Mouse.Sex.M)
+        assertThat(saved.male.strainTransgenicLine).isEqualTo(strainTransgenicLine)
 
         assertThat(saved.female).isNotNull()
         assertThat(saved.female.animalNumber)
@@ -127,7 +133,7 @@ class MatingTest {
 
         assertThat(saved.female.sex)
             .isEqualTo(Mouse.Sex.F)
-
+        assertThat(saved.female.strainTransgenicLine).isEqualTo(strainTransgenicLine)
 
         assertThat(saved.matingDate).isEqualTo(LocalDate.of(2026, 5, 17))
         assertThat(saved.plugDate).isEqualTo(LocalDate.of(2026, 5, 18),)
@@ -150,8 +156,11 @@ class MatingTest {
         assertThat(saved.toString())
             .contains("Mating [(id=")
             .contains("), (female=Mouse [(")
-            .contains("), animalNumber=3013, sex=F]), (male=Mouse [(")
-            .contains("), animalNumber=1001, sex=M]), note=Everything is fine)]")
+            .contains("), animalNumber=3013, sex=F, strainTransgenicLine=StrainTransgenicLine [id=(32),")
+            .contains(", strainTransgenicLine=StrainTransgenicLine [id=(32), strain=Strain [id=32, code=C57BL/6J, name=Black 6], name=XYZ]])")
+            .contains(", name=XYZ]]), (male=Mouse [(id=59), animalNumber=1001, sex=M,")
+            .contains("sex=M, strainTransgenicLine=StrainTransgenicLine [id=(32), strain=Strain [id=32")
+            .contains("[id=32, code=C57BL/6J, name=Black 6], name=XYZ]]), note=Everything is fine)]")
     }
 
     @Test
@@ -159,19 +168,24 @@ class MatingTest {
         val strain = entityManager.persistFlushFind(
             Strain("FVB", "Friend Virus B")
         )
+        val strainTransgenicLine = entityManager.persistFlushFind(
+            StrainTransgenicLine(strain, "XYZ")
+        )
 
         val mother = Mouse(
             animalNumber = 3001,
             sex = Mouse.Sex.F,
-            strain = strain
-        )
+            strain = strain,
+            strainTransgenicLine = strainTransgenicLine
+            )
         entityManager.persistAndFlush(mother)
 
         val father = Mouse(
             animalNumber = 3009,
             sex = Mouse.Sex.M,
-            strain = strain
-        )
+            strain = strain,
+            strainTransgenicLine = strainTransgenicLine
+            )
         entityManager.persistAndFlush(father)
         entityManager.clear()
 
@@ -225,18 +239,23 @@ class MatingTest {
         val strain = entityManager.persistFlushFind(
             Strain("DBA", "DBA/2")
         )
+        val strainTransgenicLine = entityManager.persistFlushFind(
+            StrainTransgenicLine(strain, "XYZ")
+        )
 
         val mother = Mouse(
             animalNumber = 3001,
             sex = Mouse.Sex.F,
-            strain = strain
-        )
+            strain = strain,
+            strainTransgenicLine = strainTransgenicLine
+            )
         entityManager.persistAndFlush(mother)
 
         val father = Mouse(
             animalNumber = 3009,
             sex = Mouse.Sex.M,
-            strain = strain
+            strain = strain,
+            strainTransgenicLine = strainTransgenicLine
         )
         entityManager.persistAndFlush(father)
 
@@ -258,14 +277,15 @@ class MatingTest {
 
         entityManager.persistAndFlush(mating)
 
-        val unkle = Mouse(
+        val uncle = Mouse(
             animalNumber = 3017,
             sex = Mouse.Sex.M,
-            strain = strain
+            strain = strain,
+            strainTransgenicLine = strainTransgenicLine
         )
-        entityManager.persistAndFlush(unkle)
+        entityManager.persistAndFlush(uncle)
 
-        mating.male = unkle
+        mating.male = uncle
 
         mating.matingDate = LocalDate.of(2026, 5, 1)
         mating.plugDate = LocalDate.of(2026, 5, 3)
@@ -291,7 +311,7 @@ class MatingTest {
 
         assertThat(saved.female).isEqualTo(mother)
 
-        assertThat(saved.male).isEqualTo(unkle)
+        assertThat(saved.male).isEqualTo(uncle)
 
         assertThat(saved.matingDate).isEqualTo(LocalDate.of(2026, 5, 1))
 
@@ -318,10 +338,15 @@ class MatingTest {
                 "Non-obese diabetic"
             )
         )
+        val strainTransgenicLine = entityManager.persistFlushFind(
+            StrainTransgenicLine(strain, "XYZ")
+        )
+
         val female = Mouse(
             animalNumber = 5001,
             sex = Mouse.Sex.F,
-            strain = strain
+            strain = strain,
+            strainTransgenicLine = strainTransgenicLine
         )
         entityManager.persistAndFlush(female)
 
@@ -354,10 +379,15 @@ class MatingTest {
                 "Non-obese diabetic"
             )
         )
+        val strainTransgenicLine = entityManager.persistFlushFind(
+            StrainTransgenicLine(strain, "XYZ")
+        )
+
         val male = Mouse(
             animalNumber = 301,
             sex = Mouse.Sex.M,
-            strain = strain
+            strain = strain,
+            strainTransgenicLine = strainTransgenicLine
         )
         entityManager.persistAndFlush(male)
 
@@ -390,10 +420,15 @@ class MatingTest {
                 "Non-obese diabetic"
             )
         )
+        val strainTransgenicLine = entityManager.persistFlushFind(
+            StrainTransgenicLine(strain, "XYZ")
+        )
+
         val male = Mouse(
             animalNumber = 301,
             sex = Mouse.Sex.M,
-            strain = strain
+            strain = strain,
+            strainTransgenicLine = strainTransgenicLine
         )
         entityManager.persistAndFlush(male)
 
@@ -421,16 +456,22 @@ class MatingTest {
                 "Non-obese diabetic"
             )
         )
+        val strainTransgenicLine = entityManager.persistFlushFind(
+            StrainTransgenicLine(strain, "XYZ")
+        )
+
         val male = Mouse(
             animalNumber = 301,
             sex = Mouse.Sex.M,
-            strain = strain
+            strain = strain,
+            strainTransgenicLine = strainTransgenicLine
         )
         entityManager.persistAndFlush(male)
         val female = Mouse(
             animalNumber = 1301,
             sex = Mouse.Sex.F,
-            strain = strain
+            strain = strain,
+            strainTransgenicLine = strainTransgenicLine
         )
         entityManager.persistAndFlush(female)
 
@@ -460,16 +501,22 @@ class MatingTest {
                 "Non-obese diabetic"
             )
         )
+        val strainTransgenicLine = entityManager.persistFlushFind(
+            StrainTransgenicLine(strain, "XYZ")
+        )
+
         val male = Mouse(
             animalNumber = 301,
             sex = Mouse.Sex.M,
-            strain = strain
+            strain = strain,
+            strainTransgenicLine = strainTransgenicLine
         )
         entityManager.persistAndFlush(male)
         val female = Mouse(
             animalNumber = 1301,
             sex = Mouse.Sex.F,
-            strain = strain
+            strain = strain,
+            strainTransgenicLine = strainTransgenicLine
         )
         entityManager.persistAndFlush(female)
 
@@ -500,16 +547,22 @@ class MatingTest {
                 "Non-obese diabetic"
             )
         )
+        val strainTransgenicLine = entityManager.persistFlushFind(
+            StrainTransgenicLine(strain, "XYZ")
+        )
+
         val male = Mouse(
             animalNumber = 301,
             sex = Mouse.Sex.M,
-            strain = strain
+            strain = strain,
+            strainTransgenicLine = strainTransgenicLine
         )
         entityManager.persistAndFlush(male)
         val female = Mouse(
             animalNumber = 1301,
             sex = Mouse.Sex.F,
-            strain = strain
+            strain = strain,
+            strainTransgenicLine = strainTransgenicLine
         )
         entityManager.persistAndFlush(female)
 
@@ -540,16 +593,22 @@ class MatingTest {
                 "Non-obese diabetic"
             )
         )
+        val strainTransgenicLine = entityManager.persistFlushFind(
+            StrainTransgenicLine(strain, "XYZ")
+        )
+
         val male = Mouse(
             animalNumber = 301,
             sex = Mouse.Sex.M,
-            strain = strain
+            strain = strain,
+            strainTransgenicLine = strainTransgenicLine
         )
         entityManager.persistAndFlush(male)
         val female = Mouse(
             animalNumber = 1301,
             sex = Mouse.Sex.F,
-            strain = strain
+            strain = strain,
+            strainTransgenicLine = strainTransgenicLine
         )
         entityManager.persistAndFlush(female)
 
@@ -580,16 +639,22 @@ class MatingTest {
                 "Non-obese diabetic"
             )
         )
+        val strainTransgenicLine = entityManager.persistFlushFind(
+            StrainTransgenicLine(strain, "XYZ")
+        )
+
         val male = Mouse(
             animalNumber = 301,
             sex = Mouse.Sex.M,
-            strain = strain
+            strain = strain,
+            strainTransgenicLine = strainTransgenicLine
         )
         entityManager.persistAndFlush(male)
         val female = Mouse(
             animalNumber = 1301,
             sex = Mouse.Sex.F,
-            strain = strain
+            strain = strain,
+            strainTransgenicLine = strainTransgenicLine
         )
         entityManager.persistAndFlush(female)
 
@@ -622,16 +687,22 @@ class MatingTest {
                 "Non-obese diabetic"
             )
         )
+        val strainTransgenicLine = entityManager.persistFlushFind(
+            StrainTransgenicLine(strain, "XYZ")
+        )
+
         val male = Mouse(
             animalNumber = 301,
             sex = Mouse.Sex.M,
-            strain = strain
+            strain = strain,
+            strainTransgenicLine = strainTransgenicLine
         )
         entityManager.persistAndFlush(male)
         val female = Mouse(
             animalNumber = 1301,
             sex = Mouse.Sex.F,
-            strain = strain
+            strain = strain,
+            strainTransgenicLine = strainTransgenicLine
         )
         entityManager.persistAndFlush(female)
 
@@ -664,16 +735,22 @@ class MatingTest {
                 "Non-obese diabetic"
             )
         )
+        val strainTransgenicLine = entityManager.persistFlushFind(
+            StrainTransgenicLine(strain, "XYZ")
+        )
+
         val male = Mouse(
             animalNumber = 301,
             sex = Mouse.Sex.M,
-            strain = strain
+            strain = strain,
+            strainTransgenicLine = strainTransgenicLine
         )
         entityManager.persistAndFlush(male)
         val female = Mouse(
             animalNumber = 1301,
             sex = Mouse.Sex.F,
-            strain = strain
+            strain = strain,
+            strainTransgenicLine = strainTransgenicLine
         )
         entityManager.persistAndFlush(female)
 
@@ -706,16 +783,22 @@ class MatingTest {
                 "Non-obese diabetic"
             )
         )
+        val strainTransgenicLine = entityManager.persistFlushFind(
+            StrainTransgenicLine(strain, "XYZ")
+        )
+
         val male = Mouse(
             animalNumber = 301,
             sex = Mouse.Sex.M,
-            strain = strain
+            strain = strain,
+            strainTransgenicLine = strainTransgenicLine
         )
         entityManager.persistAndFlush(male)
         val female = Mouse(
             animalNumber = 1301,
             sex = Mouse.Sex.F,
-            strain = strain
+            strain = strain,
+            strainTransgenicLine = strainTransgenicLine
         )
         entityManager.persistAndFlush(female)
 
@@ -748,16 +831,22 @@ class MatingTest {
                 "Non-obese diabetic"
             )
         )
+        val strainTransgenicLine = entityManager.persistFlushFind(
+            StrainTransgenicLine(strain, "XYZ")
+        )
+
         val male = Mouse(
             animalNumber = 301,
             sex = Mouse.Sex.M,
-            strain = strain
+            strain = strain,
+            strainTransgenicLine = strainTransgenicLine
         )
         entityManager.persistAndFlush(male)
         val female = Mouse(
             animalNumber = 1301,
             sex = Mouse.Sex.F,
-            strain = strain
+            strain = strain,
+            strainTransgenicLine = strainTransgenicLine
         )
         entityManager.persistAndFlush(female)
 
@@ -790,16 +879,22 @@ class MatingTest {
                 "Non-obese diabetic"
             )
         )
+        val strainTransgenicLine = entityManager.persistFlushFind(
+            StrainTransgenicLine(strain, "XYZ")
+        )
+
         val male = Mouse(
             animalNumber = 301,
             sex = Mouse.Sex.M,
-            strain = strain
+            strain = strain,
+            strainTransgenicLine = strainTransgenicLine
         )
         entityManager.persistAndFlush(male)
         val female = Mouse(
             animalNumber = 1301,
             sex = Mouse.Sex.F,
-            strain = strain
+            strain = strain,
+            strainTransgenicLine = strainTransgenicLine
         )
         entityManager.persistAndFlush(female)
 
@@ -832,16 +927,22 @@ class MatingTest {
                 "Non-obese diabetic"
             )
         )
+        val strainTransgenicLine = entityManager.persistFlushFind(
+            StrainTransgenicLine(strain, "XYZ")
+        )
+
         val male = Mouse(
             animalNumber = 301,
             sex = Mouse.Sex.M,
-            strain = strain
+            strain = strain,
+            strainTransgenicLine = strainTransgenicLine
         )
         entityManager.persistAndFlush(male)
         val female = Mouse(
             animalNumber = 1301,
             sex = Mouse.Sex.F,
-            strain = strain
+            strain = strain,
+            strainTransgenicLine = strainTransgenicLine
         )
         entityManager.persistAndFlush(female)
 
@@ -874,16 +975,22 @@ class MatingTest {
                 "Non-obese diabetic"
             )
         )
+        val strainTransgenicLine = entityManager.persistFlushFind(
+            StrainTransgenicLine(strain, "XYZ")
+        )
+
         val male = Mouse(
             animalNumber = 301,
             sex = Mouse.Sex.M,
-            strain = strain
+            strain = strain,
+            strainTransgenicLine = strainTransgenicLine
         )
         entityManager.persistAndFlush(male)
         val female = Mouse(
             animalNumber = 1301,
             sex = Mouse.Sex.F,
-            strain = strain
+            strain = strain,
+            strainTransgenicLine = strainTransgenicLine
         )
         entityManager.persistAndFlush(female)
 
@@ -925,11 +1032,17 @@ class MatingTest {
         val strain = entityManager.persistFlushFind(
             Strain("NOD", "Non-obese diabetic")
         )
+        val strainTransgenicLine = entityManager.persistFlushFind(
+            StrainTransgenicLine(strain, "XYZ")
+        )
+
         val female = entityManager.persistFlushFind(
-            Mouse(animalNumber = 1301, sex = Mouse.Sex.F, strain = strain)
+            Mouse(animalNumber = 1301, sex = Mouse.Sex.F, strain = strain,
+                strainTransgenicLine = strainTransgenicLine)
         )
         val male = entityManager.persistFlushFind(
-            Mouse(animalNumber = 301, sex = Mouse.Sex.M, strain = strain)
+            Mouse(animalNumber = 301, sex = Mouse.Sex.M, strain = strain,
+                strainTransgenicLine = strainTransgenicLine)
         )
 
         val mating = Mating(
@@ -968,11 +1081,17 @@ class MatingTest {
         val strain = entityManager.persistFlushFind(
             Strain("NOD", "Non-obese diabetic")
         )
+        val strainTransgenicLine = entityManager.persistFlushFind(
+            StrainTransgenicLine(strain, "XYZ")
+        )
+
         val female = entityManager.persistFlushFind(
-            Mouse(animalNumber = 1301, sex = Mouse.Sex.F, strain = strain)
+            Mouse(animalNumber = 1301, sex = Mouse.Sex.F, strain = strain,
+                strainTransgenicLine = strainTransgenicLine)
         )
         val male = entityManager.persistFlushFind(
-            Mouse(animalNumber = 301, sex = Mouse.Sex.M, strain = strain)
+            Mouse(animalNumber = 301, sex = Mouse.Sex.M, strain = strain,
+                strainTransgenicLine = strainTransgenicLine)
         )
 
         val mating = Mating(
@@ -1001,12 +1120,16 @@ class MatingTest {
         val strain = entityManager.persistFlushFind(
             Strain("NOD", "Non-obese diabetic")
         )
+        val strainTransgenicLine = entityManager.persistFlushFind(
+            StrainTransgenicLine(strain, "XYZ")
+        )
 
         val male = entityManager.persistFlushFind(
             Mouse(
                 animalNumber = 301,
                 sex = Mouse.Sex.M,
-                strain = strain
+                strain = strain,
+                strainTransgenicLine = strainTransgenicLine
             )
         )
 
@@ -1032,12 +1155,16 @@ class MatingTest {
         val strain = entityManager.persistFlushFind(
             Strain("NOD", "Non-obese diabetic")
         )
+        val strainTransgenicLine = entityManager.persistFlushFind(
+            StrainTransgenicLine(strain, "XYZ")
+        )
 
         val female = entityManager.persistFlushFind(
             Mouse(
                 animalNumber = 1301,
                 sex = Mouse.Sex.F,
-                strain = strain
+                strain = strain,
+                strainTransgenicLine = strainTransgenicLine
             )
         )
 
@@ -1063,12 +1190,16 @@ class MatingTest {
         val strain = entityManager.persistFlushFind(
             Strain("NOD", "Non-obese diabetic")
         )
+        val strainTransgenicLine = entityManager.persistFlushFind(
+            StrainTransgenicLine(strain, "XYZ")
+        )
 
         val female = entityManager.persistFlushFind(
             Mouse(
                 animalNumber = 1301,
                 sex = Mouse.Sex.F,
-                strain = strain
+                strain = strain,
+                strainTransgenicLine = strainTransgenicLine
             )
         )
 
@@ -1076,7 +1207,8 @@ class MatingTest {
             Mouse(
                 animalNumber = 301,
                 sex = Mouse.Sex.M,
-                strain = strain
+                strain = strain,
+                strainTransgenicLine = strainTransgenicLine
             )
         )
 
@@ -1121,12 +1253,16 @@ class MatingTest {
         val strain = entityManager.persistFlushFind(
             Strain("NOD", "Non-obese diabetic")
         )
+        val strainTransgenicLine = entityManager.persistFlushFind(
+            StrainTransgenicLine(strain, "XYZ")
+        )
 
         val female = entityManager.persistFlushFind(
             Mouse(
                 animalNumber = 1301,
                 sex = Mouse.Sex.F,
-                strain = strain
+                strain = strain,
+                strainTransgenicLine = strainTransgenicLine
             )
         )
 
@@ -1134,7 +1270,8 @@ class MatingTest {
             Mouse(
                 animalNumber = 301,
                 sex = Mouse.Sex.M,
-                strain = strain
+                strain = strain,
+                strainTransgenicLine = strainTransgenicLine
             )
         )
 

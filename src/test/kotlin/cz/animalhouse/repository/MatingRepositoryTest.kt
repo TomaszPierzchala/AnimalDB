@@ -4,9 +4,8 @@ import cz.animalhouse.entity.Mating
 import cz.animalhouse.entity.Mouse
 import cz.animalhouse.entity.Strain
 import cz.animalhouse.entity.Mouse.Sex
+import cz.animalhouse.entity.StrainTransgenicLine
 import org.assertj.core.api.Assertions.assertThat
-import org.junit.jupiter.api.assertThrows
-import org.springframework.dao.DataIntegrityViolationException
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.data.jpa.test.autoconfigure.DataJpaTest
@@ -16,6 +15,7 @@ import org.testcontainers.postgresql.PostgreSQLContainer
 import java.time.LocalDate
 
 import jakarta.persistence.EntityManager
+import org.junit.jupiter.api.BeforeEach
 import org.springframework.test.context.ActiveProfiles
 
 @DataJpaTest
@@ -41,21 +41,32 @@ class MatingRepositoryTest {
     lateinit var strainRepository: StrainRepository
 
     @Autowired
+    lateinit var strainTransgenicLineRepository: StrainTransgenicLineRepository
+
+    @Autowired
     lateinit var entityManager: EntityManager
 
+    private lateinit var strain: Strain
+    private lateinit var strainTransgenicLine: StrainTransgenicLine
+    @BeforeEach
+    fun setUp() {
+        strain = strainRepository.save(
+            Strain("C57BL6", "C57BL-6")
+        )
 
+        strainTransgenicLine =strainTransgenicLineRepository.save(
+            StrainTransgenicLine(strain, "ABCD")
+        )
+    }
 
     @Test
     fun `should save and find mating by id`() {
-
-        val strain = strainRepository.save(
-            Strain("C57BL6", "C57BL-6")
-        )
 
         val mother = Mouse(
             1001,
             Sex.F,
             strain,
+            strainTransgenicLine = strainTransgenicLine,
             birthDate = LocalDate.of(2026, 8, 1)
         )
 
@@ -63,6 +74,7 @@ class MatingRepositoryTest {
             2001,
             Sex.M,
             strain,
+            strainTransgenicLine = strainTransgenicLine,
             birthDate = LocalDate.of(2026, 7, 21)
         )
 
@@ -97,6 +109,8 @@ class MatingRepositoryTest {
         assertThat(loaded.male.animalNumber)
             .isEqualTo(2001)
 
+        assertThat(loaded.female.strainTransgenicLine).isEqualTo(strainTransgenicLine)
+
         assertThat(loaded.matingDate).isNull()
         assertThat(loaded.plugDate).isNull()
         assertThat(loaded.pregnancyDate).isNull()
@@ -116,14 +130,11 @@ class MatingRepositoryTest {
     @Test
     fun `should set endMatingDate on insert when weaningDate is not null`(){
 
-        val strain = strainRepository.save(
-            Strain("C57BL6", "C57BL-6")
-        )
-
-        val mother = Mouse(
+       val mother = Mouse(
             1001,
             Sex.F,
             strain,
+            strainTransgenicLine = strainTransgenicLine,
             birthDate = LocalDate.of(2026, 8, 1)
         )
 
@@ -131,6 +142,7 @@ class MatingRepositoryTest {
             2001,
             Sex.M,
             strain,
+            strainTransgenicLine = strainTransgenicLine,
             birthDate = LocalDate.of(2026, 7, 21)
         )
 
@@ -161,14 +173,11 @@ class MatingRepositoryTest {
     @Test
     fun `should set endMatingDate when updated with not NULL weaningDate`(){
 
-        val strain = strainRepository.save(
-            Strain("C57BL6", "C57BL-6")
-        )
-
         val mother = Mouse(
             1001,
             Sex.F,
             strain,
+            strainTransgenicLine = strainTransgenicLine,
             birthDate = LocalDate.of(2026, 8, 1)
         )
 
@@ -176,6 +185,7 @@ class MatingRepositoryTest {
             2001,
             Sex.M,
             strain,
+            strainTransgenicLine = strainTransgenicLine,
             birthDate = LocalDate.of(2026, 7, 21)
         )
 

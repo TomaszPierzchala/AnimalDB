@@ -78,7 +78,7 @@ public class StrainTransgenicLine {
 
 	@Override
 	public String toString() {
-		return "StrainTransgenicLine [id=" + id + "strain=" + strain + ", name=" + name + "]";
+		return "StrainTransgenicLine [id=(" + id + "), strain=" + strain + ", name=" + name + "]";
 	}
 
 }
