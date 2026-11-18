@@ -14,7 +14,7 @@ import org.testcontainers.postgresql.PostgreSQLContainer;
 
 import cz.animalhouse.entity.Gene;
 import cz.animalhouse.entity.Strain;
-import cz.animalhouse.entity.TransgenicLine;
+import cz.animalhouse.entity.StrainTransgenicLine;
 import cz.animalhouse.entity.TransgenicLineGene;
 import cz.animalhouse.entity.TransgenicLineGeneId;
 import jakarta.persistence.EntityManager;
@@ -36,7 +36,7 @@ class TransgenicLineGeneRepositoryTest {
             transgenicLineGeneRepository;
 
     @Autowired
-    private TransgenicLineRepository
+    private StrainTransgenicLineRepository
             transgenicLineRepository;
 
     @Autowired
@@ -57,9 +57,9 @@ class TransgenicLineGeneRepositoryTest {
                 )
         );
 
-        TransgenicLine transgenicLine =
+        StrainTransgenicLine transgenicLine =
                 transgenicLineRepository.save(
-                        new TransgenicLine(
+                        new StrainTransgenicLine(
                                 strain,
                                 "OT-I"
                         )
@@ -130,9 +130,9 @@ class TransgenicLineGeneRepositoryTest {
                 )
         );
 
-        TransgenicLine transgenicLine =
+        StrainTransgenicLine transgenicLine =
                 transgenicLineRepository.save(
-                        new TransgenicLine(
+                        new StrainTransgenicLine(
                                 strain,
                                 "OT-I"
                         )
@@ -184,9 +184,9 @@ class TransgenicLineGeneRepositoryTest {
                 )
         );
 
-        TransgenicLine transgenicLine =
+        StrainTransgenicLine transgenicLine =
                 transgenicLineRepository.save(
-                        new TransgenicLine(
+                        new StrainTransgenicLine(
                                 strain,
                                 "OT-I"
                         )
@@ -252,9 +252,9 @@ class TransgenicLineGeneRepositoryTest {
                 )
         );
 
-        TransgenicLine transgenicLine =
+        StrainTransgenicLine transgenicLine =
                 transgenicLineRepository.save(
-                        new TransgenicLine(
+                        new StrainTransgenicLine(
                                 strain,
                                 "OT-I"
                         )
@@ -322,17 +322,17 @@ class TransgenicLineGeneRepositoryTest {
                 )
         );
 
-        TransgenicLine line1 =
+        StrainTransgenicLine line1 =
                 transgenicLineRepository.save(
-                        new TransgenicLine(
+                        new StrainTransgenicLine(
                                 strain,
                                 "Line 1"
                         )
                 );
 
-        TransgenicLine line2 =
+        StrainTransgenicLine line2 =
                 transgenicLineRepository.save(
-                        new TransgenicLine(
+                        new StrainTransgenicLine(
                                 strain,
                                 "Line 2"
                         )
