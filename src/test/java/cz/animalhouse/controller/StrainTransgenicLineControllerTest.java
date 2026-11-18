@@ -17,32 +17,32 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
-import cz.animalhouse.dto.TransgenicLineRequest;
-import cz.animalhouse.dto.TransgenicLineResponse;
-import cz.animalhouse.service.TransgenicLineService;
+import cz.animalhouse.dto.StrainTransgenicLineRequest;
+import cz.animalhouse.dto.StrainTransgenicLineResponse;
+import cz.animalhouse.service.StrainTransgenicLineService;
 
-@WebMvcTest(TransgenicLineController.class)
-class TransgenicLineControllerTest {
+@WebMvcTest(StrainTransgenicLineController.class)
+class StrainTransgenicLineControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
 
     @MockitoBean
-    private TransgenicLineService transgenicLineService;
+    private StrainTransgenicLineService transgenicLineService;
 
     @Test
     void shouldReturnAllTransgenicLines() throws Exception {
 
-        TransgenicLineResponse line1 =
-                new TransgenicLineResponse(
+        StrainTransgenicLineResponse line1 =
+                new StrainTransgenicLineResponse(
                         10L,
                         1L,
                         "C57BL6",
                         "C57BL/6",
                         "OT-I");
 
-        TransgenicLineResponse line2 =
-                new TransgenicLineResponse(
+        StrainTransgenicLineResponse line2 =
+                new StrainTransgenicLineResponse(
                         11L,
                         1L,
                         "C57BL6_2",
@@ -69,13 +69,13 @@ class TransgenicLineControllerTest {
     @Test
     void shouldCreateTransgenicLine() throws Exception {
 
-        TransgenicLineRequest request =
-                new TransgenicLineRequest(
+        StrainTransgenicLineRequest request =
+                new StrainTransgenicLineRequest(
                         1L,
                         "OT-I");
 
-        TransgenicLineResponse response =
-                new TransgenicLineResponse(
+        StrainTransgenicLineResponse response =
+                new StrainTransgenicLineResponse(
                         10L,
                         1L,
                         "C57BL6",

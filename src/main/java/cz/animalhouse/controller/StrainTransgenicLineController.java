@@ -15,31 +15,31 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
-import cz.animalhouse.dto.TransgenicLineRequest;
-import cz.animalhouse.dto.TransgenicLineResponse;
-import cz.animalhouse.service.TransgenicLineService;
+import cz.animalhouse.dto.StrainTransgenicLineRequest;
+import cz.animalhouse.dto.StrainTransgenicLineResponse;
+import cz.animalhouse.service.StrainTransgenicLineService;
 import jakarta.validation.Valid;
 
 @CrossOrigin(origins = "${app.cors.allowed-origin}")
 @RestController
 @RequestMapping("/api/transgenic-lines")
-public class TransgenicLineController {
+public class StrainTransgenicLineController {
 
-    private final TransgenicLineService transgenicLineService;
+    private final StrainTransgenicLineService transgenicLineService;
 
-    public TransgenicLineController(
-            TransgenicLineService transgenicLineService) {
+    public StrainTransgenicLineController(
+            StrainTransgenicLineService transgenicLineService) {
 
         this.transgenicLineService = transgenicLineService;
     }
 
     @GetMapping
-    public List<TransgenicLineResponse> findAll() {
+    public List<StrainTransgenicLineResponse> findAll() {
         return transgenicLineService.findAll();
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<TransgenicLineResponse> findById(
+    public ResponseEntity<StrainTransgenicLineResponse> findById(
             @PathVariable Long id) {
 
         return transgenicLineService.findById(id)
@@ -51,16 +51,16 @@ public class TransgenicLineController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public TransgenicLineResponse create(
-            @Valid @RequestBody TransgenicLineRequest request) {
+    public StrainTransgenicLineResponse create(
+            @Valid @RequestBody StrainTransgenicLineRequest request) {
 
         return transgenicLineService.create(request);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<TransgenicLineResponse> update(
+    public ResponseEntity<StrainTransgenicLineResponse> update(
             @PathVariable Long id,
-            @Valid @RequestBody TransgenicLineRequest request) {
+            @Valid @RequestBody StrainTransgenicLineRequest request) {
 
         return transgenicLineService.update(id, request)
                 .map(ResponseEntity::ok)
