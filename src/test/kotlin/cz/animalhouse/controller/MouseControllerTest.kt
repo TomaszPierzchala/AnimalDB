@@ -390,6 +390,7 @@ class MouseControllerTest {
             "animalNumber": 1001,
             "sex": "M",
             "strainId": 10,
+            "strainTransgenicLineId": 13,
             "birthDate": "2026-01-10",
             "deathDate": "2026-01-09"
         }
@@ -412,7 +413,8 @@ class MouseControllerTest {
         {
             "animalNumber": 1001,
             "sex": "X",
-            "strainId": 10
+            "strainId": 10,
+            "strainTransgenicLineId": 7,
         }
     """.trimIndent()
 
@@ -472,6 +474,7 @@ class MouseControllerTest {
                       "animalNumber": 7301,
                       "sex": "F",
                       "strainId": 1,
+                      "strainTransgenicLineId": 13,
                       "motherAnimalNumber": 26010101,
                       "fatherAnimalNumber": 26010102
                     }
@@ -503,6 +506,7 @@ class MouseControllerTest {
                       "animalNumber": 7301,
                       "sex": "F",
                       "strainId": 1,
+                      "strainTransgenicLineId": 11,
                       "motherAnimalNumber": 26010101,
                       "fatherAnimalNumber": 26010102
                     }
@@ -561,7 +565,7 @@ class MouseControllerTest {
             strainId = 10L,
             strainCode = "STR1",
             strainName = "FIRST strain",
-            transgenicLineId = null,
+            strainTransgenicLineId = 10L,
             labProcedureId = null,
             motherAnimalNumber = motherAnimalNumber,
             fatherAnimalNumber = fatherAnimalNumber,
@@ -583,6 +587,7 @@ class MouseControllerTest {
             "animalNumber": $animalNumber,
             "sex": "$sex",
             "strainId": 10,
+            "strainTransgenicLineId": 19,
             "birthDate": "2026-01-10",
             "room": "A1",
             "rack": "R2",

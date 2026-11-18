@@ -3,6 +3,7 @@ package cz.animalhouse.repository
 import cz.animalhouse.entity.Mouse
 import cz.animalhouse.entity.Strain
 import cz.animalhouse.entity.Mouse.Sex
+import cz.animalhouse.entity.StrainTransgenicLine
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.assertThrows
 import org.springframework.dao.DataIntegrityViolationException
@@ -35,6 +36,9 @@ class MouseRepositoryTest {
 
     @Autowired
     lateinit var strainRepository: StrainRepository
+
+    @Autowired
+    lateinit var strainTransgenicLineRepository: StrainTransgenicLineRepository
     
     @Autowired
     lateinit var entityManager: EntityManager
@@ -48,11 +52,15 @@ class MouseRepositoryTest {
                 "C57BL-6"
             )
         )
+        val strainTransgenicLine = strainTransgenicLineRepository.save(
+            StrainTransgenicLine(strain, "ABCD")
+        )
 
         val mouse = createMouse(
             1001,
             Sex.M,
             strain,
+            strainTransgenicLine,
             birthDate = LocalDate.of(2026, 8, 1))
 
         val saved = mouseRepository.save(mouse)
@@ -82,6 +90,9 @@ class MouseRepositoryTest {
         assertThat(loaded.strain.id)
             .isEqualTo(strain.id)
 
+        assertThat(loaded.strainTransgenicLine.id)
+            .isEqualTo(strainTransgenicLine.id)
+
         assertThat(loaded.birthDate)
             .isEqualTo(LocalDate.of(2026, 8, 1))
 
@@ -109,12 +120,16 @@ class MouseRepositoryTest {
                 "BALB-c"
             )
         )
+        val strainTransgenicLine = strainTransgenicLineRepository.save(
+            StrainTransgenicLine(strain, "ABCD")
+        )
 
         mouseRepository.save(
             createMouse(
                 2001,
                 Sex.F,
                 strain,
+                strainTransgenicLine
             )
         )
 
@@ -123,6 +138,7 @@ class MouseRepositoryTest {
                 2002,
                 Sex.M,
                 strain,
+                strainTransgenicLine
             )
         )
 
@@ -150,17 +166,22 @@ class MouseRepositoryTest {
                 "C57"
             )
         )
+        val strainTransgenicLine = strainTransgenicLineRepository.save(
+            StrainTransgenicLine(someStrain, "ABCD")
+        )
 
         val father = createMouse(
             31,
             Sex.M,
             someStrain,
+            strainTransgenicLine
         )
 
         val mother = createMouse(
             37,
             Sex.F,
             someStrain,
+            strainTransgenicLine
         )
         mouseRepository.saveAll(
             listOf(father, mother))
@@ -170,12 +191,14 @@ class MouseRepositoryTest {
             137,
             Sex.F,
             someStrain,
+            strainTransgenicLine = strainTransgenicLine,
             mother = mother
         )
         val mouse2 = createMouse(
             437,
             Sex.F,
             someStrain,
+            strainTransgenicLine = strainTransgenicLine,
             father = father
         )
 
@@ -200,17 +223,22 @@ class MouseRepositoryTest {
                 "C57"
             )
         )
+        val strainTransgenicLine = strainTransgenicLineRepository.save(
+            StrainTransgenicLine(strain, "ABCD")
+        )
 
         val first = createMouse(
             3001,
             Sex.M,
             strain,
+            strainTransgenicLine
         )
 
         val second = createMouse(
             3001,
             Sex.F,
             strain,
+            strainTransgenicLine
         )
 
         mouseRepository.save(first)
@@ -239,23 +267,29 @@ class MouseRepositoryTest {
                 "C57BL/6"
             )
         )
+        val strainTransgenicLine = strainTransgenicLineRepository.save(
+            StrainTransgenicLine(strain, "ABCD")
+        )
 
         mouseRepository.saveAll(
             listOf(
                 createMouse(
                     animalNumber = 5,
                     sex = Sex.M,
-                    strain
+                    strain,
+                    strainTransgenicLine
                 ),
                 createMouse(
                     animalNumber = 12,
                     sex = Mouse.Sex.F,
-                    strain
+                    strain,
+                    strainTransgenicLine
                 ),
                 createMouse(
                     animalNumber = 8,
                     sex =Mouse.Sex.M,
-                    strain
+                    strain,
+                    strainTransgenicLine
                 )
             )
         )
@@ -274,11 +308,16 @@ class MouseRepositoryTest {
                 "C57BL/6"
             )
         )
+        val strainTransgenicLine = strainTransgenicLineRepository.save(
+            StrainTransgenicLine(strain, "ABCD")
+        )
+
         val saved = mouseRepository.save(
             createMouse(
                 animalNumber = 26010101,
                 sex = Mouse.Sex.F,
-                strain
+                strain,
+                strainTransgenicLine
             )
         )
 
@@ -307,12 +346,16 @@ class MouseRepositoryTest {
                 "C57BL/6"
             )
         )
+        val strainTransgenicLine = strainTransgenicLineRepository.save(
+            StrainTransgenicLine(strain, "ABCD")
+        )
 
         mouseRepository.saveAndFlush(
             createMouse(
                 animalNumber = 26010101,
                 sex = Mouse.Sex.F,
-                strain = strain
+                strain = strain,
+                strainTransgenicLine
             )
         )
 
@@ -321,7 +364,8 @@ class MouseRepositoryTest {
                 createMouse(
                     animalNumber = 26010101,
                     sex = Mouse.Sex.M,
-                    strain = strain
+                    strain = strain,
+                    strainTransgenicLine
                 )
             )
         }
@@ -335,12 +379,15 @@ class MouseRepositoryTest {
                 "C57BL/6"
             )
         )
+        val trLine = strainTransgenicLineRepository.save(
+            StrainTransgenicLine(strain, "ABCD")
+        )
         mouseRepository.saveAll(
             listOf(
-                createMouse(26010101, Mouse.Sex.F, strain = strain),
-                createMouse(26010102, Mouse.Sex.F, strain = strain),
-                createMouse(26010103, Mouse.Sex.M, strain = strain),
-                createMouse(27010101, Mouse.Sex.F, strain = strain)
+                createMouse(26010101, Mouse.Sex.F, strain = strain, strainTransgenicLine = trLine),
+                createMouse(26010102, Mouse.Sex.F, strain = strain, strainTransgenicLine = trLine),
+                createMouse(26010103, Mouse.Sex.M, strain = strain, strainTransgenicLine = trLine),
+                createMouse(27010101, Mouse.Sex.F, strain = strain, strainTransgenicLine = trLine)
             )
         )
 
@@ -383,23 +430,26 @@ class MouseRepositoryTest {
                 "C57BL/6"
             )
         )
+        val trLine = strainTransgenicLineRepository.save(
+            StrainTransgenicLine(strain, "ABCD")
+        )
 
         mouseRepository.saveAll(
             listOf(
-                createMouse(723001, Mouse.Sex.F, strain = strain),
-                createMouse(723002, Mouse.Sex.F, strain = strain),
-                createMouse(723003, Mouse.Sex.F, strain = strain),
-                createMouse(723004, Mouse.Sex.F, strain = strain),
-                createMouse(723005, Mouse.Sex.F, strain = strain),
-                createMouse(723006, Mouse.Sex.F, strain = strain),
-                createMouse(723007, Mouse.Sex.F, strain = strain),
-                createMouse(723008, Mouse.Sex.F, strain = strain),
-                createMouse(723009, Mouse.Sex.F, strain = strain),
-                createMouse(723010, Mouse.Sex.F, strain = strain),
-                createMouse(723011, Mouse.Sex.F, strain = strain),
-                createMouse(723012, Mouse.Sex.F, strain = strain),
-                createMouse(723013, Mouse.Sex.F, strain = strain),
-                createMouse(723014, Mouse.Sex.F, strain = strain)
+                createMouse(723001, Mouse.Sex.F, strain = strain, strainTransgenicLine = trLine),
+                createMouse(723002, Mouse.Sex.F, strain = strain, strainTransgenicLine = trLine),
+                createMouse(723003, Mouse.Sex.F, strain = strain, strainTransgenicLine = trLine),
+                createMouse(723004, Mouse.Sex.F, strain = strain, strainTransgenicLine = trLine),
+                createMouse(723005, Mouse.Sex.F, strain = strain, strainTransgenicLine = trLine),
+                createMouse(723006, Mouse.Sex.F, strain = strain, strainTransgenicLine = trLine),
+                createMouse(723007, Mouse.Sex.F, strain = strain, strainTransgenicLine = trLine),
+                createMouse(723008, Mouse.Sex.F, strain = strain, strainTransgenicLine = trLine),
+                createMouse(723009, Mouse.Sex.F, strain = strain, strainTransgenicLine = trLine),
+                createMouse(723010, Mouse.Sex.F, strain = strain, strainTransgenicLine = trLine),
+                createMouse(723011, Mouse.Sex.F, strain = strain, strainTransgenicLine = trLine),
+                createMouse(723012, Mouse.Sex.F, strain = strain, strainTransgenicLine = trLine),
+                createMouse(723013, Mouse.Sex.F, strain = strain, strainTransgenicLine = trLine),
+                createMouse(723014, Mouse.Sex.F, strain = strain, strainTransgenicLine = trLine),
             )
         )
 
@@ -428,11 +478,15 @@ class MouseRepositoryTest {
                 "C57BL/6"
             )
         )
+        val strainTransgenicLine = strainTransgenicLineRepository.save(
+            StrainTransgenicLine(strain, "ABCD")
+        )
         
         val femaleTooYoung = Mouse(
             animalNumber = 3723001,
             sex = Mouse.Sex.F,
             strain = strain,
+            strainTransgenicLine = strainTransgenicLine,
             birthDate = FIXED_TODAY.minusWeeks(3)
         )
 
@@ -440,6 +494,7 @@ class MouseRepositoryTest {
             animalNumber = 1723002,
             sex = Mouse.Sex.F,
             strain = strain,
+            strainTransgenicLine = strainTransgenicLine,
             birthDate = FIXED_TODAY.minusWeeks(5)
         )
 
@@ -447,12 +502,14 @@ class MouseRepositoryTest {
             animalNumber = 67230021,
             sex = Mouse.Sex.F,
             strain = strain,
+            strainTransgenicLine = strainTransgenicLine,
             birthDate = FIXED_TODAY.minusWeeks(5).plusDays(4)
         )
         val femaleOldEnoughButOlder = Mouse(
             animalNumber = 7230023,
             sex = Mouse.Sex.F,
             strain = strain,
+            strainTransgenicLine = strainTransgenicLine,
             birthDate = FIXED_TODAY.minusWeeks(5).minusDays(3)
         )
 
@@ -460,6 +517,7 @@ class MouseRepositoryTest {
             animalNumber = 5723003,
             sex = Mouse.Sex.F,
             strain = strain,
+            strainTransgenicLine = strainTransgenicLine,
             birthDate = null
         )
 
@@ -467,6 +525,7 @@ class MouseRepositoryTest {
             animalNumber = 2723004,
             sex = Mouse.Sex.F,
             strain = strain,
+            strainTransgenicLine = strainTransgenicLine,
             birthDate = FIXED_TODAY.minusWeeks(10),
             deathDate = FIXED_TODAY.minusDays(1)
         )
@@ -511,11 +570,15 @@ class MouseRepositoryTest {
                 "C57BL/6"
             )
         )
+        val strainTransgenicLine = strainTransgenicLineRepository.save(
+            StrainTransgenicLine(strain, "ABCD")
+        )
 
         val maleTooYoung = Mouse(
             animalNumber = 913001,
             sex = Mouse.Sex.M,
             strain = strain,
+            strainTransgenicLine = strainTransgenicLine,
             birthDate = FIXED_TODAY.minusWeeks(5)
         )
 
@@ -523,6 +586,7 @@ class MouseRepositoryTest {
             animalNumber = 913002,
             sex = Mouse.Sex.M,
             strain = strain,
+            strainTransgenicLine = strainTransgenicLine,
             birthDate = FIXED_TODAY.minusWeeks(6)
         )
 
@@ -530,6 +594,7 @@ class MouseRepositoryTest {
             animalNumber = 913003,
             sex = Mouse.Sex.M,
             strain = strain,
+            strainTransgenicLine = strainTransgenicLine,
             birthDate = null
         )
 
@@ -537,6 +602,7 @@ class MouseRepositoryTest {
             animalNumber = 913004,
             sex = Mouse.Sex.M,
             strain = strain,
+            strainTransgenicLine = strainTransgenicLine,
             birthDate = FIXED_TODAY.minusWeeks(10),
             deathDate = FIXED_TODAY.minusDays(1)
         )
@@ -545,12 +611,14 @@ class MouseRepositoryTest {
             animalNumber = 713007,
             sex = Mouse.Sex.M,
             strain = strain,
+            strainTransgenicLine = strainTransgenicLine,
             birthDate = FIXED_TODAY.minusWeeks(6).plusDays(3)
         )
         val maleOldEnoughButOlder = Mouse(
             animalNumber = 713009,
             sex = Mouse.Sex.M,
             strain = strain,
+            strainTransgenicLine = strainTransgenicLine,
             birthDate = FIXED_TODAY.minusWeeks(6).minusDays(4)
         )
 
@@ -589,6 +657,7 @@ class MouseRepositoryTest {
         animalNumber: Int,
         sex: Mouse.Sex,
         strain: Strain,
+        strainTransgenicLine: StrainTransgenicLine,
         father: Mouse? = null,
         mother: Mouse? = null,
         birthDate: LocalDate? = null) : Mouse {
@@ -596,6 +665,7 @@ class MouseRepositoryTest {
             animalNumber,
             sex,
             strain,
+            strainTransgenicLine = strainTransgenicLine,
             father = father,
             mother = mother,
             birthDate = birthDate,
