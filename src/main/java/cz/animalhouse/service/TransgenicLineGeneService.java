@@ -11,7 +11,7 @@ import cz.animalhouse.dto.GeneResponse;
 import cz.animalhouse.dto.TransgenicLineGeneRequest;
 import cz.animalhouse.dto.TransgenicLineGeneRowResponse;
 import cz.animalhouse.entity.Gene;
-import cz.animalhouse.entity.TransgenicLine;
+import cz.animalhouse.entity.StrainTransgenicLine;
 import cz.animalhouse.entity.TransgenicLineGene;
 import cz.animalhouse.entity.TransgenicLineGeneId;
 import cz.animalhouse.exception.DuplicateTransgenicLineGeneException;
@@ -20,7 +20,7 @@ import cz.animalhouse.exception.TransgenicLineGeneNotFoundException;
 import cz.animalhouse.exception.TransgenicLineNotFoundException;
 import cz.animalhouse.repository.GeneRepository;
 import cz.animalhouse.repository.TransgenicLineGeneRepository;
-import cz.animalhouse.repository.TransgenicLineRepository;
+import cz.animalhouse.repository.StrainTransgenicLineRepository;
 
 @Service
 public class TransgenicLineGeneService {
@@ -28,14 +28,14 @@ public class TransgenicLineGeneService {
     private final TransgenicLineGeneRepository
             transgenicLineGeneRepository;
 
-    private final TransgenicLineRepository
+    private final StrainTransgenicLineRepository
             transgenicLineRepository;
 
     private final GeneRepository geneRepository;
 
     public TransgenicLineGeneService(
             TransgenicLineGeneRepository transgenicLineGeneRepository,
-            TransgenicLineRepository transgenicLineRepository,
+            StrainTransgenicLineRepository transgenicLineRepository,
             GeneRepository geneRepository) {
 
         this.transgenicLineGeneRepository =
@@ -55,7 +55,7 @@ public class TransgenicLineGeneService {
         Map<Long, RowBuilder> rows = new LinkedHashMap<>();
 
         for (TransgenicLineGene assignment : assignments) {
-            TransgenicLine line =
+            StrainTransgenicLine line =
                     assignment.getTransgenicLine();
 
             rows.computeIfAbsent(
@@ -90,7 +90,7 @@ public class TransgenicLineGeneService {
             );
         }
 
-        TransgenicLine line =
+        StrainTransgenicLine line =
                 findTransgenicLine(request.transgenicLineId());
 
         Gene gene = findGene(request.geneId());
@@ -137,7 +137,7 @@ public class TransgenicLineGeneService {
             );
         }
 
-        TransgenicLine newLine =
+        StrainTransgenicLine newLine =
                 findTransgenicLine(request.transgenicLineId());
 
         Gene newGene = findGene(request.geneId());
@@ -189,7 +189,7 @@ public class TransgenicLineGeneService {
 	            );
 	}
 
-    private TransgenicLine findTransgenicLine(Long id) {
+    private StrainTransgenicLine findTransgenicLine(Long id) {
         return transgenicLineRepository.findById(id)
                 .orElseThrow(() ->
                         new TransgenicLineNotFoundException(id)
@@ -204,7 +204,7 @@ public class TransgenicLineGeneService {
     }
 
     private TransgenicLineGeneRowResponse createSingleRowResponse(
-            TransgenicLine line,
+            StrainTransgenicLine line,
             Gene gene) {
 
         return new TransgenicLineGeneRowResponse(
@@ -218,11 +218,11 @@ public class TransgenicLineGeneService {
     }
 
     private record RowBuilder(
-            TransgenicLine line,
+            StrainTransgenicLine line,
             List<GeneResponse> genes
     ) {
 
-        private RowBuilder(TransgenicLine line) {
+        private RowBuilder(StrainTransgenicLine line) {
             this(line, new java.util.ArrayList<>());
         }
 

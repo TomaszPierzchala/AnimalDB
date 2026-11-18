@@ -4,7 +4,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
@@ -24,7 +23,7 @@ import cz.animalhouse.dto.TransgenicLineGeneRequest;
 import cz.animalhouse.dto.TransgenicLineGeneRowResponse;
 import cz.animalhouse.entity.Gene;
 import cz.animalhouse.entity.Strain;
-import cz.animalhouse.entity.TransgenicLine;
+import cz.animalhouse.entity.StrainTransgenicLine;
 import cz.animalhouse.entity.TransgenicLineGene;
 import cz.animalhouse.entity.TransgenicLineGeneId;
 import cz.animalhouse.exception.DuplicateTransgenicLineGeneException;
@@ -33,7 +32,7 @@ import cz.animalhouse.exception.TransgenicLineGeneNotFoundException;
 import cz.animalhouse.exception.TransgenicLineNotFoundException;
 import cz.animalhouse.repository.GeneRepository;
 import cz.animalhouse.repository.TransgenicLineGeneRepository;
-import cz.animalhouse.repository.TransgenicLineRepository;
+import cz.animalhouse.repository.StrainTransgenicLineRepository;
 
 @ExtendWith(MockitoExtension.class)
 class TransgenicLineGeneServiceTest {
@@ -43,7 +42,7 @@ class TransgenicLineGeneServiceTest {
             transgenicLineGeneRepository;
 
     @Mock
-    private TransgenicLineRepository
+    private StrainTransgenicLineRepository
             transgenicLineRepository;
 
     @Mock
@@ -68,13 +67,13 @@ class TransgenicLineGeneServiceTest {
                 "C57BL/6"
         );
 
-        TransgenicLine line1 = createTransgenicLine(
+        StrainTransgenicLine line1 = createStrainTransgenicLine(
                 10L,
                 strain,
                 "OT-I"
         );
 
-        TransgenicLine line2 = createTransgenicLine(
+        StrainTransgenicLine line2 = createStrainTransgenicLine(
                 20L,
                 strain,
                 "OT-II"
@@ -181,7 +180,7 @@ class TransgenicLineGeneServiceTest {
                 "C57BL/6"
         );
 
-        TransgenicLine line = createTransgenicLine(
+        StrainTransgenicLine line = createStrainTransgenicLine(
                 lineId,
                 strain,
                 "OT-I"
@@ -336,7 +335,7 @@ class TransgenicLineGeneServiceTest {
                 "C57BL/6"
         );
 
-        TransgenicLine line = createTransgenicLine(
+        StrainTransgenicLine line = createStrainTransgenicLine(
                 lineId,
                 strain,
                 "OT-I"
@@ -387,8 +386,8 @@ class TransgenicLineGeneServiceTest {
                 "C57BL/6"
         );
 
-        TransgenicLine currentLine =
-                createTransgenicLine(
+        StrainTransgenicLine currentLine =
+                createStrainTransgenicLine(
                         currentLineId,
                         strain,
                         "OT-I"
@@ -406,8 +405,8 @@ class TransgenicLineGeneServiceTest {
                         currentGene
                 );
 
-        TransgenicLine newLine =
-                createTransgenicLine(
+        StrainTransgenicLine newLine =
+                createStrainTransgenicLine(
                         newLineId,
                         strain,
                         "OT-II"
@@ -502,7 +501,7 @@ class TransgenicLineGeneServiceTest {
                 "C57BL/6"
         );
 
-        TransgenicLine line = createTransgenicLine(
+        StrainTransgenicLine line = createStrainTransgenicLine(
                 lineId,
                 strain,
                 "OT-I"
@@ -614,8 +613,8 @@ class TransgenicLineGeneServiceTest {
                 "C57BL/6"
         );
 
-        TransgenicLine currentLine =
-                createTransgenicLine(
+        StrainTransgenicLine currentLine =
+                createStrainTransgenicLine(
                         currentLineId,
                         strain,
                         "OT-I"
@@ -806,13 +805,13 @@ class TransgenicLineGeneServiceTest {
         return strain;
     }
 
-    private TransgenicLine createTransgenicLine(
+    private StrainTransgenicLine createStrainTransgenicLine(
             Long id,
             Strain strain,
             String name) {
 
-        TransgenicLine line =
-                new TransgenicLine(strain, name);
+        StrainTransgenicLine line =
+                new StrainTransgenicLine(strain, name);
 
         ReflectionTestUtils.setField(
                 line,
