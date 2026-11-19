@@ -2,7 +2,7 @@ package cz.animalhouse.service
 
 import cz.animalhouse.dto.MouseRequest
 import cz.animalhouse.dto.MouseResponse
-import cz.animalhouse.entity.LabProcedure
+//import cz.animalhouse.entity.LabProcedure
 import cz.animalhouse.entity.Mouse
 import cz.animalhouse.entity.Strain
 import cz.animalhouse.entity.StrainTransgenicLine
@@ -55,8 +55,8 @@ class MouseServiceTest {
     private lateinit var strain: Strain
     private lateinit var strainTransgenicLine: StrainTransgenicLine
 
-    @Mock
-    private lateinit var labProcedure: LabProcedure
+//    @Mock
+//    private lateinit var labProcedure: LabProcedure
 
     private lateinit var mouseService: MouseService
 
