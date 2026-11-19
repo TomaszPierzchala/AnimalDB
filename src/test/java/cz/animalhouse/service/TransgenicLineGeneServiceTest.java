@@ -11,6 +11,7 @@ import static org.mockito.Mockito.when;
 import java.util.List;
 import java.util.Optional;
 
+import cz.animalhouse.dto.GeneResponse;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -119,7 +120,7 @@ class TransgenicLineGeneServiceTest {
         assertThat(result).hasSize(2);
 
         TransgenicLineGeneRowResponse firstRow =
-                result.get(0);
+                result.getFirst();
 
         assertThat(firstRow.transgenicLineId())
                 .isEqualTo(10L);
@@ -137,7 +138,7 @@ class TransgenicLineGeneServiceTest {
                 .isEqualTo("C57BL/6");
 
         assertThat(firstRow.genes())
-                .extracting(gene -> gene.symbol())
+                .extracting(GeneResponse::symbol)
                 .containsExactly("OT1", "GFP");
 
         TransgenicLineGeneRowResponse secondRow =
@@ -150,7 +151,7 @@ class TransgenicLineGeneServiceTest {
         		.isEqualTo("OT-II");
         
         assertThat(secondRow.genes())
-                .extracting(gene -> gene.symbol())
+                .extracting(GeneResponse::symbol)
                 .containsExactly("CRE");
 
         verify(transgenicLineGeneRepository).findAll();
