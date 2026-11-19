@@ -132,7 +132,7 @@ Current public database model:
 |---|---|
 | `mouse` | Stores individual laboratory mouse records, including animal number, sex, strain, transgenic line, genealogy, location, dates, and notes. |
 | `strain` | Stores mouse strain definitions, such as strain code and name. |
-| `transgenic_line` | Stores transgenic lines linked to mouse strains. |
+| `strain_transgenic_line` | Stores strains or transgenic lines linked to mouse strains. |
 | `gene` | Stores gene definitions and descriptions. |
 | `mouse_gene` | Links individual mice with genes and stores genotype information. |
 | `transgenic_line_gene` | Links transgenic lines with genes. |
