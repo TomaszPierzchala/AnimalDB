@@ -9,7 +9,6 @@ public record StrainTransgenicLineRequest(
         @NotNull(message = "Strain ID is required")
         Long strainId,
 
-        @NotBlank(message = "Transgenic line name is required")
         @Size(
             max = 100,
             message = "Transgenic line name cannot exceed 100 characters"
