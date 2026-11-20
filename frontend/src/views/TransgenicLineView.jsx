@@ -27,6 +27,7 @@ function TransgenicLineView() {
       firstEditName="strainId"
       firstInputType="select"
 
+      warningKey={FIRST}
       dropDown={FIRST}
 
       getSubEntityApi={getStrains}
