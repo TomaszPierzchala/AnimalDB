@@ -1,5 +1,5 @@
 import TwoColumnView from './TwoColumnView';
-import { FIRST } from '../utils/const'
+import {FIRST, SECOND} from '../utils/const'
 
 
 import {
@@ -28,6 +28,7 @@ function TransgenicLineView() {
       firstInputType="select"
 
       warningKey={FIRST}
+      nullAllowedKey={SECOND}
       dropDown={FIRST}
 
       getSubEntityApi={getStrains}

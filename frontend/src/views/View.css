@@ -596,3 +596,9 @@ button[type="submit"] {
 .disabled-action:hover {
   background-color: transparent !important;
 }
+/* ===  helper  === */
+.null-value {
+    color: #9ca3af;
+    font-style: italic;
+    cursor: help;
+}

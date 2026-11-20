@@ -1,4 +1,4 @@
-import { VAR_MAX_LENGTH } from '../utils/const';
+import {FIRST, SECOND, VAR_MAX_LENGTH} from '../utils/const';
 
 function FormField({
   label,
@@ -8,7 +8,8 @@ function FormField({
   placeholder = 'Select from drop-down menu',
   maxLength = VAR_MAX_LENGTH,
   onChange,
-  warning = ''
+  warning = '',
+  inputShowPlaceholder=false
 }) {
   return (
     <div>
@@ -37,6 +38,8 @@ function FormField({
           <input
             type="text"
             value={value}
+            placeholder={inputShowPlaceholder ? '—' : undefined}
+            title={inputShowPlaceholder ? 'long dash when null' : undefined}
             maxLength={maxLength}
             onChange={event => onChange(event.target.value)}
           />
@@ -72,6 +75,8 @@ export default function DoubleParamForm({
   secondMaxLength = VAR_MAX_LENGTH,
   secondWarning = '',
 
+  nullAllowedKey,
+
   onChangeFirstField,
   onChangeSecondField,
   onSubmit,
@@ -100,6 +105,7 @@ export default function DoubleParamForm({
             maxLength={firstMaxLength}
             warning={firstWarning}
             onChange={onChangeFirstField}
+            inputShowPlaceholder={(nullAllowedKey & FIRST) !== 0}
           />
 
           <FormField
@@ -111,6 +117,7 @@ export default function DoubleParamForm({
             maxLength={secondMaxLength}
             warning={secondWarning}
             onChange={onChangeSecondField}
+            inputShowPlaceholder={(nullAllowedKey & SECOND) !== 0}
           />
 
           <div className="popup-buttons">

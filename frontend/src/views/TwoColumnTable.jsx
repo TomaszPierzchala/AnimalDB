@@ -1,4 +1,5 @@
 import AddNewRecordRow from './AddNewRecordRow'
+import {SECOND} from "../utils/const.js";
 
 function TwoColumnTable({
   records,
@@ -11,7 +12,9 @@ function TwoColumnTable({
   firstLabel,
 
   secondName,
-  secondLabel
+  secondLabel,
+
+  nullAllowedKey
 }) {
   function getFirstColumnValue(record) {
     if (!firstName2) {
@@ -19,6 +22,13 @@ function TwoColumnTable({
     }
 
     return `${record[firstName] ?? ''} — ${record[firstName2] ?? ''}`;
+  }
+  function longDashWhenNull(value) {
+      return value ?? (
+          <span className="null-value" title="long dash when null">
+            —
+          </span>
+      )
   }
 
   return (
@@ -49,11 +59,11 @@ function TwoColumnTable({
             </td>
 
             <td>
-              {getFirstColumnValue(record)}
+              {(nullAllowedKey & SECOND) !== 0 ? getFirstColumnValue(record) : getFirstColumnValue(record)}
             </td>
 
             <td>
-              {record[secondName]}
+              {(nullAllowedKey & SECOND) !== 0 ? longDashWhenNull(record[secondName]) : record[secondName]}
             </td>
           </tr>
         ))}

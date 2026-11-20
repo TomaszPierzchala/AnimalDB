@@ -23,6 +23,7 @@ function TwoColumnView({
   secondMaxLength = VAR_MAX_LENGTH,
 
   warningKey = FIRST | SECOND,
+  nullAllowedKey = ZERO,
   dropDown = ZERO,
 
   firstRequestName = firstName,
@@ -276,6 +277,7 @@ function TwoColumnView({
         firstLabel={firstLabel}
         secondName={secondName}
         secondLabel={secondLabel}
+        nullAllowedKey={nullAllowedKey}
       />
 
       {popupOpen && (
@@ -294,6 +296,8 @@ function TwoColumnView({
           secondLabel={secondLabel}
           secondValue={secondValue}
           secondMaxLength={secondMaxLength}
+
+          nullAllowedKey={nullAllowedKey}
 
           deleteArmed={deleteArmed}
           isSaveEnabled={isSaveEnabled}
