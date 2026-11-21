@@ -10,7 +10,13 @@ CREATE TABLE strain (
 CREATE TABLE strain_transgenic_line (
                                  id BIGSERIAL PRIMARY KEY,
                                  strain_id BIGINT NOT NULL REFERENCES strain(id),
-                                 name VARCHAR(100) UNIQUE
+                                 name VARCHAR(100),
+
+                                 CONSTRAINT uq_strain_transgenic_line
+                                     UNIQUE NULLS NOT DISTINCT (strain_id, name),
+
+                                 CONSTRAINT chk_strain_transgenic_line_name
+                                     CHECK (name IS NULL OR name ~ '[^[:space:]]')
 );
 
 CREATE TABLE gene (
