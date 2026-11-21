@@ -5,7 +5,7 @@ public class DuplicateStrainTransgenicLineException
 
     public DuplicateStrainTransgenicLineException(Long id, String name) {
         super(
-                "Strain/transgenic line with strainId '%d' & name '%s' already exists"
+                "StrainTransgenicLine with strainId=%d and name=%s already exists"
                         .formatted(id, name)
         );
     }

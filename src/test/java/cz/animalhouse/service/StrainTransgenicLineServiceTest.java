@@ -120,7 +120,7 @@ class StrainTransgenicLineServiceTest {
         assertThatThrownBy(() ->
                 transgenicLineService.create(request))
                 .isInstanceOf(DuplicateStrainTransgenicLineException.class)
-                .hasMessageContaining("Strain/transgenic line with strainId '13' & name 'OT-I' already exists");
+                .hasMessageContaining("StrainTransgenicLine with strainId=13 and name=OT-I already exists");
 
         verify(strainRepository, never())
                 .findById(any());
