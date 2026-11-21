@@ -20,7 +20,7 @@ import cz.animalhouse.dto.StrainTransgenicLineRequest;
 import cz.animalhouse.dto.StrainTransgenicLineResponse;
 import cz.animalhouse.entity.Strain;
 import cz.animalhouse.entity.StrainTransgenicLine;
-import cz.animalhouse.exception.DuplicateStrainTransgenicLineNameException;
+import cz.animalhouse.exception.DuplicateStrainTransgenicLineException;
 import cz.animalhouse.exception.StrainNotFoundException;
 import cz.animalhouse.repository.StrainRepository;
 import cz.animalhouse.repository.StrainTransgenicLineRepository;
@@ -83,7 +83,7 @@ class StrainTransgenicLineServiceTest {
                         strainId,
                         "OT-I");
 
-        when(transgenicLineRepository.existsByName("OT-I"))
+        when(transgenicLineRepository.existsByStrainIdAndName(strainId, "OT-I"))
                 .thenReturn(false);
 
         when(strainRepository.findById(strainId))
@@ -107,23 +107,23 @@ class StrainTransgenicLineServiceTest {
     }
 
     @Test
-    void shouldRejectDuplicateNameDuringCreate() {
+    void shouldRejectDuplicateDuringCreate() {
 
         StrainTransgenicLineRequest request =
                 new StrainTransgenicLineRequest(
-                        1L,
+                        13L,
                         "OT-I");
 
-        when(transgenicLineRepository.existsByName("OT-I"))
+        when(transgenicLineRepository.existsByStrainIdAndName(13L, "OT-I"))
                 .thenReturn(true);
 
         assertThatThrownBy(() ->
                 transgenicLineService.create(request))
-                .isInstanceOf(DuplicateStrainTransgenicLineNameException.class)
-                .hasMessageContaining("Strain/transgenic line with name 'OT-I' already exists");
+                .isInstanceOf(DuplicateStrainTransgenicLineException.class)
+                .hasMessageContaining("Strain/transgenic line with strainId '13' & name 'OT-I' already exists");
 
         verify(strainRepository, never())
-                .findById(1L);
+                .findById(any());
 
         verify(transgenicLineRepository, never())
                 .save(org.mockito.ArgumentMatchers.any());
@@ -139,7 +139,7 @@ class StrainTransgenicLineServiceTest {
                         "OT-I"
                 );
 
-        when(transgenicLineRepository.existsByName("OT-I"))
+        when(transgenicLineRepository.existsByStrainIdAndName(strainId, "OT-I"))
                 .thenReturn(false);
 
         when(strainRepository.findById(strainId))
@@ -151,7 +151,7 @@ class StrainTransgenicLineServiceTest {
                 .hasMessageContaining("Strain with ID 999 does not exist");
 
         verify(transgenicLineRepository)
-                .existsByName("OT-I");
+                .existsByStrainIdAndName(strainId, "OT-I");
 
         verify(strainRepository)
                 .findById(strainId);
@@ -190,7 +190,7 @@ class StrainTransgenicLineServiceTest {
                 .thenReturn(Optional.of(transgenicLine));
 
         when(transgenicLineRepository
-                .existsByNameAndIdNot("OT-II", id))
+                .existsByStrainIdAndNameAndIdNot(newStrainId, "OT-II", id))
                 .thenReturn(false);
 
         when(strainRepository.findById(newStrainId))
@@ -215,7 +215,7 @@ class StrainTransgenicLineServiceTest {
         verify(transgenicLineRepository).findById(id);
 
         verify(transgenicLineRepository)
-                .existsByNameAndIdNot("OT-II", id);
+                .existsByStrainIdAndNameAndIdNot(newStrainId, "OT-II", id);
 
         verify(strainRepository).findById(newStrainId);
     }
@@ -244,7 +244,7 @@ class StrainTransgenicLineServiceTest {
     }
 
     @Test
-    void shouldThrowExceptionWhenUpdatingTransgenicLineWithDuplicateName() {
+    void shouldThrowExceptionWhenUpdatingTransgenicLineWithDuplicate() {
         final Long id = 1L;
         final Long newStrainId = 20L;
 
@@ -268,13 +268,13 @@ class StrainTransgenicLineServiceTest {
                 .thenReturn(Optional.of(transgenicLine));
 
         when(transgenicLineRepository
-                .existsByNameAndIdNot("OT-II", id))
+                .existsByStrainIdAndNameAndIdNot(newStrainId, "OT-II", id))
                 .thenReturn(true);
 
         assertThatThrownBy(() ->
                 transgenicLineService.update(id, request))
                 .isInstanceOf(
-                        DuplicateStrainTransgenicLineNameException.class)
+                        DuplicateStrainTransgenicLineException.class)
                 .hasMessageContaining("OT-II");
 
         assertThat(transgenicLine.getName()).isEqualTo("OT-I");
@@ -283,7 +283,7 @@ class StrainTransgenicLineServiceTest {
         verify(transgenicLineRepository).findById(id);
 
         verify(transgenicLineRepository)
-                .existsByNameAndIdNot("OT-II", id);
+                .existsByStrainIdAndNameAndIdNot(newStrainId, "OT-II", id);
 
         verify(strainRepository, never()).findById(newStrainId);
     }

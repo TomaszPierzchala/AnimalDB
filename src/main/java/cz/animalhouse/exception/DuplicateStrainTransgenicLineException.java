@@ -1,12 +1,12 @@
 package cz.animalhouse.exception;
 
-public class DuplicateStrainTransgenicLineNameException
+public class DuplicateStrainTransgenicLineException
         extends RuntimeException {
 
-    public DuplicateStrainTransgenicLineNameException(String name) {
+    public DuplicateStrainTransgenicLineException(Long id, String name) {
         super(
-                "Strain/transgenic line with name '%s' already exists"
-                        .formatted(name)
+                "Strain/transgenic line with strainId '%d' & name '%s' already exists"
+                        .formatted(id, name)
         );
     }
 }

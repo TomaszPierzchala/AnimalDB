@@ -156,25 +156,24 @@ class StrainTransgenicLineRepositoryTest {
     @Test
     void shouldCheckWhetherNameExists() {
 
-        Strain strain = strainRepository.save(
+        Strain strain = strainRepository.saveAndFlush(
                 new Strain(
                         "C57BL6",
                         "C57BL/6"));
 
-        transgenicLineRepository.save(
+        transgenicLineRepository.saveAndFlush(
                 new StrainTransgenicLine(
                         strain,
                         "OT-I"));
 
-        transgenicLineRepository.flush();
         entityManager.clear();
 
         assertThat(
-                transgenicLineRepository.existsByName("OT-I")
+                transgenicLineRepository.existsByStrainIdAndName(strain.getId(), "OT-I")
         ).isTrue();
 
         assertThat(
-                transgenicLineRepository.existsByName("Unknown")
+                transgenicLineRepository.existsByStrainIdAndName(strain.getId(), "Unknown")
         ).isFalse();
     }
 
@@ -203,14 +202,16 @@ class StrainTransgenicLineRepositoryTest {
 
         assertThat(
                 transgenicLineRepository
-                        .existsByNameAndIdNot(
+                        .existsByStrainIdAndNameAndIdNot(
+                                strain.getId(),
                                 "OT-I",
                                 line2.getId())
         ).isTrue();
 
         assertThat(
                 transgenicLineRepository
-                        .existsByNameAndIdNot(
+                        .existsByStrainIdAndNameAndIdNot(
+                                strain.getId(),
                                 "OT-I",
                                 line1.getId())
         ).isFalse();

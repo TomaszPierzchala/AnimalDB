@@ -97,23 +97,6 @@ class StrainTransgenicLineTest {
     }
     
     @Test
-    void shouldRejectDuplicateName() {
-
-        Strain strain =
-                entityManager.persistFlushFind(new Strain("C57BL/6J", "Black 6"));
-
-        entityManager.persistAndFlush(
-                new StrainTransgenicLine(strain, "OT-I"));
-
-        StrainTransgenicLine duplicate =
-                new StrainTransgenicLine(strain, "OT-I");
-
-        assertThatThrownBy(() -> entityManager.persistAndFlush(duplicate))
-                .hasRootCauseInstanceOf(org.postgresql.util.PSQLException.class)
-                .hasMessageContaining("ERROR: duplicate key value violates unique constraint");
-    }
-    
-    @Test
     void shouldAllowNullName() {
 
         Strain strain =
@@ -127,5 +110,77 @@ class StrainTransgenicLineTest {
 
         assertThat(saved.getId()).isNotNull();
         assertThat(saved.getName()).isNull();
+    }
+
+    @Test
+    void shouldRejectWhiteCharsStringOnlyName() {
+        Strain strain =
+                entityManager.persistFlushFind(new Strain("C57BL/6J", "Black 6"));
+
+        final String WHITE_CHARS_ONLY = "       ";
+        StrainTransgenicLine line =
+                new StrainTransgenicLine(strain, WHITE_CHARS_ONLY);
+
+        assertThatThrownBy(() -> entityManager.persistAndFlush(line))
+                .hasRootCauseInstanceOf(org.postgresql.util.PSQLException.class)
+                .hasMessageContaining("ERROR: new row for relation \"strain_transgenic_line\" violates check constraint \"chk_strain_transgenic_line_name\"");
+    }
+
+    @Test
+    void shouldEnforceUniqueNameWithinStrain() {
+        Strain strain1 = entityManager.persistFlushFind(
+                new Strain("C57BL/6J", "Black 6"));
+
+        Strain strain2 = entityManager.persistFlushFind(
+                new Strain("BALB", "BALB/c"));
+
+        // Same name within different strains is allowed
+        StrainTransgenicLine line1 = entityManager.persistFlushFind(
+                new StrainTransgenicLine(strain1, "OT-I"));
+
+        StrainTransgenicLine line2 = entityManager.persistFlushFind(
+                new StrainTransgenicLine(strain2, "OT-I"));
+
+        assertThat(line1.getId()).isNotNull();
+        assertThat(line2.getId()).isNotNull();
+        assertThat(line1.getId()).isNotEqualTo(line2.getId());
+
+        // Same name within the same strain is forbidden
+        StrainTransgenicLine duplicate =
+                new StrainTransgenicLine(strain1, "OT-I");
+
+        assertThatThrownBy(() -> entityManager.persistAndFlush(duplicate))
+                .hasRootCauseInstanceOf(org.postgresql.util.PSQLException.class)
+                .hasMessageContaining(
+                        "ERROR: duplicate key value violates unique constraint \"uq_strain_transgenic_line\"");
+    }
+
+    @Test
+    void shouldEnforceUniqueNullNameWithinStrain() {
+        Strain strain1 = entityManager.persistFlushFind(
+                new Strain("C57BL/6J", "Black 6"));
+
+        Strain strain2 = entityManager.persistFlushFind(
+                new Strain("BALB", "BALB/c"));
+
+        // NULL name for different strains is allowed
+        StrainTransgenicLine line1 = entityManager.persistFlushFind(
+                new StrainTransgenicLine(strain1, null));
+
+        StrainTransgenicLine line2 = entityManager.persistFlushFind(
+                new StrainTransgenicLine(strain2, null));
+
+        assertThat(line1.getId()).isNotNull();
+        assertThat(line2.getId()).isNotNull();
+        assertThat(line1.getId()).isNotEqualTo(line2.getId());
+
+        // Duplicate NULL name within the same strain is forbidden
+        StrainTransgenicLine duplicate =
+                new StrainTransgenicLine(strain1, null);
+
+        assertThatThrownBy(() -> entityManager.persistAndFlush(duplicate))
+                .hasRootCauseInstanceOf(org.postgresql.util.PSQLException.class)
+                .hasMessageContaining(
+                        "ERROR: duplicate key value violates unique constraint \"uq_strain_transgenic_line\"");
     }
 }

@@ -6,7 +6,12 @@ import cz.animalhouse.entity.StrainTransgenicLine;
 
 public interface StrainTransgenicLineRepository extends JpaRepository<StrainTransgenicLine, Long> {
 
-	boolean existsByName(String name);
+	boolean existsByStrainIdAndName(Long strainId, String name);
 
-	boolean existsByNameAndIdNot(String name, Long id);
+
+    boolean existsByStrainIdAndNameAndIdNot(
+            Long strainId,
+            String name,
+            Long id
+    );
 }

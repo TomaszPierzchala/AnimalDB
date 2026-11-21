@@ -10,7 +10,7 @@ import cz.animalhouse.dto.StrainTransgenicLineRequest;
 import cz.animalhouse.dto.StrainTransgenicLineResponse;
 import cz.animalhouse.entity.Strain;
 import cz.animalhouse.entity.StrainTransgenicLine;
-import cz.animalhouse.exception.DuplicateStrainTransgenicLineNameException;
+import cz.animalhouse.exception.DuplicateStrainTransgenicLineException;
 import cz.animalhouse.exception.StrainNotFoundException;
 import cz.animalhouse.repository.StrainRepository;
 import cz.animalhouse.repository.StrainTransgenicLineRepository;
@@ -47,8 +47,9 @@ public class StrainTransgenicLineService {
     public StrainTransgenicLineResponse create(
             StrainTransgenicLineRequest request) {
 
-        if (transgenicLineRepository.existsByName(request.name())) {
-            throw new DuplicateStrainTransgenicLineNameException(
+        if (transgenicLineRepository.existsByStrainIdAndName(request.strainId(), request.name())) {
+            throw new DuplicateStrainTransgenicLineException(
+                    request.strainId(),
                     request.name()
             );
         }
@@ -78,11 +79,13 @@ public class StrainTransgenicLineService {
             return Optional.empty();
         }
 
-        if (transgenicLineRepository.existsByNameAndIdNot(
+        if (transgenicLineRepository.existsByStrainIdAndNameAndIdNot(
+                request.strainId(),
                 request.name(),
                 id)) {
 
-            throw new DuplicateStrainTransgenicLineNameException(
+            throw new DuplicateStrainTransgenicLineException(
+                    request.strainId(),
                     request.name()
             );
         }
