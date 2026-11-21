@@ -40,7 +40,8 @@ function TwoColumnView({
   deleteApi
 }) {
   const initialFirstValue =
-    firstInputType === 'select' ? '-1' : '';
+    firstInputType === 'select' ? '-1' : (nullAllowedKey & FIRST) !== 0  ? null : '';
+  const initialSecondValue = (nullAllowedKey & SECOND) !== 0  ? null : '';
   const {
     error,
     errorFading,
@@ -58,7 +59,7 @@ function TwoColumnView({
   const [firstValue, setFirstValue] =
     useState(initialFirstValue);
 
-  const [secondValue, setSecondValue] = useState('');
+  const [secondValue, setSecondValue] = useState(initialSecondValue);
   const [isSaveEnabled, setIsSaveEnabled] = useState(false);
   const [fieldWarning, setFieldWarning] = useState('');
 
@@ -119,8 +120,8 @@ function TwoColumnView({
                 ? initialFirstValue
                 : String(entity[firstEditName] ?? initialFirstValue),
             secondValue: entity === null
-                ? ''
-                : entity[secondName] ?? ''
+                ? initialSecondValue
+                : entity[secondName] ?? initialSecondValue
         };
     }
 
@@ -164,7 +165,7 @@ function TwoColumnView({
     setPopupOpen(false);
     setEntity(null);
     setFirstValue(initialFirstValue);
-    setSecondValue('');
+    setSecondValue(initialSecondValue);
     setInitialPopupState({});
     setIsSaveEnabled(false);
     setDeleteArmed(false);
