@@ -1,5 +1,6 @@
 package cz.animalhouse.controller;
 
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -10,6 +11,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import java.util.List;
 
+import cz.animalhouse.exception.DuplicateStrainTransgenicLineException;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
@@ -145,5 +147,33 @@ class StrainTransgenicLineControllerTest {
         mockMvc.perform(
                         delete("/api/transgenic-lines/999"))
                 .andExpect(status().isNotFound());
+    }
+
+    @Test
+    void shouldReturnConflictWhenCreatingDuplicateStrainTransgenicLine()
+            throws Exception {
+
+        StrainTransgenicLineRequest request =
+                new StrainTransgenicLineRequest(1L, "OT-I");
+
+        when(transgenicLineService.create(request))
+                .thenThrow(
+                        new DuplicateStrainTransgenicLineException(1L, "OT-I")
+                );
+
+        mockMvc.perform(
+                        post("/api/transgenic-lines")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content("""
+                                    {
+                                      "strainId": 1,
+                                      "name": "OT-I"
+                                    }
+                                    """))
+                .andExpect(status().isConflict())
+                .andExpect(jsonPath("$.message")
+                        .value("StrainTransgenicLine with strainId=1 and name=OT-I already exists"));
+
+        verify(transgenicLineService).create(request);
     }
 }

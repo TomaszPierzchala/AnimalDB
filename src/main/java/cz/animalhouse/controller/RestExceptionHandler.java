@@ -27,6 +27,12 @@ public class RestExceptionHandler {
     public ErrorResponse handleDuplicateStrainCode(DuplicateStrainCodeException ex) {
         return new ErrorResponse(ex.getMessage());
     }
+
+    @ExceptionHandler(DuplicateStrainTransgenicLineException.class)
+    @ResponseStatus(HttpStatus.CONFLICT)
+    public ErrorResponse handleDuplicateStrainTransgenicLine(DuplicateStrainTransgenicLineException ex) {
+        return new ErrorResponse(ex.getMessage());
+    }
     
     @ExceptionHandler(TransgenicLineGeneNotFoundException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
