@@ -602,3 +602,31 @@ button[type="submit"] {
     font-style: italic;
     cursor: help;
 }
+
+/*** AddNewRecordRow ***/
+.accept-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 60px;
+}
+
+.accept-select {
+    width: 40%;
+    min-width: 0;
+    padding: 8px 12px;
+
+    border: 1px solid #cccccc;
+    border-radius: 4px;
+    background: white;
+
+    color: #6b6375;
+    font: inherit;
+    font-style: normal;
+    cursor: pointer;
+}
+
+.accept-select:focus {
+    outline: none;
+    border-color: #999999;
+}

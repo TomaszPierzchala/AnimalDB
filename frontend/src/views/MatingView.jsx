@@ -581,8 +581,8 @@ function MatingView() {
                                     <>
                                         Click here to{' '}
                                         <span className="accept-text">
-                            accept
-                        </span>
+                                            accept
+                                        </span>
                                         {' '}new mating...
                                     </>
                                 )
@@ -594,6 +594,7 @@ function MatingView() {
                                 : null
                         }
                         colSpan={1}
+                        select_options={true}
                     />
                 )}
                 </tbody>
