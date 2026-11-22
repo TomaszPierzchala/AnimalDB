@@ -89,6 +89,8 @@ function MatingView() {
     // STATE
     // =========================
 
+    const [strainTranscenicLineId, setStrainTrLineId] = useState(null)
+
     const [matings, setMatings] = useState([]);
     const [editedMating, setEditedMating] = useState(null);
 
@@ -179,6 +181,9 @@ function MatingView() {
     // =========================
     // EFFECTS
     // =========================
+    useEffect(() => {
+        console.log("New strainTrLine =", strainTranscenicLineId);
+    }, [strainTranscenicLineId]);
 
     useEffect(() => {
         loadMatings();
@@ -220,6 +225,10 @@ function MatingView() {
     // =========================
     // ADDING
     // =========================
+
+    async function handelSelectedStrainTransgenicLine(selected) {
+        setStrainTrLineId(selected);
+    }
 
     async function startAddingMating() {
         try {
@@ -272,6 +281,7 @@ function MatingView() {
 
     function clearEditedMating() {
         setEditedMating(null);
+        setStrainTrLineId(null);
     }
 
     async function saveEditedMating() {
@@ -594,7 +604,7 @@ function MatingView() {
                                 : null
                         }
                         colSpan={1}
-                        select_options={true}
+                        onSelect={handelSelectedStrainTransgenicLine}
                     />
                 )}
                 </tbody>

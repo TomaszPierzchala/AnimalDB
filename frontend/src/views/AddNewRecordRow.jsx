@@ -4,7 +4,7 @@ function AddNewRecordRow({
 							 colSpan = 2,
 							 acceptText = null,
 							 cancelAction = null,
-                             select_options = false
+                             onSelect = null
 						 }) {
 	return (
 		<tr className={`empty-row${acceptText ? ' accept-row' : ''}`}>
@@ -24,14 +24,14 @@ function AddNewRecordRow({
                 onClick={onCreate}
 			>
                 <div className="accept-container">
-                    {(select_options && cancelAction) && (
+                    {(onSelect && cancelAction) && (
                         <select
                             className="accept-select"
                             defaultValue=""
                             title={"Select the Strain-TransgenicLine.\nThis determines the genetic line of the mating."}
                             onClick={(e) => e.stopPropagation()}
                             onChange={(e) => {
-                                console.log("Selected:", e.target.value);
+                                onSelect?.(Number(e.target.value));
                             }}
                         >
                             <option value="" disabled>select : Strain / TransgenicLine</option>
