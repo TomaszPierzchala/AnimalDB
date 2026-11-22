@@ -6,7 +6,8 @@ import WorkInProgressBar from "./WorkInProgress";
 import ErrorBanner from '../components/ErrorBanner';
 import MouseAnimalNumberInput from "../components/MouseAnimalNumberInput";
 import useFadingError from "../hooks/fadingError";
-import {useEditKeyDown} from '../hooks/useEditKeyDown'
+import {useEditKeyDown} from '../hooks/useEditKeyDown';
+import {getTransLines} from '../api/transgenicLineApi';
 import {createMating, deleteMating, getMatings, updateMating} from '../api/matingApi';
 import {todayAsInputDate} from '../utils/timeUtils'
 
@@ -88,8 +89,8 @@ function MatingView() {
     // =========================
     // STATE
     // =========================
-
-    const [strainTranscenicLineId, setStrainTrLineId] = useState(null)
+    const [strainTransgenicLines, setStrainTrLines] = useState([]);
+    const [strainTransgenicLineId, setStrainTrLineId] = useState(0)
 
     const [matings, setMatings] = useState([]);
     const [editedMating, setEditedMating] = useState(null);
@@ -181,9 +182,33 @@ function MatingView() {
     // =========================
     // EFFECTS
     // =========================
+
+    // === temporary ===
     useEffect(() => {
-        console.log("New strainTrLine =", strainTranscenicLineId);
-    }, [strainTranscenicLineId]);
+        console.log("New strainTrLine =", strainTransgenicLineId);
+    }, [strainTransgenicLineId]);
+    useEffect(() => {
+        console.log("strainTrLines = ", strainTransgenicLines);
+    }, [strainTransgenicLines]);
+    // ==== ==== ====
+
+    useEffect(() => {
+        async function loadStrainTransgenicLines() {
+            try{
+                const strainData = await getTransLines();
+                setStrainTrLines(Array.isArray(strainData)
+                    ? strainData
+                    : [])
+            } catch (err) {
+                showError(
+                    `Could not load initial strainTransgenicLines.\n${err.message}`
+                );
+            }
+        }
+
+        loadStrainTransgenicLines();
+    }, []);
+// ===============================================================
 
     useEffect(() => {
         loadMatings();
@@ -281,7 +306,7 @@ function MatingView() {
 
     function clearEditedMating() {
         setEditedMating(null);
-        setStrainTrLineId(null);
+        setStrainTrLineId(0);
     }
 
     async function saveEditedMating() {
@@ -605,6 +630,7 @@ function MatingView() {
                         }
                         colSpan={1}
                         onSelect={handelSelectedStrainTransgenicLine}
+                        selectOptions={strainTransgenicLines}
                     />
                 )}
                 </tbody>

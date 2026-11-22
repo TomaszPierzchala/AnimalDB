@@ -1,10 +1,13 @@
+const NON_BREAKING_SPACE3 = "\u00A0\u00A0\u00A0"
+
 function AddNewRecordRow({
 							 entityName,
 							 onCreate,
 							 colSpan = 2,
 							 acceptText = null,
 							 cancelAction = null,
-                             onSelect = null
+                             onSelect = null,
+                             selectOptions = []
 						 }) {
 	return (
 		<tr className={`empty-row${acceptText ? ' accept-row' : ''}`}>
@@ -27,18 +30,22 @@ function AddNewRecordRow({
                     {(onSelect && cancelAction) && (
                         <select
                             className="accept-select"
-                            defaultValue=""
+                            defaultValue="0"
                             title={"Select the Strain-TransgenicLine.\nThis determines the genetic line of the mating."}
                             onClick={(e) => e.stopPropagation()}
                             onChange={(e) => {
                                 onSelect?.(Number(e.target.value));
                             }}
                         >
-                            <option value="" disabled>select : Strain / TransgenicLine</option>
-                            <option value="1">STR — Strain Name : PRG1</option>
-                            <option value="2">LONG LIVE — 100 : PRG2</option>
-                            <option value="3">STR — Strain Name : —</option>
-                            <option value="10">LONG LIVE — 100 : —</option>
+                            <option value="0" disabled>select : Strain / TransgenicLine</option>
+                            {selectOptions.map(option => (
+                                <option
+                                    key={option.id}
+                                    value={option.id}
+                                >
+                                    {option.strainCode + ' — ' + option.strainName + ' :' + NON_BREAKING_SPACE3 + (option.name?? '—')}
+                                </option>
+                            ))}
                         </select>
                     )}
 
