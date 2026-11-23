@@ -41,6 +41,12 @@ class MouseController(
     ): List<ParentCandidateResponse> =
         mouseService.findParentCandidates(infix, sex)
 
+    @GetMapping("/mating-candidates")
+    fun getMatingCandidates(
+        @RequestParam sex: String
+    ): List<ParentCandidateResponse> =
+        mouseService.findCandidatesForFutureParents(sex)
+
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     fun createMouse(

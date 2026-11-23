@@ -547,6 +547,34 @@ class MouseControllerTest {
         verify(mouseService).findParentCandidates(any<String>(), any<String>())
     }
 
+    @Test
+    fun `should return MatingCandidtes`(){
+        val parent1 = ParentCandidateResponse(
+            animalNumber = 7913
+        )
+
+        val parent2 = ParentCandidateResponse(
+            animalNumber = 7919
+        )
+
+        whenever(mouseService.findCandidatesForFutureParents(
+            eq("M")))
+            .thenReturn(
+                listOf(parent1, parent2)
+            )
+
+        mockMvc.perform(
+            get("/api/mice/mating-candidates")
+                .param("sex", "M")
+        )
+            .andExpect(status().isOk)
+            .andExpect(jsonPath("$.length()").value(2))
+            .andExpect(jsonPath("$[0].animalNumber").value(7913))
+            .andExpect(jsonPath("$[1].animalNumber").value(7919))
+
+        verify(mouseService).findCandidatesForFutureParents(any<String>())
+    }
+
     // -------------------------------------------------
     // Helpers
     // -------------------------------------------------
