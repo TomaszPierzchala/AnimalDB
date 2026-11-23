@@ -29,3 +29,7 @@ app:
 
 server:
   port: ${PORT:8080}
+
+breeding:
+  female-min-age-weeks: 4
+  male-min-age-weeks: 5
