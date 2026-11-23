@@ -65,6 +65,44 @@ interface MouseRepository : JpaRepository<Mouse, Long> {
         @Param("maleMinAgeWeeks") maleMinAgeWeeks: Int
     ): List<Mouse>
 
+    @Query(
+        value = """
+        SELECT *
+        FROM mouse m
+        WHERE m.sex = :sex
+          AND m.death_date IS NULL
+          AND (
+              m.birth_date IS NULL
+              OR (
+                  m.sex = 'F'
+                  AND m.birth_date < CAST(:currentDate AS DATE) - (:femaleMinAgeWeeks * 7)
+              )
+              OR (
+                  m.sex = 'M'
+                  AND m.birth_date < CAST(:currentDate AS DATE) - (:maleMinAgeWeeks * 7)
+              )
+          )
+          AND NOT EXISTS (
+              SELECT 1
+              FROM mating mt
+              WHERE mt.end_mating_date IS NULL
+                AND (
+                    mt.female_id = m.id
+                    OR mt.male_id = m.id
+                )
+          )
+        ORDER BY m.birth_date DESC NULLS FIRST
+        LIMIT 20;
+    """,
+        nativeQuery = true
+    )
+    fun findCandidatesForFutureParents(
+        @Param("sex") sex: String,
+        @Param("currentDate") currentDate: LocalDate,
+        @Param("femaleMinAgeWeeks") femaleMinAgeWeeks: Int,
+        @Param("maleMinAgeWeeks") maleMinAgeWeeks: Int
+    ): List<Mouse>
+
     fun existsByMotherId(id: Long): Boolean
 
     fun existsByFatherId(id: Long): Boolean

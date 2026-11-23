@@ -1,5 +1,6 @@
 package cz.animalhouse.repository
 
+import cz.animalhouse.entity.Mating
 import cz.animalhouse.entity.Mouse
 import cz.animalhouse.entity.Strain
 import cz.animalhouse.entity.Mouse.Sex
@@ -33,6 +34,9 @@ class MouseRepositoryTest {
 
     @Autowired
     lateinit var mouseRepository: MouseRepository
+
+    @Autowired
+    lateinit var matingRepository: MatingRepository
 
     @Autowired
     lateinit var strainRepository: StrainRepository
@@ -653,6 +657,402 @@ class MouseRepositoryTest {
             )
     }
 
+    @Test
+    fun `findCandidatesForFutureParents should find mice by sex`() {
+        val strain = strainRepository.save(
+            Strain(
+                "C57BL6",
+                "C57BL/6"
+            )
+        )
+        val trLine = strainTransgenicLineRepository.save(
+            StrainTransgenicLine(strain, "ABCD")
+        )
+        mouseRepository.saveAll(
+            listOf(
+                createMouse(26010101, Mouse.Sex.F, strain = strain, strainTransgenicLine = trLine,
+                    birthDate = FIXED_TODAY.minusWeeks(3)),
+                createMouse(26010102, Mouse.Sex.F, strain = strain, strainTransgenicLine = trLine,
+                    deathDate = FIXED_TODAY.minusWeeks(1)),
+                createMouse(26010103, Mouse.Sex.M, strain = strain, strainTransgenicLine = trLine),
+                createMouse(27010101, Mouse.Sex.F, strain = strain, strainTransgenicLine = trLine)
+            )
+        )
+
+        val result =
+            mouseRepository.findCandidatesForFutureParents(
+                sex = "F",
+                currentDate = FIXED_TODAY,
+                femaleMinAgeWeeks = 4,
+                maleMinAgeWeeks = 5
+            )
+
+        assertThat(result)
+            .extracting<Int> { it.animalNumber }
+            .containsExactly(
+                27010101
+            )
+    }
+
+    @Test
+    fun `findCandidatesForFutureParents should return empty list when nothing matches`() {
+        val result =
+            mouseRepository.findCandidatesForFutureParents(
+                sex = "F",
+                currentDate = FIXED_TODAY,
+                femaleMinAgeWeeks = 4,
+                maleMinAgeWeeks = 5
+            )
+
+        assertThat(result).isEmpty()
+    }
+
+    @Test
+    fun `findCandidatesForFutureParents should return at most 20 mice`() {
+        val strain = strainRepository.save(
+            Strain(
+                "C57BL6",
+                "C57BL/6"
+            )
+        )
+        val trLine = strainTransgenicLineRepository.save(
+            StrainTransgenicLine(strain, "ABCD")
+        )
+
+        mouseRepository.saveAll(
+            listOf(
+                createMouse(723001, Mouse.Sex.M, strain = strain, strainTransgenicLine = trLine),
+                createMouse(723002, Mouse.Sex.M, strain = strain, strainTransgenicLine = trLine),
+                createMouse(723003, Mouse.Sex.M, strain = strain, strainTransgenicLine = trLine),
+                createMouse(723004, Mouse.Sex.M, strain = strain, strainTransgenicLine = trLine),
+                createMouse(723005, Mouse.Sex.M, strain = strain, strainTransgenicLine = trLine),
+                createMouse(723006, Mouse.Sex.M, strain = strain, strainTransgenicLine = trLine),
+                createMouse(723007, Mouse.Sex.M, strain = strain, strainTransgenicLine = trLine),
+                createMouse(723008, Mouse.Sex.M, strain = strain, strainTransgenicLine = trLine),
+                createMouse(723009, Mouse.Sex.M, strain = strain, strainTransgenicLine = trLine),
+                createMouse(723010, Mouse.Sex.M, strain = strain, strainTransgenicLine = trLine),
+                createMouse(723011, Mouse.Sex.M, strain = strain, strainTransgenicLine = trLine),
+                createMouse(723012, Mouse.Sex.M, strain = strain, strainTransgenicLine = trLine),
+                createMouse(723013, Mouse.Sex.M, strain = strain, strainTransgenicLine = trLine),
+                createMouse(723014, Mouse.Sex.M, strain = strain, strainTransgenicLine = trLine),
+
+                createMouse(9101, Mouse.Sex.M, strain = strain, strainTransgenicLine = trLine,
+                    birthDate = FIXED_TODAY.minusWeeks(8).plusDays(9)),
+                createMouse(9102, Mouse.Sex.M, strain = strain, strainTransgenicLine = trLine,
+                    birthDate = FIXED_TODAY.minusWeeks(8).plusDays(8)),
+                createMouse(9103, Mouse.Sex.M, strain = strain, strainTransgenicLine = trLine,
+                    birthDate = FIXED_TODAY.minusWeeks(8).plusDays(7)),
+                createMouse(9104, Mouse.Sex.M, strain = strain, strainTransgenicLine = trLine,
+                    birthDate = FIXED_TODAY.minusWeeks(8).plusDays(6)),
+                createMouse(9105, Mouse.Sex.M, strain = strain, strainTransgenicLine = trLine,
+                    birthDate = FIXED_TODAY.minusWeeks(8).plusDays(5)),
+                createMouse(9106, Mouse.Sex.M, strain = strain, strainTransgenicLine = trLine,
+                    birthDate = FIXED_TODAY.minusWeeks(8).plusDays(4)),
+                createMouse(9107, Mouse.Sex.M, strain = strain, strainTransgenicLine = trLine,
+                    birthDate = FIXED_TODAY.minusWeeks(8).plusDays(3)),
+                createMouse(9108, Mouse.Sex.M, strain = strain, strainTransgenicLine = trLine,
+                    birthDate = FIXED_TODAY.minusWeeks(8).plusDays(2)),
+                createMouse(9109, Mouse.Sex.M, strain = strain, strainTransgenicLine = trLine,
+                    birthDate = FIXED_TODAY.minusWeeks(8).plusDays(1)),
+                createMouse(9110, Mouse.Sex.M, strain = strain, strainTransgenicLine = trLine,
+                    birthDate = FIXED_TODAY.minusWeeks(8)),
+            )
+        )
+
+        val result =
+            mouseRepository.findCandidatesForFutureParents(
+                sex = "M",
+                currentDate = FIXED_TODAY,
+                femaleMinAgeWeeks = 4,
+                maleMinAgeWeeks = 5
+            )
+
+        assertThat(result).hasSize(20)
+        assertThat(result)
+            .extracting<Int> { it.animalNumber }
+            .containsExactlyElementsOf(
+                (723001..723014).toList() + (9101..9106).toList(),
+            )
+    }
+
+    @Test
+    fun `findCandidatesForFutureParents should filter females by age and death date and not in active mating`() {
+        val strain = strainRepository.save(
+            Strain(
+                "C57BL6",
+                "C57BL/6"
+            )
+        )
+        val strainTransgenicLine = strainTransgenicLineRepository.save(
+            StrainTransgenicLine(strain, "ABCD")
+        )
+
+        val femaleTooYoung = Mouse(
+            animalNumber = 3723001,
+            sex = Mouse.Sex.F,
+            strain = strain,
+            strainTransgenicLine = strainTransgenicLine,
+            birthDate = FIXED_TODAY.minusWeeks(3)
+        )
+
+        val femaleOldEnough = Mouse(
+            animalNumber = 1723002,
+            sex = Mouse.Sex.F,
+            strain = strain,
+            strainTransgenicLine = strainTransgenicLine,
+            birthDate = FIXED_TODAY.minusWeeks(5)
+        )
+
+        val femaleOldEnoughButInMating = Mouse(
+            animalNumber = 81723002,
+            sex = Mouse.Sex.F,
+            strain = strain,
+            strainTransgenicLine = strainTransgenicLine,
+            birthDate = FIXED_TODAY.minusWeeks(5)
+        )
+
+        val father = Mouse(
+            animalNumber = 3998765,
+            sex = Mouse.Sex.M,
+            strain = strain,
+            strainTransgenicLine = strainTransgenicLine
+        )
+        val mating1 = Mating(
+            female = femaleOldEnoughButInMating,
+            male = father
+        )
+
+        val femaleOldEnoughButYounger = Mouse(
+            animalNumber = 67230021,
+            sex = Mouse.Sex.F,
+            strain = strain,
+            strainTransgenicLine = strainTransgenicLine,
+            birthDate = FIXED_TODAY.minusWeeks(5).plusDays(4)
+        )
+        val femaleOldEnoughButOlderButInMating = Mouse(
+            animalNumber = 87230023,
+            sex = Mouse.Sex.F,
+            strain = strain,
+            strainTransgenicLine = strainTransgenicLine,
+            birthDate = FIXED_TODAY.minusWeeks(5).minusDays(3)
+        )
+        val mating2 = Mating(
+            female = femaleOldEnoughButOlderButInMating,
+            male = father
+        )
+
+        val femaleOldEnoughButOlder = Mouse(
+            animalNumber = 7230023,
+            sex = Mouse.Sex.F,
+            strain = strain,
+            strainTransgenicLine = strainTransgenicLine,
+            birthDate = FIXED_TODAY.minusWeeks(5).minusDays(3)
+        )
+        val nextFemaleOldEnoughButInMating = Mouse(
+            animalNumber = 17230023,
+            sex = Mouse.Sex.F,
+            strain = strain,
+            strainTransgenicLine = strainTransgenicLine,
+            birthDate = FIXED_TODAY.minusWeeks(5).minusDays(3)
+        )
+        val mating3 = Mating(
+            female = nextFemaleOldEnoughButInMating,
+            male = father,
+            endMatingDate = FIXED_TODAY.minusDays(3)
+        )
+
+        val femaleNoBirthDate = Mouse(
+            animalNumber = 5723003,
+            sex = Mouse.Sex.F,
+            strain = strain,
+            strainTransgenicLine = strainTransgenicLine,
+            birthDate = null
+        )
+
+        val deadFemale = Mouse(
+            animalNumber = 2723004,
+            sex = Mouse.Sex.F,
+            strain = strain,
+            strainTransgenicLine = strainTransgenicLine,
+            birthDate = FIXED_TODAY.minusWeeks(10),
+            deathDate = FIXED_TODAY.minusDays(1)
+        )
+
+        mouseRepository.saveAll(
+            listOf(
+                femaleOldEnoughButOlder,
+                femaleTooYoung,
+                femaleOldEnough,
+                femaleOldEnoughButYounger,
+                femaleNoBirthDate,
+                deadFemale,
+                father,
+                femaleOldEnoughButOlderButInMating,
+                femaleOldEnoughButInMating,
+                nextFemaleOldEnoughButInMating
+            )
+        )
+        mouseRepository.flush()
+
+        matingRepository.saveAllAndFlush(listOf(mating1, mating2, mating3))
+
+        val result = mouseRepository.findCandidatesForFutureParents(
+            sex = "F",
+            currentDate = FIXED_TODAY,
+            femaleMinAgeWeeks = 4,
+            maleMinAgeWeeks = 5
+        )
+
+        assertThat(result)
+            .extracting<Int> { it.animalNumber }
+            .containsExactly(
+                5723003,
+                67230021,
+                1723002,
+                7230023,
+                17230023
+            )
+
+    }
+
+    @Test
+    fun `findCandidatesForFutureParents should filter males by age and death date and not in active mating`() {
+        val strain = strainRepository.save(
+            Strain(
+                "C57BL6",
+                "C57BL/6"
+            )
+        )
+        val strainTransgenicLine = strainTransgenicLineRepository.save(
+            StrainTransgenicLine(strain, "ABCD")
+        )
+
+        val maleTooYoung = Mouse(
+            animalNumber = 913001,
+            sex = Mouse.Sex.M,
+            strain = strain,
+            strainTransgenicLine = strainTransgenicLine,
+            birthDate = FIXED_TODAY.minusWeeks(5)
+        )
+
+        val maleOldEnough = Mouse(
+            animalNumber = 913002,
+            sex = Mouse.Sex.M,
+            strain = strain,
+            strainTransgenicLine = strainTransgenicLine,
+            birthDate = FIXED_TODAY.minusWeeks(6)
+        )
+
+        val mother = Mouse(
+            animalNumber = 7998765,
+            sex = Mouse.Sex.F,
+            strain = strain,
+            strainTransgenicLine = strainTransgenicLine
+        )
+        val maleOldEnoughButInMating = Mouse(
+            animalNumber = 8913002,
+            sex = Mouse.Sex.M,
+            strain = strain,
+            strainTransgenicLine = strainTransgenicLine,
+            birthDate = FIXED_TODAY.minusWeeks(6)
+        )
+        val mating1 = Mating(
+            male = maleOldEnoughButInMating,
+            female = mother)
+
+        val maleNoBirthDate = Mouse(
+            animalNumber = 913003,
+            sex = Mouse.Sex.M,
+            strain = strain,
+            strainTransgenicLine = strainTransgenicLine,
+            birthDate = null
+        )
+
+        val deadMale = Mouse(
+            animalNumber = 913004,
+            sex = Mouse.Sex.M,
+            strain = strain,
+            strainTransgenicLine = strainTransgenicLine,
+            birthDate = FIXED_TODAY.minusWeeks(10),
+            deathDate = FIXED_TODAY.minusDays(1)
+        )
+
+        val maleOldEnoughButYounger = Mouse(
+            animalNumber = 713007,
+            sex = Mouse.Sex.M,
+            strain = strain,
+            strainTransgenicLine = strainTransgenicLine,
+            birthDate = FIXED_TODAY.minusWeeks(6).plusDays(3)
+        )
+        val maleOldEnoughButYoungerButInMating = Mouse(
+            animalNumber = 8713007,
+            sex = Mouse.Sex.M,
+            strain = strain,
+            strainTransgenicLine = strainTransgenicLine,
+            birthDate = FIXED_TODAY.minusWeeks(6).plusDays(3)
+        )
+        val mating2 = Mating(
+            male = maleOldEnoughButYoungerButInMating,
+            female = mother
+        )
+
+        val maleOldEnoughButOlder = Mouse(
+            animalNumber = 713009,
+            sex = Mouse.Sex.M,
+            strain = strain,
+            strainTransgenicLine = strainTransgenicLine,
+            birthDate = FIXED_TODAY.minusWeeks(6).minusDays(4)
+        )
+        val maleOldEnoughButOlderButInMating = Mouse(
+            animalNumber = 18713009,
+            sex = Mouse.Sex.M,
+            strain = strain,
+            strainTransgenicLine = strainTransgenicLine,
+            birthDate = FIXED_TODAY.minusWeeks(6).minusDays(4)
+        )
+        val mating3 = Mating(
+            male = maleOldEnoughButOlderButInMating,
+            female = mother,
+            endMatingDate = FIXED_TODAY.minusWeeks(1)
+        )
+
+        mouseRepository.saveAll(
+            listOf(
+                maleTooYoung,
+                maleOldEnough,
+                maleNoBirthDate,
+                maleOldEnoughButOlder,
+                deadMale,
+                maleOldEnoughButYounger,
+                mother,
+                maleOldEnoughButInMating,
+                maleOldEnoughButYoungerButInMating,
+                maleOldEnoughButOlderButInMating
+
+            )
+        )
+        mouseRepository.flush()
+
+        matingRepository.saveAllAndFlush(listOf(mating1, mating2, mating3))
+
+        val result = mouseRepository.findCandidatesForFutureParents(
+            sex = "M",
+            currentDate = FIXED_TODAY,
+            femaleMinAgeWeeks = 4,
+            maleMinAgeWeeks = 5
+        )
+
+        assertThat(result)
+            .extracting<Int> { it.animalNumber }
+            .containsExactly(
+                913003,
+                713007,
+                913002,
+                713009,
+                18713009
+            )
+    }
+
     private fun createMouse(
         animalNumber: Int,
         sex: Mouse.Sex,
@@ -660,7 +1060,8 @@ class MouseRepositoryTest {
         strainTransgenicLine: StrainTransgenicLine,
         father: Mouse? = null,
         mother: Mouse? = null,
-        birthDate: LocalDate? = null) : Mouse {
+        birthDate: LocalDate? = null,
+        deathDate: LocalDate? = null): Mouse {
         return Mouse(
             animalNumber,
             sex,
@@ -669,6 +1070,7 @@ class MouseRepositoryTest {
             father = father,
             mother = mother,
             birthDate = birthDate,
+            deathDate = deathDate,
             room = "Room 1",
             rack = "Rack A",
             cage = "Cage 12",
