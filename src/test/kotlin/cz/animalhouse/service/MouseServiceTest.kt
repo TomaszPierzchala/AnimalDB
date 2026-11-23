@@ -1737,6 +1737,81 @@ class MouseServiceTest {
             )
     }
 
+    @Test
+    fun `findCandidatesForFutureParents should return parent candidates`() {
+        val mouse1 = createMouse(
+            id = 17,
+            animalNumber = 13001,
+            sex = Mouse.Sex.F
+        )
+
+        val mouse2 = createMouse(
+            id = 19,
+            animalNumber = 13002,
+            sex = Mouse.Sex.F
+        )
+
+        whenever(
+            mouseRepository.findCandidatesForFutureParents(
+                sex = eq("F"),
+                currentDate = any<LocalDate>(),
+                femaleMinAgeWeeks = any<Int>(),
+                maleMinAgeWeeks = any<Int>()
+            )
+        ).thenReturn(
+            listOf(mouse1, mouse2)
+        )
+
+        val result =
+            mouseService.findCandidatesForFutureParents(
+                sex = "F"
+            )
+
+        assertThat(result).hasSize(2)
+
+        assertThat(result)
+            .extracting<Int> { it.animalNumber }
+            .containsExactly(
+                13001,
+                13002
+            )
+
+        verify(mouseRepository)
+            .findCandidatesForFutureParents(
+                sex = eq("F"),
+                currentDate = any<LocalDate>(),
+                femaleMinAgeWeeks = any<Int>(),
+                maleMinAgeWeeks = any<Int>()
+            )
+    }
+
+    @Test
+    fun `findCandidatesForFutureParents should return empty list when repository returns no mice`() {
+        whenever(
+            mouseRepository.findCandidatesForFutureParents(
+                sex = eq("F"),
+                currentDate = any<LocalDate>(),
+                femaleMinAgeWeeks = any<Int>(),
+                maleMinAgeWeeks = any<Int>()
+            )
+        ).thenReturn(emptyList())
+
+        val result =
+            mouseService.findCandidatesForFutureParents(
+                sex = "F"
+            )
+
+        assertThat(result).isEmpty()
+
+        verify(mouseRepository)
+            .findCandidatesForFutureParents(
+                sex = eq("F"),
+                currentDate = any<LocalDate>(),
+                femaleMinAgeWeeks = any<Int>(),
+                maleMinAgeWeeks = any<Int>()
+            )
+    }
+
     private fun createMouse(
         id: Long,
         animalNumber: Int,

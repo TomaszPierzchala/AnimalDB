@@ -288,6 +288,25 @@ class MouseService(
             )
         }
     }
+
+    @Transactional(readOnly = true)
+    fun findCandidatesForFutureParents(
+        sex: String
+    ): List<ParentCandidateResponse> {
+
+        val currentDate = LocalDate.now(clock)
+
+        return mouseRepository.findCandidatesForFutureParents(
+            sex = sex,
+            currentDate = currentDate,
+            femaleMinAgeWeeks = breedingProperties.femaleMinAgeWeeks,
+            maleMinAgeWeeks = breedingProperties.maleMinAgeWeeks,
+        ).map {
+            ParentCandidateResponse(
+                animalNumber = it.animalNumber
+            )
+        }
+    }
             
     private fun validateDates(
         birthDate: LocalDate?,
