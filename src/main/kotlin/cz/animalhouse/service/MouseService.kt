@@ -1,5 +1,6 @@
 package cz.animalhouse.service
 
+import cz.animalhouse.config.BreedingProperties
 import cz.animalhouse.dto.MouseRequest
 import cz.animalhouse.dto.MouseResponse
 import cz.animalhouse.dto.ParentCandidateResponse
@@ -25,12 +26,9 @@ class MouseService(
     private val strainRepository: StrainRepository,
     private val transgenicLineRepository: StrainTransgenicLineRepository,
     // private val labProcedureRepository: LabProcedureRepository
+    private val breedingProperties: BreedingProperties,
     private val clock: Clock
 ) {
-    private companion object {
-        const val FEMALE_MIN_BREEDING_AGE_WEEKS = 4
-        const val MALE_MIN_BREEDING_AGE_WEEKS = 5
-    }
 
     @Transactional(readOnly = true)
     fun findAll(pageable: Pageable): Page<MouseResponse> =
@@ -282,8 +280,8 @@ class MouseService(
         infix = infix,
         sex = sex,
         currentDate = currentDate,
-        femaleMinAgeWeeks = FEMALE_MIN_BREEDING_AGE_WEEKS,
-        maleMinAgeWeeks = MALE_MIN_BREEDING_AGE_WEEKS
+        femaleMinAgeWeeks = breedingProperties.femaleMinAgeWeeks,
+        maleMinAgeWeeks = breedingProperties.maleMinAgeWeeks,
         ).map {
             ParentCandidateResponse(
                 animalNumber = it.animalNumber

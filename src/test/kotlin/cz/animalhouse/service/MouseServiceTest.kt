@@ -1,5 +1,6 @@
 package cz.animalhouse.service
 
+import cz.animalhouse.config.BreedingProperties
 import cz.animalhouse.dto.MouseRequest
 import cz.animalhouse.dto.MouseResponse
 //import cz.animalhouse.entity.LabProcedure
@@ -49,6 +50,9 @@ class MouseServiceTest {
     @Mock
     private lateinit var transgenicLineRepository: StrainTransgenicLineRepository
 
+    @Mock
+    private lateinit var breedingProperties: BreedingProperties
+
 //     @Mock
 //     private lateinit var labProcedureRepository: LabProcedureRepository
 
@@ -69,6 +73,7 @@ class MouseServiceTest {
             strainRepository,
             transgenicLineRepository,
             //labProcedureRepository,
+            breedingProperties,
             clock
         )
 
