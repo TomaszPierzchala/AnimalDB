@@ -35,6 +35,17 @@ export async function getParentCandidates(infix, sex) {
     );
 }
 
+export async function getMatingCandidates(sex, transgenicLineId) {
+    const params = new URLSearchParams({
+        sex,
+        transgenicLineId
+    });
+
+    return apiJson(
+        `${MOUSE_API_URL}/mating-candidates?${params}`
+    );
+}
+
 export function createMouse(mouse) {
     return apiJson(MOUSE_API_URL, {
         method: 'POST',
