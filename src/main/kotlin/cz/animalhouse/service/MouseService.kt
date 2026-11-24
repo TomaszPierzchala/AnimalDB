@@ -291,14 +291,15 @@ class MouseService(
 
     @Transactional(readOnly = true)
     fun findCandidatesForFutureParents(
-        sex: String
+        sex: String,
+        transgenicLineId: Long
     ): List<ParentCandidateResponse> {
 
         val currentDate = LocalDate.now(clock)
 
         return mouseRepository.findCandidatesForFutureParents(
             sex = sex,
-            transgenicLineId = 1L, //TODO update service call
+            transgenicLineId = transgenicLineId,
             currentDate = currentDate,
             femaleMinAgeWeeks = breedingProperties.femaleMinAgeWeeks,
             maleMinAgeWeeks = breedingProperties.maleMinAgeWeeks,

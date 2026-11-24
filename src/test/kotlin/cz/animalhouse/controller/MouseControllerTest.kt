@@ -558,7 +558,7 @@ class MouseControllerTest {
         )
 
         whenever(mouseService.findCandidatesForFutureParents(
-            eq("M")))
+            eq("M"), eq(7L)))
             .thenReturn(
                 listOf(parent1, parent2)
             )
@@ -566,13 +566,14 @@ class MouseControllerTest {
         mockMvc.perform(
             get("/api/mice/mating-candidates")
                 .param("sex", "M")
+                .param("transgenicLineId", 7L.toString())
         )
             .andExpect(status().isOk)
             .andExpect(jsonPath("$.length()").value(2))
             .andExpect(jsonPath("$[0].animalNumber").value(7913))
             .andExpect(jsonPath("$[1].animalNumber").value(7919))
 
-        verify(mouseService).findCandidatesForFutureParents(any<String>())
+        verify(mouseService).findCandidatesForFutureParents(any<String>(), any<Long>())
     }
 
     // -------------------------------------------------

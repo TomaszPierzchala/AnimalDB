@@ -1763,9 +1763,11 @@ class MouseServiceTest {
             listOf(mouse1, mouse2)
         )
 
+        val SOME_TRANSGENIC_LINE = 13L
         val result =
             mouseService.findCandidatesForFutureParents(
-                sex = "F"
+                sex = "F",
+                transgenicLineId = SOME_TRANSGENIC_LINE
             )
 
         assertThat(result).hasSize(2)
@@ -1799,9 +1801,11 @@ class MouseServiceTest {
             )
         ).thenReturn(emptyList())
 
+        val SOME_TRANSGENIC_LINE = 19L
         val result =
             mouseService.findCandidatesForFutureParents(
-                sex = "F"
+                sex = "F",
+                transgenicLineId = SOME_TRANSGENIC_LINE
             )
 
         assertThat(result).isEmpty()
