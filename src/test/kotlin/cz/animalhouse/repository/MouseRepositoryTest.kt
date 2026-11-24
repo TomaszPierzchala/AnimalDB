@@ -658,30 +658,39 @@ class MouseRepositoryTest {
     }
 
     @Test
-    fun `findCandidatesForFutureParents should find mice by sex`() {
+    fun `findCandidatesForFutureParents should find mice by sex and transgenicLine`() {
         val strain = strainRepository.save(
             Strain(
                 "C57BL6",
                 "C57BL/6"
             )
         )
-        val trLine = strainTransgenicLineRepository.save(
+        val trLine1 = strainTransgenicLineRepository.save(
             StrainTransgenicLine(strain, "ABCD")
+        )
+
+        val trLine2 = strainTransgenicLineRepository.save(
+            StrainTransgenicLine(strain, "XYZD")
         )
         mouseRepository.saveAll(
             listOf(
-                createMouse(26010101, Mouse.Sex.F, strain = strain, strainTransgenicLine = trLine,
+                createMouse(26010101, Mouse.Sex.F, strain = strain, strainTransgenicLine = trLine1,
                     birthDate = FIXED_TODAY.minusWeeks(3)),
-                createMouse(26010102, Mouse.Sex.F, strain = strain, strainTransgenicLine = trLine,
+                createMouse(26010102, Mouse.Sex.F, strain = strain, strainTransgenicLine = trLine1,
                     deathDate = FIXED_TODAY.minusWeeks(1)),
-                createMouse(26010103, Mouse.Sex.M, strain = strain, strainTransgenicLine = trLine),
-                createMouse(27010101, Mouse.Sex.F, strain = strain, strainTransgenicLine = trLine)
+                createMouse(26010103, Mouse.Sex.M, strain = strain, strainTransgenicLine = trLine1),
+                createMouse(27010101, Mouse.Sex.F, strain = strain, strainTransgenicLine = trLine1,
+                    birthDate = FIXED_TODAY.minusWeeks(7)),
+                createMouse(99901, Mouse.Sex.F, strain = strain, strainTransgenicLine = trLine2),
+                createMouse(99902, Mouse.Sex.F, strain = strain, strainTransgenicLine = trLine2,
+                    birthDate = FIXED_TODAY.minusWeeks(7))
             )
         )
 
         val result =
             mouseRepository.findCandidatesForFutureParents(
                 sex = "F",
+                transgenicLineId = trLine1.id,
                 currentDate = FIXED_TODAY,
                 femaleMinAgeWeeks = 4,
                 maleMinAgeWeeks = 5
@@ -699,6 +708,7 @@ class MouseRepositoryTest {
         val result =
             mouseRepository.findCandidatesForFutureParents(
                 sex = "F",
+                transgenicLineId = 13L,
                 currentDate = FIXED_TODAY,
                 femaleMinAgeWeeks = 4,
                 maleMinAgeWeeks = 5
@@ -762,6 +772,7 @@ class MouseRepositoryTest {
         val result =
             mouseRepository.findCandidatesForFutureParents(
                 sex = "M",
+                transgenicLineId = trLine.id,
                 currentDate = FIXED_TODAY,
                 femaleMinAgeWeeks = 4,
                 maleMinAgeWeeks = 5
@@ -898,6 +909,7 @@ class MouseRepositoryTest {
 
         val result = mouseRepository.findCandidatesForFutureParents(
             sex = "F",
+            transgenicLineId = strainTransgenicLine.id,
             currentDate = FIXED_TODAY,
             femaleMinAgeWeeks = 4,
             maleMinAgeWeeks = 5
@@ -1037,6 +1049,7 @@ class MouseRepositoryTest {
 
         val result = mouseRepository.findCandidatesForFutureParents(
             sex = "M",
+            transgenicLineId = strainTransgenicLine.id,
             currentDate = FIXED_TODAY,
             femaleMinAgeWeeks = 4,
             maleMinAgeWeeks = 5

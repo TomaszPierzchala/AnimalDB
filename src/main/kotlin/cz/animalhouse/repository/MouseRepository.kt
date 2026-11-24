@@ -70,6 +70,7 @@ interface MouseRepository : JpaRepository<Mouse, Long> {
         SELECT *
         FROM mouse m
         WHERE m.sex = :sex
+          AND m.strain_transgenic_line_id = :transgenicLineId
           AND m.death_date IS NULL
           AND (
               m.birth_date IS NULL
@@ -98,6 +99,7 @@ interface MouseRepository : JpaRepository<Mouse, Long> {
     )
     fun findCandidatesForFutureParents(
         @Param("sex") sex: String,
+        @Param("transgenicLineId") transgenicLineId: Long,
         @Param("currentDate") currentDate: LocalDate,
         @Param("femaleMinAgeWeeks") femaleMinAgeWeeks: Int,
         @Param("maleMinAgeWeeks") maleMinAgeWeeks: Int

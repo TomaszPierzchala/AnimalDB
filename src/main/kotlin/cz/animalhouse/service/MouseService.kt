@@ -298,6 +298,7 @@ class MouseService(
 
         return mouseRepository.findCandidatesForFutureParents(
             sex = sex,
+            transgenicLineId = 1L, //TODO update service call
             currentDate = currentDate,
             femaleMinAgeWeeks = breedingProperties.femaleMinAgeWeeks,
             maleMinAgeWeeks = breedingProperties.maleMinAgeWeeks,

@@ -1754,6 +1754,7 @@ class MouseServiceTest {
         whenever(
             mouseRepository.findCandidatesForFutureParents(
                 sex = eq("F"),
+                transgenicLineId = any<Long>(),
                 currentDate = any<LocalDate>(),
                 femaleMinAgeWeeks = any<Int>(),
                 maleMinAgeWeeks = any<Int>()
@@ -1779,6 +1780,7 @@ class MouseServiceTest {
         verify(mouseRepository)
             .findCandidatesForFutureParents(
                 sex = eq("F"),
+                transgenicLineId = any<Long>(),
                 currentDate = any<LocalDate>(),
                 femaleMinAgeWeeks = any<Int>(),
                 maleMinAgeWeeks = any<Int>()
@@ -1790,6 +1792,7 @@ class MouseServiceTest {
         whenever(
             mouseRepository.findCandidatesForFutureParents(
                 sex = eq("F"),
+                transgenicLineId = any<Long>(),
                 currentDate = any<LocalDate>(),
                 femaleMinAgeWeeks = any<Int>(),
                 maleMinAgeWeeks = any<Int>()
@@ -1806,6 +1809,7 @@ class MouseServiceTest {
         verify(mouseRepository)
             .findCandidatesForFutureParents(
                 sex = eq("F"),
+                transgenicLineId = any<Long>(),
                 currentDate = any<LocalDate>(),
                 femaleMinAgeWeeks = any<Int>(),
                 maleMinAgeWeeks = any<Int>()
