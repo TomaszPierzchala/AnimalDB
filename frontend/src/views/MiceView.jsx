@@ -13,6 +13,7 @@ import {getStrains} from "../api/strainApi.js";
 import {todayAsInputDate} from '../utils/timeUtils'
 
 import './View.css';
+import {conditionalClearStorage} from '../utils/devUtils';
 
 
 const COLUMNS = [
@@ -125,10 +126,17 @@ function MiceView() {
     const [editedMouse, setEditedMouse] = useState(null);
     const [strainOptions, setStrainOptions] = useState([]);
 
+
+    const STORAGE_KEY = 'miceSelectedColumns';
+    const CLEAR_STORAGE = false
+
     const [selectedColumns, setSelectedColumns] =
         useState(() => {
+
+            conditionalClearStorage(STORAGE_KEY, CLEAR_STORAGE);
+
             const savedColumns =
-                localStorage.getItem('miceSelectedColumns');
+                localStorage.getItem(STORAGE_KEY);
 
             if (!savedColumns) {
                 return REQUIRED_COLUMNS;
@@ -222,7 +230,7 @@ function MiceView() {
 
     useEffect(() => {
         localStorage.setItem(
-            'miceSelectedColumns',
+            STORAGE_KEY,
             JSON.stringify(selectedColumns)
         );
     }, [selectedColumns]);

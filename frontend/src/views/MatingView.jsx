@@ -10,6 +10,7 @@ import {useEditKeyDown} from '../hooks/useEditKeyDown';
 import {getTransLines} from '../api/transgenicLineApi';
 import {createMating, deleteMating, getMatings, updateMating} from '../api/matingApi';
 import {todayAsInputDate} from '../utils/timeUtils'
+import {conditionalClearStorage} from '../utils/devUtils';
 
 import './View.css';
 
@@ -95,10 +96,17 @@ function MatingView() {
     const [matings, setMatings] = useState([]);
     const [editedMating, setEditedMating] = useState(null);
 
+
+    const STORAGE_KEY = 'matingSelectedColumns';
+    const CLEAR_STORAGE = false
+
     const [selectedColumns, setSelectedColumns] =
         useState(() => {
+
+            conditionalClearStorage(STORAGE_KEY, CLEAR_STORAGE);
+
             const savedColumns =
-                localStorage.getItem('matingSelectedColumns');
+                localStorage.getItem(STORAGE_KEY);
 
             if (!savedColumns) {
                 return REQUIRED_COLUMNS;
@@ -216,7 +224,7 @@ function MatingView() {
 
     useEffect(() => {
         localStorage.setItem(
-            'matingSelectedColumns',
+            STORAGE_KEY,
             JSON.stringify(selectedColumns)
         );
     }, [selectedColumns]);
