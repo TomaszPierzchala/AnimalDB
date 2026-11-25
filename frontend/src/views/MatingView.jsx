@@ -4,7 +4,7 @@ import AddNewRecordRow from './AddNewRecordRow';
 import EditRecordActionsRow from './EditRecordActionsRow';
 import WorkInProgressBar from "./WorkInProgress";
 import ErrorBanner from '../components/ErrorBanner';
-import MouseAnimalNumberInput from "../components/MouseAnimalNumberInput";
+import MatingCandidatesInput from "../components/MatingCandidatesInput";
 import useFadingError from "../hooks/fadingError";
 import {useEditKeyDown} from '../hooks/useEditKeyDown';
 import {getTransLines} from '../api/transgenicLineApi';
@@ -405,9 +405,10 @@ function MatingView() {
     function renderEditableCell(column) {
         if (column.name === 'femaleAnimalNumber') {
             return (
-                <MouseAnimalNumberInput
+                <MatingCandidatesInput
                     value={editedMating.femaleAnimalNumber}
                     sex="F"
+                    transgenicLineId={strainTransgenicLineId}
                     onChange={value =>
                         changeEditedMatingField(
                             'femaleAnimalNumber',
@@ -420,9 +421,10 @@ function MatingView() {
 
         if (column.name === 'maleAnimalNumber') {
             return (
-                <MouseAnimalNumberInput
+                <MatingCandidatesInput
                     value={editedMating.maleAnimalNumber}
                     sex="M"
+                    transgenicLineId={strainTransgenicLineId}
                     onChange={value =>
                         changeEditedMatingField(
                             'maleAnimalNumber',

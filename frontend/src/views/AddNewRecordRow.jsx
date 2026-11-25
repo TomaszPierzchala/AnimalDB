@@ -1,3 +1,5 @@
+import {SELECT_TRANSGENIC_LINE} from '../components/MatingCandidatesInput';
+
 const NON_BREAKING_SPACE3 = "\u00A0\u00A0\u00A0"
 
 function AddNewRecordRow({
@@ -37,7 +39,7 @@ function AddNewRecordRow({
                                 onSelect?.(Number(e.target.value));
                             }}
                         >
-                            <option value="0" disabled>select : Strain / TransgenicLine</option>
+                            <option value="0" disabled>{SELECT_TRANSGENIC_LINE}</option>
                             {selectOptions.map(option => (
                                 <option
                                     key={option.id}
