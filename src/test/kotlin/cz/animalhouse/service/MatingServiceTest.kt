@@ -4,6 +4,8 @@ package cz.animalhouse.service
 import cz.animalhouse.dto.MatingRequest
 import cz.animalhouse.entity.Mating
 import cz.animalhouse.entity.Mouse
+import cz.animalhouse.entity.Strain
+import cz.animalhouse.entity.StrainTransgenicLine
 import cz.animalhouse.repository.MatingRepository
 import jakarta.persistence.EntityManager
 import org.junit.jupiter.api.Assertions.*
@@ -33,6 +35,8 @@ class MatingServiceTest {
 
     private val female = mock<Mouse>()
     private val male = mock<Mouse>()
+    private val strain = mock<Strain>()
+    private val strainTransgenicLine = mock<StrainTransgenicLine>()
 
     private fun mockMice() {
         whenever(female.sex).thenReturn(Mouse.Sex.F)
@@ -40,6 +44,18 @@ class MatingServiceTest {
 
         whenever(female.animalNumber).thenReturn(1001)
         whenever(male.animalNumber).thenReturn(1002)
+
+        whenever(female.strainTransgenicLine).thenReturn(strainTransgenicLine)
+        whenever(female.strainTransgenicLine.strain).thenReturn(strain)
+        whenever(female.strainTransgenicLine.strain.code).thenReturn("BALB")
+        whenever(female.strainTransgenicLine.strain.name).thenReturn("BALB/c")
+        whenever(female.strainTransgenicLine.name).thenReturn("ABCD")
+
+        whenever(male.strainTransgenicLine).thenReturn(strainTransgenicLine)
+        whenever(male.strainTransgenicLine.strain).thenReturn(strain)
+        whenever(male.strainTransgenicLine.strain.code).thenReturn("BALB")
+        whenever(male.strainTransgenicLine.strain.name).thenReturn("BALB/c")
+        whenever(male.strainTransgenicLine.name).thenReturn("ABCD")
 
         whenever(mouseService.findMouseByAnimalNumber(1001))
             .thenReturn(female)

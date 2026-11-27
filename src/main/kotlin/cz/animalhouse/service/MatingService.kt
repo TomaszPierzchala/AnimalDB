@@ -2,6 +2,7 @@ package cz.animalhouse.service
 
 import cz.animalhouse.dto.MatingRequest
 import cz.animalhouse.dto.MatingResponse
+import cz.animalhouse.dto.ParentCandidateResponse
 import cz.animalhouse.entity.Mating
 import cz.animalhouse.entity.Mouse
 import cz.animalhouse.repository.MatingRepository
@@ -191,6 +192,8 @@ class MatingService(
             id = requireNotNull(id),
             femaleAnimalNumber = female.animalNumber,
             maleAnimalNumber = male.animalNumber,
+            femaleStrainTransgenicLineDetails = toParentStrainTransgenicLineDetails(female),
+            maleStrainTransgenicLineDetails = toParentStrainTransgenicLineDetails(male),
 
             matingDate = matingDate,
             plugDate = plugDate,
@@ -206,4 +209,11 @@ class MatingService(
             note = note,
             endMatingDate = endMatingDate
     )
+    private fun toParentStrainTransgenicLineDetails(mouse: Mouse) =
+        ParentCandidateResponse(
+            animalNumber = mouse.animalNumber,
+            strainCode = mouse.strainTransgenicLine.strain.code,
+            strainName = mouse.strainTransgenicLine.strain.name,
+            name = mouse.strainTransgenicLine.name
+        )
 }

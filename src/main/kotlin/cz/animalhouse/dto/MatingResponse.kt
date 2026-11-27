@@ -6,6 +6,8 @@ data class MatingResponse(
     val id: Long,
     val femaleAnimalNumber: Int,
     val maleAnimalNumber: Int,
+    val femaleStrainTransgenicLineDetails : ParentCandidateResponse? = null,
+    val maleStrainTransgenicLineDetails : ParentCandidateResponse? = null,
 
     val matingDate: LocalDate?,
     val plugDate: LocalDate?,

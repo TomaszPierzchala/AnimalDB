@@ -53,6 +53,9 @@ function createEmptyMating() {
         id: null,
         femaleAnimalNumber: null,
         maleAnimalNumber: null,
+        femaleStrainTransgenicLineDetails: null,
+        maleStrainTransgenicLineDetails: null,
+
         matingDate: '',
         plugDate: '',
         pregnancyDate: '',
@@ -406,6 +409,25 @@ function MatingView() {
 
     function displayValue(mating, columnName) {
         const value = mating[columnName];
+
+        if (columnName === 'femaleAnimalNumber' || columnName === 'maleAnimalNumber') {
+            const details = (columnName === 'femaleAnimalNumber')?
+                mating.femaleStrainTransgenicLineDetails
+                : mating.maleStrainTransgenicLineDetails;
+
+            if (!details) {
+                return value ?? '—';
+            }
+
+            return (
+                <>
+                    <strong>{value ?? '—'}</strong>
+                    <small>
+                        {` : ${details.strainCode ?? '—'} - ${details.strainName ?? '—'}/${details.name ?? '—'}`}
+                    </small>
+                </>
+            );
+        }
 
         return value ?? '—';
     }
