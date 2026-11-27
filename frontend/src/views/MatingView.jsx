@@ -358,6 +358,12 @@ function MatingView() {
     // COLUMNS / SORTING
     // =========================
 
+    const parentsColumnTitles = {
+        femaleAnimalNumber: "Female mouse animal number, with strain and transgenic line details",
+        maleAnimalNumber: "Male mouse animal number, with strain and transgenic line details"
+    };
+    const getParentsColumnTitle = (columnName) => parentsColumnTitles[columnName];
+
     function toggleColumn(columnName) {
         setSelectedColumns(currentColumns => {
 
@@ -573,6 +579,7 @@ function MatingView() {
                             <th
                                 key={column.name}
                                 className="mice-data-column"
+                                title={getParentsColumnTitle(column.name)}
                                 onClick={() => handleSort(column.name)}
                             >
                                 {column.label}
@@ -594,8 +601,9 @@ function MatingView() {
                             </td>
 
                             {visibleColumns.map(column => (
-                                <td key={column.name} className="mice-data-column">
-
+                                <td key={column.name} className="mice-data-column"
+                                    title={getParentsColumnTitle(column.name)}
+                                >
                                     {editedMating?.id === mating.id
                                         ? renderEditableCell(column)
                                         : displayValue(mating, column.name)
