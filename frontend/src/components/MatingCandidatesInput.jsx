@@ -62,7 +62,14 @@ function MatingCandidatesInput({
                     <option
                         key={candidate.animalNumber}
                         value={candidate.animalNumber}
-                    />
+                        style={{
+                            color: 'darkblue',
+                            fontFamily: 'monospace',
+                            fontWeight: 'bold'
+                        }}
+                    >
+                        {candidate.animalNumber} : {candidate.strainCode} - {candidate.strainName} / {candidate.name ?? '—'}
+                    </option>
                 ))}
             </datalist>
         </>

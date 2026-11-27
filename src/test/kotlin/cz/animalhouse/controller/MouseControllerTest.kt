@@ -549,18 +549,22 @@ class MouseControllerTest {
 
     @Test
     fun `should return MatingCandidtes`(){
-        val parent1 = ParentCandidateResponse(
-            animalNumber = 7913
+        val parentCandidateRes1 = ParentCandidateResponse(
+            animalNumber = 7913,
+            strainCode = "STR1", strainName = "Str - Name 1",
+            name = "TRLine-1"
         )
 
-        val parent2 = ParentCandidateResponse(
-            animalNumber = 7919
+        val parentCandidateRes2 = ParentCandidateResponse(
+            animalNumber = 7919,
+            strainCode = "STR2", strainName = "Str - Name 2",
+            name = "TRLine-2"
         )
 
         whenever(mouseService.findCandidatesForFutureParents(
             eq("M"), eq(7L)))
             .thenReturn(
-                listOf(parent1, parent2)
+                listOf(parentCandidateRes1, parentCandidateRes2)
             )
 
         mockMvc.perform(
@@ -572,6 +576,12 @@ class MouseControllerTest {
             .andExpect(jsonPath("$.length()").value(2))
             .andExpect(jsonPath("$[0].animalNumber").value(7913))
             .andExpect(jsonPath("$[1].animalNumber").value(7919))
+            .andExpect(jsonPath("$[0].strainCode").value("STR1"))
+            .andExpect(jsonPath("$[1].strainCode").value("STR2"))
+            .andExpect(jsonPath("$[0].strainName").value("Str - Name 1"))
+            .andExpect(jsonPath("$[1].strainName").value("Str - Name 2"))
+            .andExpect(jsonPath("$[0].name").value("TRLine-1"))
+            .andExpect(jsonPath("$[1].name").value("TRLine-2"))
 
         verify(mouseService).findCandidatesForFutureParents(any<String>(), any<Long>())
     }

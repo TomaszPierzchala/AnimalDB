@@ -305,7 +305,10 @@ class MouseService(
             maleMinAgeWeeks = breedingProperties.maleMinAgeWeeks,
         ).map {
             ParentCandidateResponse(
-                animalNumber = it.animalNumber
+                animalNumber = it.animalNumber,
+                strainCode = it.strainTransgenicLine.strain.code,
+                strainName = it.strainTransgenicLine.strain.name,
+                name = it.strainTransgenicLine.name
             )
         }
     }
