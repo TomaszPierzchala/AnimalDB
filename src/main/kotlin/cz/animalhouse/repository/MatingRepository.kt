@@ -8,6 +8,11 @@ import org.springframework.data.jpa.repository.JpaRepository
 
 interface MatingRepository : JpaRepository<Mating, Long> {
 
-    @EntityGraph(attributePaths = ["female", "male"])
+    @EntityGraph(
+        attributePaths = [
+            "female.strainTransgenicLine.strain",
+            "male.strainTransgenicLine.strain"
+        ]
+    )
     override fun findAll(pageable: Pageable): Page<Mating>
 }
