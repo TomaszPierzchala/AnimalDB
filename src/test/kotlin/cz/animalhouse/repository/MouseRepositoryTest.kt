@@ -1003,9 +1003,15 @@ class MouseRepositoryTest {
             strainTransgenicLine = strainTransgenicLine,
             birthDate = FIXED_TODAY.minusWeeks(6).plusDays(3)
         )
+        val mother2 = Mouse(
+            animalNumber = 531865,
+            sex = Mouse.Sex.F,
+            strain = strain,
+            strainTransgenicLine = strainTransgenicLine
+        )
         val mating2 = Mating(
             male = maleOldEnoughButYoungerButInMating,
-            female = mother
+            female = mother2
         )
 
         val maleOldEnoughButOlder = Mouse(
@@ -1022,9 +1028,15 @@ class MouseRepositoryTest {
             strainTransgenicLine = strainTransgenicLine,
             birthDate = FIXED_TODAY.minusWeeks(6).minusDays(4)
         )
+        val mother3 = Mouse(
+            animalNumber = 31998765,
+            sex = Mouse.Sex.F,
+            strain = strain,
+            strainTransgenicLine = strainTransgenicLine
+        )
         val mating3 = Mating(
             male = maleOldEnoughButOlderButInMating,
-            female = mother,
+            female = mother3,
             endMatingDate = FIXED_TODAY.minusWeeks(1)
         )
 
@@ -1036,7 +1048,7 @@ class MouseRepositoryTest {
                 maleOldEnoughButOlder,
                 deadMale,
                 maleOldEnoughButYounger,
-                mother,
+                mother, mother2, mother3,
                 maleOldEnoughButInMating,
                 maleOldEnoughButYoungerButInMating,
                 maleOldEnoughButOlderButInMating

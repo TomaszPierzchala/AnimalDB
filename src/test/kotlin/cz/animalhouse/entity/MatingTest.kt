@@ -367,7 +367,7 @@ class MatingTest {
                 PSQLException::class.java
             )
             .hasMessageContaining(
-                "ERROR: null value in column \"male_id\" of relation \"mating\" violates not-null constraint"
+                "ERROR: Mouse with id <NULL> must exists and be male (M)"
             )
     }
 
@@ -408,7 +408,7 @@ class MatingTest {
                 PSQLException::class.java
             )
             .hasMessageContaining(
-                "ERROR: null value in column \"female_id\" of relation \"mating\" violates not-null constraint"
+                "ERROR: Mouse with id <NULL> must exists and be female (F)"
             )
     }
 
@@ -431,6 +431,7 @@ class MatingTest {
             strainTransgenicLine = strainTransgenicLine
         )
         entityManager.persistAndFlush(male)
+        val CONST_MALE_ID = male.id
 
         val mating = Mating(
             female = male,
@@ -443,9 +444,7 @@ class MatingTest {
             .hasRootCauseInstanceOf(
                 PSQLException::class.java
             )
-            .hasMessageContaining(
-                "ERROR: new row for relation \"mating\" violates check constraint"
-            )
+            .hasMessageContaining("ERROR: Mouse with id $CONST_MALE_ID must exists and be female (F)")
     }
 
     @Test
@@ -1147,7 +1146,7 @@ class MatingTest {
             entityManager.persistAndFlush(mating)
         }
             .hasRootCauseInstanceOf(PSQLException::class.java)
-            .hasMessageContaining("violates foreign key constraint")
+            .hasMessageContaining("Mouse with id 999999 must exists and be female (F)")
     }
 
     @Test
@@ -1182,7 +1181,7 @@ class MatingTest {
             entityManager.persistAndFlush(mating)
         }
             .hasRootCauseInstanceOf(PSQLException::class.java)
-            .hasMessageContaining("violates foreign key constraint")
+            .hasMessageContaining("ERROR: Mouse with id 999999 must exists and be male (M)")
     }
 
     @Test

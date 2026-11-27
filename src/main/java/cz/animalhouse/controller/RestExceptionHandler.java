@@ -1,6 +1,7 @@
 package cz.animalhouse.controller;
 
 import cz.animalhouse.exception.*;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -96,5 +97,11 @@ public class RestExceptionHandler {
                 "message",
                 Objects.requireNonNull(ex.getMessage())
         );
+    }
+
+    @ExceptionHandler(DataIntegrityViolationException.class)
+    @ResponseStatus(HttpStatus.CONFLICT)
+    public ErrorResponse handleDataIntegrityViolation(DataIntegrityViolationException ex) {
+        return new ErrorResponse(ex.getMostSpecificCause().getMessage());
     }
 }
