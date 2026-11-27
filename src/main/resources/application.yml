@@ -23,6 +23,7 @@ logging:
     org:
       hibernate:
         SQL: DEBUG
+        orm.jdbc.bind: TRACE
 app:
   cors:
     allowed-origin: ${FRONTEND_URL:http://localhost:5173}

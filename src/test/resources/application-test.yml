@@ -1,3 +1,6 @@
 spring:
   flyway:
     locations: classpath:db/migrations
+logging:
+  level:
+    org.hibernate.orm.jdbc.bind: OFF
